@@ -4,7 +4,9 @@ Multilingual extension for multitask prompted training.
 
 ## Installation
 
-This repository uses [T5X](https://github.com/google-research/t5x)
+This repository uses the following external repositories that need to be setup:
+1. [T5X](https://github.com/google-research/t5x)
+2. [Promptsource](https://github.com/bigscience-workshop/promptsource)
 
 ## Finetuning
 
