@@ -4,7 +4,7 @@ Multilingual extension for multitask prompted training.
 
 ## Installation
 
-This repository uses ![T5X](https://github.com/google-research/t5x)
+This repository uses [T5X](https://github.com/google-research/t5x)
 
 ## Finetuning
 
