@@ -1,16 +1,12 @@
-T5X_DIR="..."  # directory where the t5x is cloned.
-TFDS_DATA_DIR="..."
-MODEL_DIR="..."
+T5X_DIR="/home/lintangsutawika/t5x"  # directory where the t5x is cloned, e.g., ${HOME}"/t5x".
+TFDS_DATA_DIR="gs://bigscience/experiment_d/multilingual_t0/first-run/data/"
+MODEL_DIR="gs://bigscience/experiment_d/multilingual_t0/first-run/model/"
 
-python3 ${T5X_DIR}/t5x/train.py \
+PROJECT_DIR="/home/lintangsutawika/multilingual_t0/multilingual_t0"
+export PYTHONPATH=${PROJECT_DIR}
+
+python3.7 ${T5X_DIR}/t5x/train.py \
   --tfds_data_dir=${TFDS_DATA_DIR} \
-  --gin_file="t5x/examples/t5/t5_1_1/xxl.gin" \
-  --gin_file="t5x/configs/runs/finetune.gin" \
-  --module_import="multilingual_t0.tasks" \
-  --gin.MIXTURE_OR_TASK_NAME="'mt5_d4_gpt_sglue_train'" \
-  --gin.MIXTURE_OR_TASK_MODULE="'t5.data.mixtures'" \
-  --gin.TASK_FEATURE_LENGTHS="{'inputs': 256, 'targets': 256}" \
-  --gin.TRAIN_STEPS=1_125_000 \
+  --gin_file="mt0_base_finetune.gin" \
+  --gin.TRAIN_STEPS=100005 \
   --gin.MODEL_DIR="'${MODEL_DIR}'" \
-  --gin.USE_CACHED_TASKS=False \
-  --gin.INITIAL_CHECKPOINT_PATH="'gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-1000000'"
