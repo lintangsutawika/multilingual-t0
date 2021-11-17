@@ -4,8 +4,8 @@ pip3 install jax jaxlib
 gsutil cp gs://cloud-tpu-tpuvm-v4-artifacts/wheels/libtpu/latest/libtpu_tpuv4-0.1.dev* .
 pip3 install libtpu_tpuv4-0.1.dev*
 
-mkdir -p ~/code
-cd ~/code
+#mkdir -p ~/code
+#cd ~/code
 
 git clone https://github.com/bigscience-workshop/t5x.git
 pushd t5x
@@ -27,10 +27,13 @@ pip3 install tbp-nightly
 #pip3 install tensorflow==2.7.0
 
 # Install Promptsource
+pip3 install datasets
+git clone https://github.com/lintangsutawika/multilingual-t0.git
+
 git clone https://github.com/bigscience-workshop/promptsource.git
 cd promptsource
+cp multilingual-t0/tpu_utils/setup.py ./
 pip3 install -e .
 cd ../
 
 git clone https://github.com/lintangsutawika/multilingual-t0.git
-

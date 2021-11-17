@@ -1,11 +1,11 @@
 T5X_DIR=${HOME}"/t5x"  # directory where the t5x is cloned, e.g., ${HOME}"/t5x".
 TFDS_DATA_DIR=$1"/data/"
-MODEL_DIR=$2"/model/"
+MODEL_DIR=$1"/model/"
 
 PROJECT_DIR=${HOME}"/multilingual-t0/multilingual_t0"
 export PYTHONPATH=${PROJECT_DIR}
 
-python3.7 ${T5X_DIR}/t5x/train.py \
+python3 ${T5X_DIR}/t5x/train.py \
   --tfds_data_dir=${TFDS_DATA_DIR} \
   --gin_file="mt0_xxl_finetune.gin" \
   --gin.TRAIN_STEPS=100005 \
