@@ -17,7 +17,7 @@ import preprocessors
 from t5x.partitioning import LogicalAxisRules
 
 #seqio.add_global_cache_dirs(['gs://bigscience/seqio_cached_tasks'])
-seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/experiment_d_cached_tasks/v0.2'])
+#seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/experiment_d_cached_tasks/v0.2'])
 
 def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
   """Fully sharded rules for P5X model in terms of logical axes names."""
@@ -50,21 +50,21 @@ MT5_OUTPUT_FEATURES = {
         vocabulary=MT5_VOCAB, add_eos=True)
 }
 
-#seqio.TaskRegistry.add(
-#    "mt5_test",
-#    source=seqio.TfdsDataSource(
-#        tfds_name="tydi_qa/goldp:3.0.0", splits=["train"]),
-#    preprocessors=[
-#        preprocessors.xquad,
-#        functools.partial(
-#            preprocessors.filter_tydiqa_by_language, lang="english"),
-#        seqio.preprocessors.tokenize,
-#        seqio.CacheDatasetPlaceholder(),
-#        seqio.preprocessors.append_eos_after_trim,
-#    ],
-#    postprocess_fn=t5.data.postprocessors.qa,
-#    output_features=MT5_OUTPUT_FEATURES,
-#    metric_fns=[metrics.squad])
+seqio.TaskRegistry.add(
+    "mt5_test",
+    source=seqio.TfdsDataSource(
+        tfds_name="tydi_qa/goldp:3.0.0"),
+    preprocessors=[
+        preprocessors.xquad,
+        functools.partial(
+            preprocessors.filter_tydiqa_by_language, lang="english"),
+        seqio.preprocessors.tokenize,
+        seqio.CacheDatasetPlaceholder(),
+        seqio.preprocessors.append_eos_after_trim,
+    ],
+    postprocess_fn=t5.data.postprocessors.qa,
+    output_features=MT5_OUTPUT_FEATURES,
+    metric_fns=[metrics.squad])
 
 #seqio.TaskRegistry.add(
 #    'mt5_test',
