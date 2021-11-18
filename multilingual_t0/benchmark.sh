@@ -8,5 +8,5 @@ export PYTHONPATH=${PROJECT_DIR}
 python3 ${T5X_DIR}/t5x/train.py \
   --tfds_data_dir=${TFDS_DATA_DIR} \
   --gin_file="mt0_xxl_finetune.gin" \
-  --gin.TRAIN_STEPS=100005 \
+  --gin.TRAIN_STEPS=1000005 \
   --gin.MODEL_DIR="'${MODEL_DIR}'" \
