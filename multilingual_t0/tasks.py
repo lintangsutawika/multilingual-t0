@@ -116,7 +116,8 @@ dataset_name = 'glue'
 subset_name = 'cola'
 template = 'Make sense yes no'
 dataset_splits = utils.get_dataset_splits(dataset_name, subset_name)
-split_mapping = split_mapping or {k: k for k in dataset_splits.keys()}
+# split_mapping = split_mapping or {k: k for k in dataset_splits.keys()}
+split_mapping = None or {k: k for k in dataset_splits.keys()}
 dataset_fn = functools.partial(
     get_tf_dataset,
     seed=None,
