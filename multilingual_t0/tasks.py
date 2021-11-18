@@ -141,7 +141,7 @@ preprocessors = [
 # Add train and normal eval tasks
 seqio.TaskRegistry.add(
     # task_name,
-    'mt5_test'
+    'mt5_test',
     data_source,
     preprocessors=preprocessors,
     output_features=output_features,
