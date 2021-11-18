@@ -3,7 +3,9 @@ import seqio
 import tensorflow_datasets as tfds
 import t5
 from t5.evaluation import metrics
-from t5.data import preprocessors
+#from t5.data import preprocessors
+
+import preprocessors
 
 #vocabulary = seqio.SentencePieceVocabulary(
 #    'gs://t5-data/vocabs/cc_all.32000/sentencepiece.model', extra_ids=100)
