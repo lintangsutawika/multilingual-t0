@@ -12,8 +12,8 @@ import tasks
 include "mt5_xxl.gin"
 include "t5x/configs/runs/finetune.gin"
 
-MIXTURE_OR_TASK_NAME = "mt5_d4_gpt_sglue_train"
-#MIXTURE_OR_TASK_NAME = "wmt_t2t_de_en_v003"
+#MIXTURE_OR_TASK_NAME = "mt5_d4_gpt_sglue_train"
+MIXTURE_OR_TASK_NAME = "wmt_t2t_de_en_v003"
 TASK_FEATURE_LENGTHS = {"inputs": 256, "targets": 256}
 TRAIN_STEPS = 1012500  # 1000000 pre-trained steps + 12500 fine-tuning steps.
 
@@ -22,7 +22,7 @@ TRAIN_STEPS = 1012500  # 1000000 pre-trained steps + 12500 fine-tuning steps.
 # set to `pretraining batch_size` * `target_token_length`. For T5 and T5.1.1:
 # `2048 * 114`. For mT5: `1024 * 229`. For ByT5: `1024 * 189`.
 LOSS_NORMALIZING_FACTOR = 234496
-INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/base/model.ckpt-1000000"
+INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-1000000"
 
 DROPOUT_RATE = 0.0
 
