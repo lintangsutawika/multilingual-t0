@@ -27,15 +27,32 @@ MT5_OUTPUT_FEATURES = {
 }
 
 seqio.TaskRegistry.add(
-    'mt5_test',
-    source=seqio.TfdsDataSource(tfds_name='wmt_t2t_translate/de-en:1.0.0'),
+    "mt5_test",
+    source=seqio.TfdsDataSource(
+        tfds_name="tydi_qa/goldp:2.1.0", splits=["train"]),
     preprocessors=[
+        preprocessors.xquad,
         functools.partial(
-            preprocessors.translate,
-            source_language='de', target_language='en'),
+            preprocessors.filter_tydiqa_by_language, lang="english"),
         seqio.preprocessors.tokenize,
         seqio.CacheDatasetPlaceholder(),
         seqio.preprocessors.append_eos_after_trim,
     ],
-    metric_fns=[metrics.bleu],
-    output_features=MT5_OUTPUT_FEATURES)
+    postprocess_fn=t5.data.postprocessors.qa,
+    output_features=MT5_OUTPUT_FEATURES,
+    metric_fns=[metrics.squad])
+
+#seqio.TaskRegistry.add(
+#    'mt5_test',
+#    #source=seqio.TfdsDataSource(tfds_name='wmt_t2t_translate/de-en:1.0.0'),
+#    source=seqio.TfdsDataSource(tfds_name='m'),
+#    preprocessors=[
+#        functools.partial(
+#            preprocessors.translate,
+#            source_language='de', target_language='en'),
+#        seqio.preprocessors.tokenize,
+#        seqio.CacheDatasetPlaceholder(),
+#        seqio.preprocessors.append_eos_after_trim,
+#    ],
+#    metric_fns=[metrics.bleu],
+#    output_features=MT5_OUTPUT_FEATURES)
