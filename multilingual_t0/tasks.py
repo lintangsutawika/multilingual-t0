@@ -114,7 +114,9 @@ def get_tf_dataset(split, shuffle_files, seed, dataset_name, subset_name, templa
 
 dataset_name = 'glue'
 subset_name = 'cola'
-template = 'Make sense yes no'
+task_name = 'mt5_test'
+template_name = 'Make sense yes no'
+template = dataset[template_name]
 dataset_splits = utils.get_dataset_splits(dataset_name, subset_name)
 # split_mapping = split_mapping or {k: k for k in dataset_splits.keys()}
 split_mapping = None or {k: k for k in dataset_splits.keys()}
@@ -141,8 +143,7 @@ preprocessors = [
 
 # Add train and normal eval tasks
 seqio.TaskRegistry.add(
-    # task_name,
-    'mt5_test',
+    task_name,
     data_source,
     preprocessors=preprocessors,
     output_features=output_features,
