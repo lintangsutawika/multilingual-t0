@@ -112,11 +112,18 @@ def get_tf_dataset(split, shuffle_files, seed, dataset_name, subset_name, templa
     dataset = utils.apply_template(dataset, template)
     return utils.hf_dataset_to_tf_dataset(dataset)
 
+all_templates = promptsource.templates.TemplateCollection()
+all_templates.remove("anli")
+
 dataset_name = 'glue'
 subset_name = 'cola'
 task_name = 'mt5_test'
 template_name = 'Make sense yes no'
+
+dataset = all_templates.get_dataset(dataset_name, subset_name)
 template = dataset[template_name]
+# template = all_templates.get_dataset(dataset_name, subset_name)[template_name]
+
 dataset_splits = utils.get_dataset_splits(dataset_name, subset_name)
 # split_mapping = split_mapping or {k: k for k in dataset_splits.keys()}
 split_mapping = None or {k: k for k in dataset_splits.keys()}
