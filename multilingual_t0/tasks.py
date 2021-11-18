@@ -127,6 +127,7 @@ template = dataset[template_name]
 dataset_splits = utils.get_dataset_splits(dataset_name, subset_name)
 # split_mapping = split_mapping or {k: k for k in dataset_splits.keys()}
 split_mapping = None or {k: k for k in dataset_splits.keys()}
+print(split_mapping)
 dataset_fn = functools.partial(
     get_tf_dataset,
     seed=None,
