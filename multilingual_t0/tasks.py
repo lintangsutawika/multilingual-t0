@@ -1,28 +1,27 @@
-# import functools
-# import seqio
-# import tensorflow_datasets as tfds
-# import t5
-# from t5.evaluation import metrics
-#from t5.data import preprocessors
+import functools
+import seqio
+import tensorflow_datasets as tfds
+import t5
+from t5.evaluation import metrics
+from t5.data import preprocessors
 
 import preprocessors
 
-import csv
-import functools
-from typing import Dict, List, Optional, Tuple
+#import csv
+#import functools
+#from typing import Dict, List, Optional, Tuple
 
-import datasets
-import pkg_resources
-import seqio
-import tensorflow as tf
+#import datasets
+#import pkg_resources
+#import seqio
+#import tensorflow as tf
 
-import t5
-from t5.data.glue_utils import get_glue_metric, get_super_glue_metric
-from t5.evaluation import metrics as mt
+#import t5
+#from t5.data.glue_utils import get_glue_metric, get_super_glue_metric
+#from t5.evaluation import metrics as mt
 
-import promptsource.templates
-from promptsource.seqio_tasks import utils
-
+#import promptsource.templates
+#from promptsource.seqio_tasks import utils
 
 from t5x.partitioning import LogicalAxisRules
 
