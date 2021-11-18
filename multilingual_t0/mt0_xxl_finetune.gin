@@ -56,4 +56,7 @@ utils.SaveCheckpointConfig:
 # `num_decodes` is equivalent to a beam size in a beam search decoding.
 models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 4
 
-partitioning.ModelBasedPjitPartitioner.model_parallel_submesh = (4, 1, 1, 1)
+#partitioning.ModelBasedPjitPartitioner.model_parallel_submesh = (4, 1, 1, 1)
+partitioning.ModelBasedPjitPartitioner:
+  model_parallel_submesh = (4,1,1,1)
+  logical_axis_rules = @task.fully_sharded_logical_axis_rules()
