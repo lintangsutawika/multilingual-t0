@@ -1,6 +1,6 @@
 # ByT5 XXL model.
 
-include 'base.gin'  # imports vocab, optimizer and model.
+include 'mt5_base.gin'  # imports vocab, optimizer and model.
 
 # ------------------- Network specification overrides --------------------------
 network.Transformer.config = @network.T5Config()
