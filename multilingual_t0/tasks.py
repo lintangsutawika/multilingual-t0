@@ -18,7 +18,7 @@ import preprocessors
 
 #import t5
 #from t5.data.glue_utils import get_glue_metric, get_super_glue_metric
-#from t5.evaluation import metrics as mt
+from t5.evaluation import metrics as mt
 
 #import promptsource.templates
 #from promptsource.seqio_tasks import utils
