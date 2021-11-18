@@ -31,7 +31,7 @@ MT5_OUTPUT_FEATURES = {
 seqio.TaskRegistry.add(
     "mt5_test",
     source=seqio.TfdsDataSource(
-        tfds_name="tydi_qa/goldp:2.1.0", splits=["train"]),
+        tfds_name="tydi_qa/goldp:3.0.0", splits=["train"]),
     preprocessors=[
         preprocessors.xquad,
         functools.partial(
