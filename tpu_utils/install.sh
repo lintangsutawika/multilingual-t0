@@ -27,13 +27,14 @@ pip3 install tbp-nightly
 #pip3 install tensorflow==2.7.0
 
 # Install Promptsource
+pip3 install py7zr
 pip3 install datasets
+
+rm -rf multilingual-t0/
 git clone https://github.com/lintangsutawika/multilingual-t0.git
 
 git clone https://github.com/bigscience-workshop/promptsource.git
 cd promptsource
-cp multilingual-t0/tpu_utils/setup.py ./
+cp ../multilingual-t0/tpu_utils/setup.py ./
 pip3 install -e .
 cd ../
-
-git clone https://github.com/lintangsutawika/multilingual-t0.git
