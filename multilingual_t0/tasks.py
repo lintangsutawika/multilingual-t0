@@ -27,7 +27,7 @@ MT5_OUTPUT_FEATURES = {
 }
 
 seqio.TaskRegistry.add(
-    'wmt_t2t_de_en_v003',
+    'mt5_test',
     source=seqio.TfdsDataSource(tfds_name='wmt_t2t_translate/de-en:1.0.0'),
     preprocessors=[
         functools.partial(
