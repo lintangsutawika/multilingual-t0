@@ -44,7 +44,7 @@ def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
 
 #seqio.add_global_cache_dirs(['gs://bigscience/seqio_cached_tasks'])
 #seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/experiment_d_cached_tasks/v0.2'])
-seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/multilingual_t0/data/tydi_qa/goldp/3.0.0'])
+#seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/multilingual_t0/data/tydi_qa/goldp/3.0.0'])
 
 
 # GET_METRICS = {
