@@ -14,6 +14,27 @@ import preprocessors
 #    'targets': seqio.Feature(vocabulary=vocabulary)
 #}
 
+from t5x.partitioning import LogicalAxisRules
+
+#seqio.add_global_cache_dirs(['gs://bigscience/seqio_cached_tasks'])
+
+def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
+  """Fully sharded rules for P5X model in terms of logical axes names."""
+  return (
+      ('batch', 'data'),
+      ('vocab', 'model'),
+      ('mlp', 'model'),
+      ('heads', 'model'),
+      ('joined_kv', 'model'),
+      ('kv', None),
+      ('embed', 'model'),
+      ('embed', 'data'),
+      ('relpos_buckets', None),
+      ('length', None),
+      ('layers', None),
+      ('stack', None),
+  )
+
 MT5_SPM_PATH = "gs://t5-data/vocabs/mc4.250000.100extra/sentencepiece.model"
 
 MT5_TEMPERATURE = 1.0 / 0.3
