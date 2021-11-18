@@ -1,18 +1,18 @@
-# ByT5 XXL model.
+# mT5 XXL model.
 
 include 'mt5_base.gin'  # imports vocab, optimizer and model.
 
 # ------------------- Network specification overrides --------------------------
 network.Transformer.config = @network.T5Config()
 network.T5Config:
-  vocab_size = 384  # vocab size rounded to a multiple of 128 for TPU efficiency
+  vocab_size = 250112  # vocab size rounded to a multiple of 128 for TPU efficiency
   dtype = 'bfloat16'
-  emb_dim = 4672
+  emb_dim = 4096
   num_heads = 64
-  num_encoder_layers = 36
-  num_decoder_layers = 12
+  num_encoder_layers = 24
+  num_decoder_layers = 24
   head_dim = 64
-  mlp_dim = 12352
+  mlp_dim = 10240
   mlp_activations = ('gelu', 'linear')
   dropout_rate = 0.0
   logits_via_embedding = False
