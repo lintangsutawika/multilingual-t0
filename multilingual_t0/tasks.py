@@ -151,7 +151,7 @@ preprocessors = [
 # Add train and normal eval tasks
 seqio.TaskRegistry.add(
     task_name,
-    data_source,
+    source=data_source,
     preprocessors=preprocessors,
     output_features=output_features,
     metric_fns=[GET_METRICS[m] for m in template.metadata.metrics],
