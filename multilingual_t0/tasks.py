@@ -82,19 +82,19 @@ MT5_OUTPUT_FEATURES = {
         vocabulary=MT5_VOCAB, add_eos=True)
 }
 
+
+preprocessors = [
+        seqio.preprocessors.tokenize,
+        seqio.preprocessors.append_eos,
+        seqio.CacheDatasetPlaceholder(required=False),
+    ]
+
 seqio.TaskRegistry.add(
     "mt5_test",
     source=seqio.TfdsDataSource(
-        tfds_name="tydi_qa/goldp:3.0.0", splits=["train"]),
-    preprocessors=[
-        preprocessors.xquad,
-        functools.partial(
-            preprocessors.filter_tydiqa_by_language, lang="english"),
-        seqio.preprocessors.tokenize,
-        seqio.CacheDatasetPlaceholder(),
-        seqio.preprocessors.append_eos_after_trim,
-    ],
-    postprocess_fn=t5.data.postprocessors.qa,
+        tfds_name="natural_questions_open:1.0.0", splits=["train"]),
+    preprocessors=preprocessors,
+    # postprocess_fn=t5.data.postprocessors.qa,
     output_features=MT5_OUTPUT_FEATURES,
     metric_fns=[metrics.squad])
 
