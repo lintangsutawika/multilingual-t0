@@ -18,7 +18,7 @@ MT5_TEMPERATURE = 1.0 / 0.3
 MT5_MIX_RATE = functools.partial(
     t5.data.rate_num_examples, temperature=MT5_TEMPERATURE)
 
-MT5_VOCAB = t5.data.SentencePieceVocabulary(MT5_SPM_PATH, extra_ids=100)
+MT5_VOCAB = t5.data.SentencePieceVocabulary(MT5_SPM_PATH, extra_ids=99)
 MT5_OUTPUT_FEATURES = {
     "inputs": t5.data.Feature(
         vocabulary=MT5_VOCAB, add_eos=True, required=False),
