@@ -226,10 +226,11 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
         split_mapping=split_mapping,
     )
     data_source = seqio.FunctionDataSource(
-        dataset_fn,
+        dataset_fn=dataset_fn,
         splits=list(split_mapping.keys()),
         num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
     )
+
     preprocessors = [
         seqio.preprocessors.tokenize,
         seqio.preprocessors.append_eos,
