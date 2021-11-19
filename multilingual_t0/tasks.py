@@ -2,7 +2,11 @@ import csv
 import seqio
 import functools
 
-import task_utils
+# import task_utils
+import importlib
+
+moduleName = input('task_utils')
+importlib.import_module(moduleName)
 
 from typing import Dict, List, Optional, Tuple
 
