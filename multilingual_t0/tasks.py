@@ -2,7 +2,6 @@ import csv
 import seqio
 import functools
 
-# import task_utils
 import importlib
 
 moduleName = input('task_utils')
@@ -243,6 +242,7 @@ for dataset_name, subset_name in all_templates.keys:
     else:
         cap = train_size
     for template_name in dataset.all_template_names:
+        print(dataset_name, subset_name, template_name)
         add_task(dataset_name, subset_name, template_name)
 
         template = dataset[template_name]
