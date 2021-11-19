@@ -5,7 +5,7 @@ MODEL_DIR=$1"/model/"
 PROJECT_DIR=${HOME}"/multilingual-t0/multilingual_t0"
 export PYTHONPATH=${PROJECT_DIR}
 
-python3 trace --trace ${T5X_DIR}/t5x/train.py \
+python3 -m trace --trace ${T5X_DIR}/t5x/train.py \
   --tfds_data_dir=${TFDS_DATA_DIR} \
   --gin_file="mt0_xxl_finetune.gin" \
   --gin.TRAIN_STEPS=1000005 \
