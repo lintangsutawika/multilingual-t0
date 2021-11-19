@@ -11,7 +11,8 @@ import tasks
 include "mt5_xxl.gin"
 include "t5x/configs/runs/finetune.gin"
 
-MIXTURE_OR_TASK_NAME = "d4_gpt_sglue_train"
+#MIXTURE_OR_TASK_NAME = "d4_gpt_sglue_train"
+MIXTURE_OR_TASK_NAME = "anli_GPT_3_style_r1"
 
 TASK_FEATURE_LENGTHS = {"inputs": 256, "targets": 256}
 TRAIN_STEPS = 1012500  # 1000000 pre-trained steps + 12500 fine-tuning steps.
