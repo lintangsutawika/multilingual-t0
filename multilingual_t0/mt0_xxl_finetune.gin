@@ -6,16 +6,12 @@ from t5x import models
 from t5x import partitioning
 from t5x import utils
 
-#import multilingual_t0.tasks
 import tasks
 
 include "mt5_xxl.gin"
 include "t5x/configs/runs/finetune.gin"
 
-#MIXTURE_OR_TASK_NAME = "mt5_d4_gpt_sglue_train"
-MIXTURE_OR_TASK_NAME = "mt5_test"
-#MIXTURE_OR_TASK_NAME = "anli_GPT_3_style_r1"
-#MIXTURE_OR_TASK_MODULE = "t5.data.mixtures"
+MIXTURE_OR_TASK_NAME = "d4_gpt_sglue_train"
 
 TASK_FEATURE_LENGTHS = {"inputs": 256, "targets": 256}
 TRAIN_STEPS = 1012500  # 1000000 pre-trained steps + 12500 fine-tuning steps.
