@@ -219,7 +219,7 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
 
     dataset_fn = functools.partial(
         get_tf_dataset,
-        # seed=None,
+        seed=None,
         dataset_name=dataset_name,
         subset_name=subset_name,
         template=template,
