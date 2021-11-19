@@ -219,12 +219,14 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
 
     dataset_fn = functools.partial(
         get_tf_dataset,
-        # seed=None,
+        seed=None,
         dataset_name=dataset_name,
         subset_name=subset_name,
         template=template,
         split_mapping=split_mapping,
     )
+    dataset_fn.__name__ = "dataset_fn"
+
     data_source = seqio.FunctionDataSource(
         dataset_fn=dataset_fn,
         splits=list(split_mapping.keys()),
