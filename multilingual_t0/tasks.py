@@ -2,8 +2,7 @@ import csv
 import seqio
 import functools
 
-# from . import task_utils
-import preprocessors
+import task_utils
 
 from typing import Dict, List, Optional, Tuple
 
@@ -13,7 +12,6 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 import t5
-from t5.data import preprocessors
 from t5.evaluation import metrics as mt
 from t5.data.glue_utils import get_glue_metric, get_super_glue_metric
 
