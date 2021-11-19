@@ -1,18 +1,16 @@
-import functools
-import seqio
-import tensorflow_datasets as tfds
-
-import preprocessors
-import utils
-
 import csv
+import seqio
 import functools
+
+import utils
+import preprocessors
+
 from typing import Dict, List, Optional, Tuple
 
 import datasets
 import pkg_resources
-import seqio
 import tensorflow as tf
+import tensorflow_datasets as tfds
 
 import t5
 from t5.data import preprocessors
