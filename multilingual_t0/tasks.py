@@ -2,7 +2,7 @@ import csv
 import seqio
 import functools
 
-import utils
+import task_utils
 import preprocessors
 
 from typing import Dict, List, Optional, Tuple
@@ -104,13 +104,13 @@ def get_tf_dataset(split, shuffle_files, seed, dataset_name, subset_name, templa
     del shuffle_files, seed
     dataset = datasets.load_dataset(dataset_name, subset_name)
     dataset = dataset[split_mapping[split]]
-    dataset = utils.apply_template(dataset, template)
-    return utils.hf_dataset_to_tf_dataset(dataset)
+    dataset = task_utils.apply_template(dataset, template)
+    return task_utils.hf_dataset_to_tf_dataset(dataset)
 
 
 def add_task(dataset_name, subset_name, template_name, task_name=None, split_mapping=None):
     template = all_templates.get_dataset(dataset_name, subset_name)[template_name]
-    task_name = task_name or utils.get_task_name(dataset_name, subset_name, template_name)
+    task_name = task_name or task_utils.get_task_name(dataset_name, subset_name, template_name)
 
     if dataset_name == "glue":
         metrics = get_glue_metric(subset_name)
@@ -124,7 +124,7 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
         # TODO what if metric is null?
         metrics = [GET_METRICS[m] for m in template.metadata.metrics]
 
-    dataset_splits = utils.get_dataset_splits(dataset_name, subset_name)
+    dataset_splits = task_utils.get_dataset_splits(dataset_name, subset_name)
     split_mapping = split_mapping or {k: k for k in dataset_splits.keys()}
 
     dataset_fn = functools.partial(
@@ -245,7 +245,7 @@ for dataset_name, subset_name in all_templates.keys:
 
         template = dataset[template_name]
 
-        task_name = utils.get_task_name(dataset_name, subset_name, template_name)
+        task_name = task_utils.get_task_name(dataset_name, subset_name, template_name)
 
         if (dataset_name, subset_name) not in single_original_task and template.metadata.original_task:
             single_original_task[(dataset_name, subset_name)] = task_name
@@ -274,7 +274,7 @@ dataset_name, subset_name = ("anli", None)
 dataset = all_templates.get_dataset(dataset_name, subset_name)
 for anli_round in ("r1", "r2", "r3"):
     for template_name in all_templates.get_dataset(dataset_name, subset_name).all_template_names:
-        task_name = utils.get_task_name(dataset_name, subset_name, template_name) + f"_{anli_round}"
+        task_name = task_utils.get_task_name(dataset_name, subset_name, template_name) + f"_{anli_round}"
         split_mapping = {
             "train": f"train_{anli_round}",
             "validation": f"dev_{anli_round}",
