@@ -15,4 +15,5 @@
 """Import API modules."""
 
 import multilingual_t0.tasks
+import multilingual_t0.utils
 import multilingual_t0.preprocessors
