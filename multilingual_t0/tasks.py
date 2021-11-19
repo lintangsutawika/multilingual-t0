@@ -189,7 +189,7 @@ def maybe_get_class_id_postprocessor(template):
         return strip_whitespace
 
 
-def get_tf_dataset(split, shuffle_files, seed, dataset_name, subset_name, template, split_mapping):
+def get_tf_dataset(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, template=None, split_mapping=None):
     # HF datasets does not support file-level shuffling
     del shuffle_files, seed
     dataset = datasets.load_dataset(dataset_name, subset_name)
@@ -219,7 +219,6 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
 
     dataset_fn = functools.partial(
         get_tf_dataset,
-        seed=None,
         dataset_name=dataset_name,
         subset_name=subset_name,
         template=template,
