@@ -377,91 +377,91 @@ for anli_round in ("r1", "r2", "r3"):
         # TODO use template.metadata.answer_choices here for rank eval
 
 
-TASK_BLACKLIST = [
-    # Tasks which often tokenize to > 1024 tokens currently
-    "hotpot_qa_distractor_Generate_Explanations",
-    "hotpot_qa_fullwiki_Generate_Explanations",
-    "hotpot_qa_distractor_Generate_Answer_and_Explanations",
-    "hotpot_qa_fullwiki_Generate_Answer_and_Explanations",
-    "hotpot_qa_fullwiki_Generate_Answer",
-    "hotpot_qa_distractor_Generate_Answer",
-    "hotpot_qa_distractor_Generate_Title_2",
-    "hotpot_qa_fullwiki_Generate_Title_2",
-    "hotpot_qa_fullwiki_Generate_Title_1",
-    "hotpot_qa_distractor_Generate_Title_1",
-    "hotpot_qa_distractor_Generate_Question",
-    "hotpot_qa_fullwiki_Generate_Question",
-    "tab_fact_tab_fact_tab_fact_3",
-    "tab_fact_tab_fact_tab_fact_2",
-    "tab_fact_tab_fact_tab_fact_1",
-    "tab_fact_tab_fact_tab_fact_7",
-    "tab_fact_tab_fact_tab_fact_4",
-    "tab_fact_tab_fact_tab_fact_5",
-    "tab_fact_tab_fact_tab_fact_6",
-    "wiki_hop_masked_Choose_Best_Object_Candidate",
-    "wiki_hop_masked_Indirect_Question_about_Birthplace_Citizenship_Place_of_Death",
-    "narrativeqa_Template_05",
-    "ecthr_cases_alleged_violation_prediction_silver_rationales",
-    # Tasks with broken cached files
-    "gigaword_summarize_",
-]
+# TASK_BLACKLIST = [
+#     # Tasks which often tokenize to > 1024 tokens currently
+#     "hotpot_qa_distractor_Generate_Explanations",
+#     "hotpot_qa_fullwiki_Generate_Explanations",
+#     "hotpot_qa_distractor_Generate_Answer_and_Explanations",
+#     "hotpot_qa_fullwiki_Generate_Answer_and_Explanations",
+#     "hotpot_qa_fullwiki_Generate_Answer",
+#     "hotpot_qa_distractor_Generate_Answer",
+#     "hotpot_qa_distractor_Generate_Title_2",
+#     "hotpot_qa_fullwiki_Generate_Title_2",
+#     "hotpot_qa_fullwiki_Generate_Title_1",
+#     "hotpot_qa_distractor_Generate_Title_1",
+#     "hotpot_qa_distractor_Generate_Question",
+#     "hotpot_qa_fullwiki_Generate_Question",
+#     "tab_fact_tab_fact_tab_fact_3",
+#     "tab_fact_tab_fact_tab_fact_2",
+#     "tab_fact_tab_fact_tab_fact_1",
+#     "tab_fact_tab_fact_tab_fact_7",
+#     "tab_fact_tab_fact_tab_fact_4",
+#     "tab_fact_tab_fact_tab_fact_5",
+#     "tab_fact_tab_fact_tab_fact_6",
+#     "wiki_hop_masked_Choose_Best_Object_Candidate",
+#     "wiki_hop_masked_Indirect_Question_about_Birthplace_Citizenship_Place_of_Death",
+#     "narrativeqa_Template_05",
+#     "ecthr_cases_alleged_violation_prediction_silver_rationales",
+#     # Tasks with broken cached files
+#     "gigaword_summarize_",
+# ]
 
-# Tasks that failed caching (won't try to fix them for now) - remove when we are done
-D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST = [
-    "amazon_polarity_Is_this_product_review_positive_score_eval",
-    "amazon_polarity_Is_this_review_negative_score_eval",
-    "amazon_polarity_Is_this_review_score_eval",
-    "amazon_polarity_User_recommend_this_product_score_eval",
-    "amazon_polarity_convey_negative_or_positive_sentiment_score_eval",
-    "amazon_polarity_flattering_or_not_score_eval",
-    "amazon_polarity_negative_or_positive_tone_score_eval",
-    "amazon_polarity_user_satisfied_score_eval",
-    "amazon_polarity_would_you_buy_score_eval",
-    "dbpedia_14_given_a_choice_of_categories__score_eval",
-    "dbpedia_14_given_list_what_category_does_the_paragraph_belong_to_score_eval",
-    "dbpedia_14_pick_one_category_for_the_following_text_score_eval",
-    "wiki_hop_original_choose_best_object_affirmative_1_score_eval",
-    "wiki_hop_original_choose_best_object_affirmative_2_score_eval",
-    "wiki_hop_original_choose_best_object_affirmative_3_score_eval",
-    "wiki_hop_original_choose_best_object_interrogative_1_score_eval",
-    "wiki_hop_original_choose_best_object_interrogative_2_score_eval",
-]
+# # Tasks that failed caching (won't try to fix them for now) - remove when we are done
+# D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST = [
+#     "amazon_polarity_Is_this_product_review_positive_score_eval",
+#     "amazon_polarity_Is_this_review_negative_score_eval",
+#     "amazon_polarity_Is_this_review_score_eval",
+#     "amazon_polarity_User_recommend_this_product_score_eval",
+#     "amazon_polarity_convey_negative_or_positive_sentiment_score_eval",
+#     "amazon_polarity_flattering_or_not_score_eval",
+#     "amazon_polarity_negative_or_positive_tone_score_eval",
+#     "amazon_polarity_user_satisfied_score_eval",
+#     "amazon_polarity_would_you_buy_score_eval",
+#     "dbpedia_14_given_a_choice_of_categories__score_eval",
+#     "dbpedia_14_given_list_what_category_does_the_paragraph_belong_to_score_eval",
+#     "dbpedia_14_pick_one_category_for_the_following_text_score_eval",
+#     "wiki_hop_original_choose_best_object_affirmative_1_score_eval",
+#     "wiki_hop_original_choose_best_object_affirmative_2_score_eval",
+#     "wiki_hop_original_choose_best_object_affirmative_3_score_eval",
+#     "wiki_hop_original_choose_best_object_interrogative_1_score_eval",
+#     "wiki_hop_original_choose_best_object_interrogative_2_score_eval",
+# ]
 
-seqio.MixtureRegistry.add(
-    "d4_train",
-    [task for task in d4_train_mixture if task not in TASK_BLACKLIST],
-    default_rate=lambda t: mixture_cap[t.name],
-)
+# seqio.MixtureRegistry.add(
+#     "d4_train",
+#     [task for task in d4_train_mixture if task not in TASK_BLACKLIST],
+#     default_rate=lambda t: mixture_cap[t.name],
+# )
 
-seqio.MixtureRegistry.add(
-    "gpt_train",
-    [task for task in gpt_train_mixture if task not in TASK_BLACKLIST],
-    default_rate=lambda t: mixture_cap[t.name],
-)
+# seqio.MixtureRegistry.add(
+#     "gpt_train",
+#     [task for task in gpt_train_mixture if task not in TASK_BLACKLIST],
+#     default_rate=lambda t: mixture_cap[t.name],
+# )
 
-seqio.MixtureRegistry.add(
-    "sglue_train",
-    [task for task in sglue_train_mixture if task not in TASK_BLACKLIST],
-    default_rate=lambda t: mixture_cap[t.name],
-)
+# seqio.MixtureRegistry.add(
+#     "sglue_train",
+#     [task for task in sglue_train_mixture if task not in TASK_BLACKLIST],
+#     default_rate=lambda t: mixture_cap[t.name],
+# )
 
-seqio.MixtureRegistry.add(
-    "d4_gpt_train",
-    [task for task in d4_train_mixture + gpt_train_mixture if task not in TASK_BLACKLIST],
-    default_rate=lambda t: mixture_cap[t.name],
-)
+# seqio.MixtureRegistry.add(
+#     "d4_gpt_train",
+#     [task for task in d4_train_mixture + gpt_train_mixture if task not in TASK_BLACKLIST],
+#     default_rate=lambda t: mixture_cap[t.name],
+# )
 
-seqio.MixtureRegistry.add(
-    "d4_gpt_sglue_train",
-    [task for task in d4_train_mixture + gpt_train_mixture + sglue_train_mixture if task not in TASK_BLACKLIST],
-    default_rate=lambda t: mixture_cap[t.name],
-)
+# seqio.MixtureRegistry.add(
+#     "d4_gpt_sglue_train",
+#     [task for task in d4_train_mixture + gpt_train_mixture + sglue_train_mixture if task not in TASK_BLACKLIST],
+#     default_rate=lambda t: mixture_cap[t.name],
+# )
 
-seqio.MixtureRegistry.add(
-    "d4_eval",
-    [task for task in d4_eval_mixture if task not in TASK_BLACKLIST],
-    default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-)  # eval mixture does not need to be capped
+# seqio.MixtureRegistry.add(
+#     "d4_eval",
+#     [task for task in d4_eval_mixture if task not in TASK_BLACKLIST],
+#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+# )  # eval mixture does not need to be capped
 
 
 # seqio.MixtureRegistry.add(
