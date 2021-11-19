@@ -230,7 +230,6 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
         splits=list(split_mapping.keys()),
         num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
     )
-    output_features = MT5_OUTPUT_FEATURES
     preprocessors = [
         seqio.preprocessors.tokenize,
         seqio.preprocessors.append_eos,
@@ -242,7 +241,7 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
         task_name,
         source=data_source,
         preprocessors=preprocessors,
-        output_features=output_features,
+        output_features=MT5_OUTPUT_FEATURES,
         metric_fns=metrics,
         postprocess_fn=maybe_get_class_id_postprocessor(template),
     )
