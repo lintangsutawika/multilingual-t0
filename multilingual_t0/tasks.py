@@ -2,7 +2,7 @@ import csv
 import seqio
 import functools
 
-from . import task_utils
+# from . import task_utils
 import preprocessors
 
 from typing import Dict, List, Optional, Tuple
