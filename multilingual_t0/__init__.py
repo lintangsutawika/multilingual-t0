@@ -14,6 +14,6 @@
 
 """Import API modules."""
 
-import multilingual_t0.tasks
+# import multilingual_t0.tasks
 # import multilingual_t0.task_utils
-from . import task_utils
+# from . import task_utils
