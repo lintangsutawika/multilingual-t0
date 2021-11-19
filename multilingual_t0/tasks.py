@@ -240,7 +240,7 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
     # Add train and normal eval tasks
     seqio.TaskRegistry.add(
         task_name,
-        data_source,
+        source=data_source,
         preprocessors=preprocessors,
         output_features=output_features,
         metric_fns=metrics,
@@ -261,7 +261,7 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
         num_classes = len(fixed_choices) if fixed_choices else None
         seqio.TaskRegistry.add(
             task_name + "_score_eval",
-            data_source,
+            source=data_source,
             preprocessors=[rank_classification_preprocessor] + preprocessors,
             output_features=output_features,
             metric_fns=[functools.partial(t5.evaluation.metrics.rank_classification, num_classes=num_classes)],
