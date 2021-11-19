@@ -247,26 +247,26 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
         postprocess_fn=maybe_get_class_id_postprocessor(template),
     )
 
-    # Add rank classification eval task
-    if template.answer_choices:
-        rank_classification_preprocessor = functools.partial(
-            t5.data.preprocessors.rank_classification,
-            inputs_fn=lambda ex: tf.fill((len(ex["answer_choices"]),), ex["inputs"]),
-            targets_fn=lambda ex: ex["answer_choices"],
-            is_correct_fn=lambda ex: tf.equal(ex["answer_choices"], tf.strings.strip(ex["targets"])),
-            weight_fn=lambda ex: 1.0,
-        )
+    # # Add rank classification eval task
+    # if template.answer_choices:
+    #     rank_classification_preprocessor = functools.partial(
+    #         t5.data.preprocessors.rank_classification,
+    #         inputs_fn=lambda ex: tf.fill((len(ex["answer_choices"]),), ex["inputs"]),
+    #         targets_fn=lambda ex: ex["answer_choices"],
+    #         is_correct_fn=lambda ex: tf.equal(ex["answer_choices"], tf.strings.strip(ex["targets"])),
+    #         weight_fn=lambda ex: 1.0,
+    #     )
 
-        fixed_choices = template.get_fixed_answer_choices_list()
-        num_classes = len(fixed_choices) if fixed_choices else None
-        seqio.TaskRegistry.add(
-            task_name + "_score_eval",
-            source=data_source,
-            preprocessors=[rank_classification_preprocessor] + preprocessors,
-            output_features=output_features,
-            metric_fns=[functools.partial(t5.evaluation.metrics.rank_classification, num_classes=num_classes)],
-            postprocess_fn=t5.data.postprocessors.rank_classification,
-        )
+    #     fixed_choices = template.get_fixed_answer_choices_list()
+    #     num_classes = len(fixed_choices) if fixed_choices else None
+    #     seqio.TaskRegistry.add(
+    #         task_name + "_score_eval",
+    #         source=data_source,
+    #         preprocessors=[rank_classification_preprocessor] + preprocessors,
+    #         output_features=output_features,
+    #         metric_fns=[functools.partial(t5.evaluation.metrics.rank_classification, num_classes=num_classes)],
+    #         postprocess_fn=t5.data.postprocessors.rank_classification,
+    #     )
 
 
 datatset_subset_tuple = Tuple[str, Optional[str]]
