@@ -3,7 +3,17 @@ import re
 import datasets
 import tensorflow as tf
 
-import promptsource.utils
+
+def removeHyphen(example):
+    example_clean = {}
+    for key in example.keys():
+        if "-" in key:
+            new_key = key.replace("-", "_")
+            example_clean[new_key] = example[key]
+        else:
+            example_clean[key] = example[key]
+    example = example_clean
+    return example
 
 
 def feature_to_spec(feature, length=False):
@@ -33,7 +43,7 @@ def hf_dataset_to_tf_dataset(dataset):
 
 def apply_template(dataset, template):
     def map_fn(ex):
-        ex = promptsource.utils.removeHyphen(ex)
+        ex = removeHyphen(ex)
         inputs_and_targets = template.apply(ex)
         answer_choices = template.get_answer_choices_list(ex)
         if len(inputs_and_targets) == 2:

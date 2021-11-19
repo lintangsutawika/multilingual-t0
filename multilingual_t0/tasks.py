@@ -19,24 +19,24 @@ from t5.data.glue_utils import get_glue_metric, get_super_glue_metric
 
 import promptsource.templates
 
-from t5x.partitioning import LogicalAxisRules
+# from t5x.partitioning import LogicalAxisRules
 
-def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
-  """Fully sharded rules for P5X model in terms of logical axes names."""
-  return (
-      ('batch', 'data'),
-      ('vocab', 'model'),
-      ('mlp', 'model'),
-      ('heads', 'model'),
-      ('joined_kv', 'model'),
-      ('kv', None),
-      ('embed', 'model'),
-      ('embed', 'data'),
-      ('relpos_buckets', None),
-      ('length', None),
-      ('layers', None),
-      ('stack', None),
-  )
+# def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
+#   """Fully sharded rules for P5X model in terms of logical axes names."""
+#   return (
+#       ('batch', 'data'),
+#       ('vocab', 'model'),
+#       ('mlp', 'model'),
+#       ('heads', 'model'),
+#       ('joined_kv', 'model'),
+#       ('kv', None),
+#       ('embed', 'model'),
+#       ('embed', 'data'),
+#       ('relpos_buckets', None),
+#       ('length', None),
+#       ('layers', None),
+#       ('stack', None),
+#   )
 
 #seqio.add_global_cache_dirs(['gs://bigscience/seqio_cached_tasks'])
 #seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/experiment_d_cached_tasks/v0.2'])
