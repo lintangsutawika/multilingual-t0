@@ -379,174 +379,174 @@ for anli_round in ("r1", "r2", "r3"):
         # TODO use template.metadata.answer_choices here for rank eval
 
 
-# TASK_BLACKLIST = [
-#     # Tasks which often tokenize to > 1024 tokens currently
-#     "hotpot_qa_distractor_Generate_Explanations",
-#     "hotpot_qa_fullwiki_Generate_Explanations",
-#     "hotpot_qa_distractor_Generate_Answer_and_Explanations",
-#     "hotpot_qa_fullwiki_Generate_Answer_and_Explanations",
-#     "hotpot_qa_fullwiki_Generate_Answer",
-#     "hotpot_qa_distractor_Generate_Answer",
-#     "hotpot_qa_distractor_Generate_Title_2",
-#     "hotpot_qa_fullwiki_Generate_Title_2",
-#     "hotpot_qa_fullwiki_Generate_Title_1",
-#     "hotpot_qa_distractor_Generate_Title_1",
-#     "hotpot_qa_distractor_Generate_Question",
-#     "hotpot_qa_fullwiki_Generate_Question",
-#     "tab_fact_tab_fact_tab_fact_3",
-#     "tab_fact_tab_fact_tab_fact_2",
-#     "tab_fact_tab_fact_tab_fact_1",
-#     "tab_fact_tab_fact_tab_fact_7",
-#     "tab_fact_tab_fact_tab_fact_4",
-#     "tab_fact_tab_fact_tab_fact_5",
-#     "tab_fact_tab_fact_tab_fact_6",
-#     "wiki_hop_masked_Choose_Best_Object_Candidate",
-#     "wiki_hop_masked_Indirect_Question_about_Birthplace_Citizenship_Place_of_Death",
-#     "narrativeqa_Template_05",
-#     "ecthr_cases_alleged_violation_prediction_silver_rationales",
-#     # Tasks with broken cached files
-#     "gigaword_summarize_",
-# ]
+TASK_BLACKLIST = [
+    # Tasks which often tokenize to > 1024 tokens currently
+    "hotpot_qa_distractor_Generate_Explanations",
+    "hotpot_qa_fullwiki_Generate_Explanations",
+    "hotpot_qa_distractor_Generate_Answer_and_Explanations",
+    "hotpot_qa_fullwiki_Generate_Answer_and_Explanations",
+    "hotpot_qa_fullwiki_Generate_Answer",
+    "hotpot_qa_distractor_Generate_Answer",
+    "hotpot_qa_distractor_Generate_Title_2",
+    "hotpot_qa_fullwiki_Generate_Title_2",
+    "hotpot_qa_fullwiki_Generate_Title_1",
+    "hotpot_qa_distractor_Generate_Title_1",
+    "hotpot_qa_distractor_Generate_Question",
+    "hotpot_qa_fullwiki_Generate_Question",
+    "tab_fact_tab_fact_tab_fact_3",
+    "tab_fact_tab_fact_tab_fact_2",
+    "tab_fact_tab_fact_tab_fact_1",
+    "tab_fact_tab_fact_tab_fact_7",
+    "tab_fact_tab_fact_tab_fact_4",
+    "tab_fact_tab_fact_tab_fact_5",
+    "tab_fact_tab_fact_tab_fact_6",
+    "wiki_hop_masked_Choose_Best_Object_Candidate",
+    "wiki_hop_masked_Indirect_Question_about_Birthplace_Citizenship_Place_of_Death",
+    "narrativeqa_Template_05",
+    "ecthr_cases_alleged_violation_prediction_silver_rationales",
+    # Tasks with broken cached files
+    "gigaword_summarize_",
+]
 
-# # Tasks that failed caching (won't try to fix them for now) - remove when we are done
-# D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST = [
-#     "amazon_polarity_Is_this_product_review_positive_score_eval",
-#     "amazon_polarity_Is_this_review_negative_score_eval",
-#     "amazon_polarity_Is_this_review_score_eval",
-#     "amazon_polarity_User_recommend_this_product_score_eval",
-#     "amazon_polarity_convey_negative_or_positive_sentiment_score_eval",
-#     "amazon_polarity_flattering_or_not_score_eval",
-#     "amazon_polarity_negative_or_positive_tone_score_eval",
-#     "amazon_polarity_user_satisfied_score_eval",
-#     "amazon_polarity_would_you_buy_score_eval",
-#     "dbpedia_14_given_a_choice_of_categories__score_eval",
-#     "dbpedia_14_given_list_what_category_does_the_paragraph_belong_to_score_eval",
-#     "dbpedia_14_pick_one_category_for_the_following_text_score_eval",
-#     "wiki_hop_original_choose_best_object_affirmative_1_score_eval",
-#     "wiki_hop_original_choose_best_object_affirmative_2_score_eval",
-#     "wiki_hop_original_choose_best_object_affirmative_3_score_eval",
-#     "wiki_hop_original_choose_best_object_interrogative_1_score_eval",
-#     "wiki_hop_original_choose_best_object_interrogative_2_score_eval",
-# ]
+# Tasks that failed caching (won't try to fix them for now) - remove when we are done
+D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST = [
+    "amazon_polarity_Is_this_product_review_positive_score_eval",
+    "amazon_polarity_Is_this_review_negative_score_eval",
+    "amazon_polarity_Is_this_review_score_eval",
+    "amazon_polarity_User_recommend_this_product_score_eval",
+    "amazon_polarity_convey_negative_or_positive_sentiment_score_eval",
+    "amazon_polarity_flattering_or_not_score_eval",
+    "amazon_polarity_negative_or_positive_tone_score_eval",
+    "amazon_polarity_user_satisfied_score_eval",
+    "amazon_polarity_would_you_buy_score_eval",
+    "dbpedia_14_given_a_choice_of_categories__score_eval",
+    "dbpedia_14_given_list_what_category_does_the_paragraph_belong_to_score_eval",
+    "dbpedia_14_pick_one_category_for_the_following_text_score_eval",
+    "wiki_hop_original_choose_best_object_affirmative_1_score_eval",
+    "wiki_hop_original_choose_best_object_affirmative_2_score_eval",
+    "wiki_hop_original_choose_best_object_affirmative_3_score_eval",
+    "wiki_hop_original_choose_best_object_interrogative_1_score_eval",
+    "wiki_hop_original_choose_best_object_interrogative_2_score_eval",
+]
 
-# seqio.MixtureRegistry.add(
-#     "d4_train",
-#     [task for task in d4_train_mixture if task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "d4_train",
+    [task for task in d4_train_mixture if task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "gpt_train",
-#     [task for task in gpt_train_mixture if task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "gpt_train",
+    [task for task in gpt_train_mixture if task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "sglue_train",
-#     [task for task in sglue_train_mixture if task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "sglue_train",
+    [task for task in sglue_train_mixture if task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "d4_gpt_train",
-#     [task for task in d4_train_mixture + gpt_train_mixture if task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "d4_gpt_train",
+    [task for task in d4_train_mixture + gpt_train_mixture if task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "d4_gpt_sglue_train",
-#     [task for task in d4_train_mixture + gpt_train_mixture + sglue_train_mixture if task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "d4_gpt_sglue_train",
+    [task for task in d4_train_mixture + gpt_train_mixture + sglue_train_mixture if task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "d4_eval",
-#     [task for task in d4_eval_mixture if task not in TASK_BLACKLIST],
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-# )  # eval mixture does not need to be capped
+seqio.MixtureRegistry.add(
+    "d4_eval",
+    [task for task in d4_eval_mixture if task not in TASK_BLACKLIST],
+    default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+)  # eval mixture does not need to be capped
 
 
-# seqio.MixtureRegistry.add(
-#     "d4_score_eval",
-#     [
-#         task
-#         for task in seqio.TaskRegistry.names()
-#         if task.endswith("_score_eval")
-#         and task.split("_score_eval")[0] in d4_eval_mixture
-#         and task.split("_score_eval")[0] not in TASK_BLACKLIST
-#     ],
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-# )
+seqio.MixtureRegistry.add(
+    "d4_score_eval",
+    [
+        task
+        for task in seqio.TaskRegistry.names()
+        if task.endswith("_score_eval")
+        and task.split("_score_eval")[0] in d4_eval_mixture
+        and task.split("_score_eval")[0] not in TASK_BLACKLIST
+    ],
+    default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+)
 
-# # Train tasks we don't care about evaluating on
-# D4_TRAIN_SKIP_EVAL = [
-#     "paws_labeled_final",
-#     "adversarial_qa_dbidaf",
-#     "adversarial_qa_dbert",
-#     "duorc_ParaphraseRC",
-#     "dream",
-#     "amazon_polarity",
-#     "app_reviews",
-#     "imdb",
-#     "wiki_bio",
-#     "gigaword",
-#     "multi_news",
-#     "samsum",
-#     "dbpedia_14",
-#     "trec",
-# ]
+# Train tasks we don't care about evaluating on
+D4_TRAIN_SKIP_EVAL = [
+    "paws_labeled_final",
+    "adversarial_qa_dbidaf",
+    "adversarial_qa_dbert",
+    "duorc_ParaphraseRC",
+    "dream",
+    "amazon_polarity",
+    "app_reviews",
+    "imdb",
+    "wiki_bio",
+    "gigaword",
+    "multi_news",
+    "samsum",
+    "dbpedia_14",
+    "trec",
+]
 
-# seqio.MixtureRegistry.add(
-#     "d4_train_eval",
-#     [
-#         task
-#         for task in d4_train_mixture
-#         if task not in TASK_BLACKLIST
-#         and not any([skip in task for skip in D4_TRAIN_SKIP_EVAL])
-#         and task in all_original_tasks
-#     ],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "d4_train_eval",
+    [
+        task
+        for task in d4_train_mixture
+        if task not in TASK_BLACKLIST
+        and not any([skip in task for skip in D4_TRAIN_SKIP_EVAL])
+        and task in all_original_tasks
+    ],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "d4_train_score_eval",
-#     [
-#         task
-#         for task in seqio.TaskRegistry.names()
-#         if task.endswith("_score_eval")
-#         and task.split("_score_eval")[0] in d4_train_mixture
-#         and task.split("_score_eval")[0] not in TASK_BLACKLIST
-#         and task not in D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST
-#         and not any([skip in task for skip in D4_TRAIN_SKIP_EVAL])
-#         and task.split("_score_eval")[0] in all_original_tasks
-#     ],
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-# )
+seqio.MixtureRegistry.add(
+    "d4_train_score_eval",
+    [
+        task
+        for task in seqio.TaskRegistry.names()
+        if task.endswith("_score_eval")
+        and task.split("_score_eval")[0] in d4_train_mixture
+        and task.split("_score_eval")[0] not in TASK_BLACKLIST
+        and task not in D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST
+        and not any([skip in task for skip in D4_TRAIN_SKIP_EVAL])
+        and task.split("_score_eval")[0] in all_original_tasks
+    ],
+    default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+)
 
-# seqio.MixtureRegistry.add(
-#     "d4_train_one_og_prompt",
-#     [task for task in single_original_task.values() if task in d4_train_mixture and task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "d4_train_one_og_prompt",
+    [task for task in single_original_task.values() if task in d4_train_mixture and task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "d4_train_all_og_prompts",
-#     [task for task in all_original_tasks if task in d4_train_mixture and task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
+seqio.MixtureRegistry.add(
+    "d4_train_all_og_prompts",
+    [task for task in all_original_tasks if task in d4_train_mixture and task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
-# seqio.MixtureRegistry.add(
-#     "bias_fairness_eval",
-#     bias_fairness_eval_mixture,
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-# )
+seqio.MixtureRegistry.add(
+    "bias_fairness_eval",
+    bias_fairness_eval_mixture,
+    default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+)
 
-# seqio.MixtureRegistry.add(
-#     "bias_fairness_eval_score_eval",
-#     [
-#         task
-#         for task in seqio.TaskRegistry.names()
-#         if task.endswith("_score_eval") and task.split("_score_eval")[0] in bias_fairness_eval_mixture
-#     ],
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-# )
+seqio.MixtureRegistry.add(
+    "bias_fairness_eval_score_eval",
+    [
+        task
+        for task in seqio.TaskRegistry.names()
+        if task.endswith("_score_eval") and task.split("_score_eval")[0] in bias_fairness_eval_mixture
+    ],
+    default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+)
