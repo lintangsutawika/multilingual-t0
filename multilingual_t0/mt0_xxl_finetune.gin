@@ -27,16 +27,16 @@ DROPOUT_RATE = 0.0
 
 train/utils.DatasetConfig:
   batch_size = 128
-  use_cached = False
+  use_cached = True
   pack = True
 
 train_eval/utils.DatasetConfig:
   batch_size = 128
-  use_cached = False
+  use_cached = True
   pack = True
 
 infer_eval/utils.DatasetConfig:
-  use_cached = False
+  use_cached = True
 
 train_script.train:
   eval_period = 500

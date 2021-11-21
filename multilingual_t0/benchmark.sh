@@ -9,7 +9,8 @@ python3 ${T5X_DIR}/t5x/train.py \
   --tfds_data_dir=${TFDS_DATA_DIR} \
   --gin_file="mt0_xxl_finetune.gin" \
   --gin.MODEL_DIR="'${MODEL_DIR}'" \
-  --gin.MIXTURE_OR_TASK_NAME="'d4_train'"
+  --gin.MIXTURE_OR_TASK_NAME="'winogrande_winogrande_xl_underscore_refer_to'" \
 
   # --gin.TRAIN_STEPS=1000005 \
   # --gin.MIXTURE_OR_TASK_NAME="'winogrande_winogrande_xl_underscore_refer_to'" \
+  # --gin.MIXTURE_OR_TASK_NAME="'d4_train'"
