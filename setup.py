@@ -110,6 +110,8 @@ class CustomCommands(setuptools.Command):
 # restriction is specified.
 REQUIRED_PACKAGES = [
     'numpy',
+    'google-cloud-bigquery-storage',
+    'apache-beam',
 ]
 
 setuptools.setup(
