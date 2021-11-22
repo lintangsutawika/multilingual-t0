@@ -1,7 +1,6 @@
 # Need to install seqio
 # gcloud auth application-default login
 
-
 MODULE_IMPORT=multilingual_t0.tasks
 TASK_NAME=$1
 JOB_NAME=$1
