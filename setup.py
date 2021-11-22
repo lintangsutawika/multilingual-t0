@@ -111,7 +111,7 @@ class CustomCommands(setuptools.Command):
 REQUIRED_PACKAGES = [
     'numpy',
     'google-cloud-bigquery-storage',
-    'apache-beam',
+    'apache-beam[gcp]',
 ]
 
 setuptools.setup(
