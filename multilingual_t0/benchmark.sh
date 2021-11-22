@@ -1,6 +1,6 @@
 T5X_DIR=${HOME}"/t5x"  # directory where the t5x is cloned, e.g., ${HOME}"/t5x".
-TFDS_DATA_DIR=$1"/data/"
-MODEL_DIR=$1"/model/"
+MODEL_DIR=$1
+TFDS_DATA_DIR=$2
 
 PROJECT_DIR=${HOME}"/multilingual-t0/multilingual_t0"
 export PYTHONPATH=${PROJECT_DIR}
