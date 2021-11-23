@@ -458,8 +458,8 @@ print(seqio.MixtureRegistry.names())
 
 
 cache_task = []
-for task in d4_train_mixture+gpt_train_mixture+sglue_train_mixture+d4_eval_mixture if task not in TASK_BLACKLIST:
-    if task not in cache_task:
+for task in d4_train_mixture+gpt_train_mixture+sglue_train_mixture+d4_eval_mixture:
+    if (task not in TASK_BLACKLIST) and (task not in cache_task):
         cache_task.append(task)
 
 with open('/tmp/cache_task.txt', 'w') as file:
