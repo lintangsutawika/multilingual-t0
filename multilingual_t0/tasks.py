@@ -454,6 +454,7 @@ seqio.MixtureRegistry.add(
     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
 )  # eval mixture does not need to be capped
 print(seqio.TaskRegistry.names())
+print(seqio.MixtureRegistry.names())
 
 # seqio.MixtureRegistry.add(
 #     "d4_score_eval",
