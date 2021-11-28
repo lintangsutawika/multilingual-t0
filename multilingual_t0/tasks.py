@@ -18,6 +18,8 @@ import promptsource.templates
 
 from t5x.partitioning import LogicalAxisRules
 
+seqio.add_global_cache_dirs(['gs://bigscience-t5x/multilingual_t0/v0.1'])
+
 def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
   """Fully sharded rules for P5X model in terms of logical axes names."""
   return (
@@ -117,10 +119,6 @@ def task_clean(text):
 
 def get_task_name(dataset_name, subset_name, template_name):
     return task_clean(dataset_name + (f"_{subset_name}_" if subset_name is not None else "_") + template_name)
-
-# seqio.add_global_cache_dirs(['gs://bigscience-t5x/multilingual_t0/v0.1'])
-#seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/experiment_d_cached_tasks/v0.2'])
-#seqio.add_global_cache_dirs(['gs://bigscience/experiment_d/multilingual_t0/data/tydi_qa/goldp/3.0.0'])
 
 GET_METRICS = {
     "BLEU": mt.bleu,
