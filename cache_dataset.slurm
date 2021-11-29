@@ -14,6 +14,8 @@
 
 source ~/.bashrc
 
+
+eval "$(conda shell.bash hook)"
 conda activate thomas_cache_seqio_tasks
 
 # export CURL_CA_BUNDLE=$six_ALL_CCFRWORK/etc/ssl/certs/ca-certificates.crt
