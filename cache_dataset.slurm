@@ -647,5 +647,5 @@ export TRANSFORMERS_OFFLINE=1
 #    --output_cache_dir=gs://bigscience-t5x/multilingual_t0/v0.1/
 seqio_cache_tasks \
    --tasks=$TASK \
-   --output_cache_dir=$ALL_CCFRSCRATCH/seqio_datasets/multilingual-t0-v0 \
+   --output_cache_dir=$six_ALL_CCFRSCRATCH/seqio_datasets/multilingual-t0-v0 \
    --module_import=multilingual_t0.tasks
