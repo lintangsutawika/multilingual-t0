@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=seq_cache_tasks
 #SBATCH --ntasks=1
-##SBATCH --partition=prepost
+#SBATCH --partition=prepost
 #SBATCH --cpus-per-task=1
 #SBATCH --hint=nomultithread
 #SBATCH --array=0-615
