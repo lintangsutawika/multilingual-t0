@@ -18,7 +18,7 @@ source ~/.bashrc
 eval "$(conda shell.bash hook)"
 conda activate thomas_cache_seqio_tasks
 
-# export CURL_CA_BUNDLE=$six_ALL_CCFRWORK/etc/ssl/certs/ca-certificates.crt
+export CURL_CA_BUNDLE=$six_ALL_CCFRWORK/etc/ssl/certs/ca-certificates.crt
 
 # all_datasets=(`cat ${WORK}/slurm/seqio_cache_tasks/09202021_mixture_d4_train_score_eval.txt`)
 all_datasets=(
