@@ -641,8 +641,8 @@ mc_taco_plausible_true_false
 )
 TASK=${all_datasets[${SLURM_ARRAY_TASK_ID}]}
 
-export HF_DATASETS_OFFLINE=1
-export TRANSFORMERS_OFFLINE=1
+# export HF_DATASETS_OFFLINE=1
+# export TRANSFORMERS_OFFLINE=1
 
 #    --output_cache_dir=gs://bigscience-t5x/multilingual_t0/v0.1/
 seqio_cache_tasks \
