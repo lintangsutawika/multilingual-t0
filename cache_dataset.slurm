@@ -7,7 +7,7 @@
 #SBATCH --array=0-615
 #SBATCH --time=2:00:00
 #SBATCH --output=logs/%x-%A_%a.out
-#SBATCH --error=logs/%x-%A_%a.out
+#SBATCH --error=logs/%x-%A_%a.err
 #SBATCH --account=six@cpu
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=thomas.wang@huggingface.co
