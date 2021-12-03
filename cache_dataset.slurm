@@ -4,8 +4,8 @@
 #SBATCH --partition=prepost
 #SBATCH --cpus-per-task=1
 #SBATCH --hint=nomultithread
-#SBATCH --array=0-615
-#SBATCH --time=2:00:00
+#SBATCH --array=0-615%200 # 0-605
+#SBATCH --time=10:00:00
 #SBATCH --output=logs/%x-%A_%a.out
 #SBATCH --error=logs/%x-%A_%a.err
 #SBATCH --account=six@cpu
@@ -536,11 +536,11 @@ winogrande_winogrande_debiased_does_underscore_refer_to,
 winogrande_winogrande_debiased_fill_in_the_blank,
 winogrande_winogrande_debiased_stand_for,
 winogrande_winogrande_debiased_underscore_refer_to,
-story_cloze_2016_Answer_Given_options,
-story_cloze_2016_Choose_Story_Ending,
-story_cloze_2016_Movie_What_Happens_Next,
-story_cloze_2016_Novel_Correct_Ending,
-story_cloze_2016_Story_Continuation_and_Options,
+# story_cloze_2016_Answer_Given_options,
+# story_cloze_2016_Choose_Story_Ending,
+# story_cloze_2016_Movie_What_Happens_Next,
+# story_cloze_2016_Novel_Correct_Ending,
+# story_cloze_2016_Story_Continuation_and_Options,
 quac_Answer_Converation_,
 quac_Answer_Given_Full_Dialogue,
 quac_Context_First_,
@@ -591,11 +591,11 @@ super_glue_axb_guaranteed_true,
 super_glue_axb_justified_in_saying,
 super_glue_axb_must_be_true,
 super_glue_axb_should_assume,
-craffel_openai_lambada_GPT_3_style,
-craffel_openai_lambada_ellipses,
-craffel_openai_lambada_fill_in_the_____,
-craffel_openai_lambada_please_next_word,
-craffel_openai_lambada_what_comes_next,
+# craffel_openai_lambada_GPT_3_style,
+# craffel_openai_lambada_ellipses,
+# craffel_openai_lambada_fill_in_the_____,
+# craffel_openai_lambada_please_next_word,
+# craffel_openai_lambada_what_comes_next,
 drop_DROP_GPT3,
 drop_can_you_tell_me,
 drop_context_question_answer,
