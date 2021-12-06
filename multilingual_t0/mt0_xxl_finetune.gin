@@ -56,7 +56,5 @@ utils.SaveCheckpointConfig:
 models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 1
 
 partitioning.ModelBasedPjitPartitioner:
-  model_parallel_submesh = (2,2,2,1)
-  num_partitions = 2
-#  model_parallel_submesh = (2,4,4,1)
-#  logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
+  model_parallel_submesh = (2,4,4,1)
+  logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
