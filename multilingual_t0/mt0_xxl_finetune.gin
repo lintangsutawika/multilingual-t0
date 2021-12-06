@@ -39,7 +39,7 @@ infer_eval/utils.DatasetConfig:
   use_cached = True
 
 train_script.train:
-  eval_period = 2500
+  eval_period = 0
   eval_steps = 0
   random_seed = 0
   use_hardware_rng = True
@@ -50,7 +50,7 @@ utils.RestoreCheckpointConfig:
   path = %INITIAL_CHECKPOINT_PATH
   dtype = 'float32'
 utils.SaveCheckpointConfig:
-  period = 5000  # checkpoint frequency
+  period = 2500  # checkpoint frequency
 
 # `num_decodes` is equivalent to a beam size in a beam search decoding.
 models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 1
