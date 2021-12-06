@@ -31,7 +31,7 @@ train/utils.DatasetConfig:
   pack = True
 
 train_eval/utils.DatasetConfig:
-  batch_size = 128
+  batch_size = 4
   use_cached = True
   pack = True
 
@@ -39,8 +39,8 @@ infer_eval/utils.DatasetConfig:
   use_cached = True
 
 train_script.train:
-  eval_period = 0
-  eval_steps = 0
+  eval_period = 12500
+  eval_steps = 10
   random_seed = 0
   use_hardware_rng = True
   partitioner = @partitioning.ModelBasedPjitPartitioner()
@@ -57,4 +57,5 @@ models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 1
 
 partitioning.ModelBasedPjitPartitioner:
   model_parallel_submesh = (2,4,4,1)
+  #model_parallel_submesh = (2,4,2,1)
   logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
