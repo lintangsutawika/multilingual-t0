@@ -13,7 +13,7 @@ include "t5x/configs/runs/finetune.gin"
 
 MIXTURE_OR_TASK_NAME = "d4_gpt_sglue_train"
 
-TASK_FEATURE_LENGTHS = {"inputs": 256, "targets": 256}
+TASK_FEATURE_LENGTHS = {"inputs": 1024, "targets": 256}
 TRAIN_STEPS = 1012500  # 1000000 pre-trained steps + 12500 fine-tuning steps.
 
 # `LOSS_NORMALIZING_FACTOR`: When fine-tuning a model that was pre-trained
@@ -26,7 +26,7 @@ INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-100
 DROPOUT_RATE = 0.0
 
 train/utils.DatasetConfig:
-  batch_size = 128
+  batch_size = 1024
   use_cached = True
   pack = True
 
@@ -39,7 +39,7 @@ infer_eval/utils.DatasetConfig:
   use_cached = True
 
 train_script.train:
-  eval_period = 500
+  eval_period = 2500
   eval_steps = 20
   random_seed = 0
   use_hardware_rng = True
