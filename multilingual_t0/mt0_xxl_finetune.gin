@@ -40,7 +40,7 @@ infer_eval/utils.DatasetConfig:
 
 train_script.train:
   eval_period = 2500
-  eval_steps = 20
+  eval_steps = 0
   random_seed = 0
   use_hardware_rng = True
   partitioner = @partitioning.ModelBasedPjitPartitioner()
