@@ -53,9 +53,9 @@ utils.SaveCheckpointConfig:
   period = 5000  # checkpoint frequency
 
 # `num_decodes` is equivalent to a beam size in a beam search decoding.
-models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 4
+models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 1
 
-partitioning.ModelBasedPjitPartitioner:
-  #model_parallel_submesh = (2,2,2,1)
-  model_parallel_submesh = (2,4,4,1)
-  logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
+#partitioning.ModelBasedPjitPartitioner:
+#  model_parallel_submesh = (2,2,2,1)
+#  model_parallel_submesh = (2,4,4,1)
+#  logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
