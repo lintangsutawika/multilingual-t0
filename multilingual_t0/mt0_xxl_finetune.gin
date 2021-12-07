@@ -26,7 +26,7 @@ INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-100
 DROPOUT_RATE = 0.1
 
 train/utils.DatasetConfig:
-  batch_size = 64 #1024
+  batch_size = 1024
   use_cached = True
   pack = True
 
@@ -52,6 +52,7 @@ utils.RestoreCheckpointConfig:
 utils.SaveCheckpointConfig:
   period = 2500  # checkpoint frequency
 
+trainer.Trainer.num_microbatches = 16
 # `num_decodes` is equivalent to a beam size in a beam search decoding.
 models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 1
 
