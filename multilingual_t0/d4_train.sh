@@ -10,4 +10,5 @@ python3 ${T5X_DIR}/t5x/train.py \
   --gin_file="mt0_xxl_finetune.gin" \
   --gin.MODEL_DIR="'${MODEL_DIR}'" \
   --gin.train.infer_eval_dataset_cfg=None \
+  --gin.trainer.Trainer.num_microbatches=16 \
   --gin.MIXTURE_OR_TASK_NAME="'d4_train'"
