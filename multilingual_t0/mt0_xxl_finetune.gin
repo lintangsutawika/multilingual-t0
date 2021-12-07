@@ -31,7 +31,7 @@ train/utils.DatasetConfig:
   pack = True
 
 train_eval/utils.DatasetConfig:
-  batch_size = 4
+  batch_size = 32
   use_cached = True
   pack = True
 
