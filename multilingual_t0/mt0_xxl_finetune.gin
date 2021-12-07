@@ -26,7 +26,7 @@ INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-100
 DROPOUT_RATE = 0.1
 
 train/utils.DatasetConfig:
-  batch_size = 128 #1024
+  batch_size = 64 #1024
   use_cached = True
   pack = True
 
