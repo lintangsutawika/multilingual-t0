@@ -14,8 +14,7 @@ include "t5x/configs/runs/finetune.gin"
 MIXTURE_OR_TASK_NAME = "d4_gpt_sglue_train"
 
 TASK_FEATURE_LENGTHS = {"inputs": 1024, "targets": 256}
-#TRAIN_STEPS = 1012500  # 1000000 pre-trained steps + 12500 fine-tuning steps.
-TRAIN_STEPS = 1000500
+TRAIN_STEPS = 1012500  # 1000000 pre-trained steps + 12500 fine-tuning steps.
 
 # `LOSS_NORMALIZING_FACTOR`: When fine-tuning a model that was pre-trained
 # using Mesh Tensorflow (e.g. the public T5 / mT5 / ByT5 models), this should be
@@ -26,7 +25,6 @@ INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-100
 
 DROPOUT_RATE = 0.1
 USE_CACHED_TASKS = True
-#BATCH_SIZE = 1024
 
 train/utils.DatasetConfig:
   batch_size = 1024
@@ -45,8 +43,9 @@ utils.RestoreCheckpointConfig:
   mode = 'specific'
   path = %INITIAL_CHECKPOINT_PATH
   dtype = 'float32'
+
 utils.SaveCheckpointConfig:
-  period = 50  # checkpoint frequency
+  period = 1  # checkpoint frequency
   dtype = 'float32'
   keep = True
   save_dataset = False  # don't checkpoint dataset state

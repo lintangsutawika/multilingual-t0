@@ -38,3 +38,5 @@ cd promptsource
 cp ../multilingual-t0/tpu_utils/setup.py ./
 pip3 install -e .
 cd ../
+
+pip3 install tensorstore==0.1.13
