@@ -45,7 +45,7 @@ utils.RestoreCheckpointConfig:
   dtype = 'float32'
 
 utils.SaveCheckpointConfig:
-  period = 1  # checkpoint frequency
+  period = 500  # checkpoint frequency
   dtype = 'float32'
   keep = True
   save_dataset = False  # don't checkpoint dataset state
