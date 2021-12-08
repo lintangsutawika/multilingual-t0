@@ -33,7 +33,7 @@ train_eval/utils.DatasetConfig:
   batch_size = 32
 
 train_script.train:
-  eval_period = %TRAIN_STEPS
+  eval_period = 500
   eval_steps = 20
   random_seed = 0
   use_hardware_rng = True
