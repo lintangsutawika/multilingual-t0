@@ -24,23 +24,18 @@ LOSS_NORMALIZING_FACTOR = 234496
 INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-1000000"
 
 DROPOUT_RATE = 0.1
+USE_CACHED_TASKS = True
+#BATCH_SIZE = 1024
 
 train/utils.DatasetConfig:
   batch_size = 1024
-  use_cached = True
-  pack = True
 
 train_eval/utils.DatasetConfig:
   batch_size = 32
-  use_cached = True
-  pack = True
-
-infer_eval/utils.DatasetConfig:
-  use_cached = True
 
 train_script.train:
-  eval_period = 12500
-  eval_steps = 10
+  eval_period = 500
+  eval_steps = 20
   random_seed = 0
   use_hardware_rng = True
   partitioner = @partitioning.ModelBasedPjitPartitioner()
@@ -50,12 +45,14 @@ utils.RestoreCheckpointConfig:
   path = %INITIAL_CHECKPOINT_PATH
   dtype = 'float32'
 utils.SaveCheckpointConfig:
-  period = 2500  # checkpoint frequency
+  period = 500  # checkpoint frequency
+  dtype = 'float32'
+  keep = True
+  save_dataset = False  # don't checkpoint dataset state
 
 # `num_decodes` is equivalent to a beam size in a beam search decoding.
 models.EncoderDecoderModel.predict_batch_with_aux.num_decodes = 1
 
 partitioning.ModelBasedPjitPartitioner:
   model_parallel_submesh = (4,1,1,1)
-  #model_parallel_submesh = (2,4,2,1)
   logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
