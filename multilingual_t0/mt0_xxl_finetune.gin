@@ -47,7 +47,6 @@ utils.RestoreCheckpointConfig:
 utils.SaveCheckpointConfig:
   period = 500  # checkpoint frequency
   dtype = 'float32'
-  keep = True
   save_dataset = False  # don't checkpoint dataset state
 
 # `num_decodes` is equivalent to a beam size in a beam search decoding.
