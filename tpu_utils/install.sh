@@ -9,7 +9,7 @@ pip3 install libtpu_tpuv4-0.1.dev*
 
 git clone https://github.com/bigscience-workshop/t5x.git
 pushd t5x
-git checkout thomas/add_train_script_span_corruption
+#git checkout thomas/add_train_script_span_corruption
 pip3 install -e .
 popd
 
