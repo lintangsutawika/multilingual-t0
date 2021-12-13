@@ -155,7 +155,7 @@ def infer(
                 #print(f"Prompt: {prompts[0]}")
                 prediction = vocabulary.decode([int(elt) for elt in predictions[0]])
                 file.write(prediction+'\n')
-
+        break
 # ----- Helpers
 
 # Copied from seqio
