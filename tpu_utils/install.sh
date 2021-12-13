@@ -27,6 +27,7 @@ pip3 install tbp-nightly
 #pip3 install tensorflow==2.7.0
 
 # Install Promptsource
+pip3 install seqio
 pip3 install py7zr
 pip3 install datasets
 
@@ -40,3 +41,4 @@ pip3 install -e .
 cd ../
 
 pip3 install tensorstore==0.1.13
+pip3 install jax==0.2.25 jaxlib==0.1.74
