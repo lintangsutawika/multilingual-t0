@@ -136,26 +136,48 @@ def infer(
     while True:
         # Create batch interactively
         # batch = get_new_batch()
-        with open(FLAGS.output_file_dir+'-prediction.txt', 'w') as file:
-            for batch in tqdm(get_batch()):
-                prompts = batch["text"]
-                assert len(prompts) == batch_size
-                # Tokenize
-                tokenized_batch = seqio.preprocessors.tokenize_impl(batch, output_features, copy_pretokenized=False)
+        if FLAGS.output_file_dir != None:
 
-                # Convert feature to model input
-                preprocessed_batch = preprocess_lm(tokenized_batch, model_type, feature_lengths, vocabulary)
+            with open(FLAGS.output_file_dir+'-prediction.txt', 'w') as file:
+                for batch in tqdm(get_batch()):
+                    prompts = batch["text"]
+                    assert len(prompts) == batch_size
+                    # Tokenize
+                    tokenized_batch = seqio.preprocessors.tokenize_impl(batch, output_features, copy_pretokenized=False)
 
-                # print(preprocessed_batch)
+                    # Convert feature to model input
+                    preprocessed_batch = preprocess_lm(tokenized_batch, model_type, feature_lengths, vocabulary)
 
-                # Run decoding algorithm
-                predictions = predict_fn(preprocessed_batch)
+                    # print(preprocessed_batch)
 
-                # Print results in string.
-                #print(f"Prompt: {prompts[0]}")
-                prediction = vocabulary.decode([int(elt) for elt in predictions[0]])
-                file.write(prediction+'\n')
-        break
+                    # Run decoding algorithm
+                    predictions = predict_fn(preprocessed_batch)
+
+                    # Print results in string.
+                    #print(f"Prompt: {prompts[0]}")
+                    prediction = vocabulary.decode([int(elt) for elt in predictions[0]])
+                    file.write(prediction+'\n')
+            break
+
+        else:
+            batch = get_new_batch()
+            prompts = batch["text"]
+            assert len(prompts) == batch_size
+            # Tokenize
+            tokenized_batch = seqio.preprocessors.tokenize_impl(batch, output_features, copy_pretokenized=False)
+
+            # Convert feature to model input
+            preprocessed_batch = preprocess_lm(tokenized_batch, model_type, feature_lengths, vocabulary)
+
+            # print(preprocessed_batch)
+            # Run decoding algorithm
+            predictions = predict_fn(preprocessed_batch)
+
+            # Print results in string.
+            #print(f"Prompt: {prompts[0]}")
+            prediction = vocabulary.decode([int(elt) for elt in predictions[0]])
+            print(prediction)
+
 # ----- Helpers
 
 # Copied from seqio
