@@ -42,3 +42,8 @@ cd ../
 
 pip3 install tensorstore==0.1.13
 pip3 install jax==0.2.25 jaxlib==0.1.74
+
+git clone https://github.com/google-research/text-to-text-transfer-transformer.git
+pushd text-to-text-transfer-transformer
+pip3 install -e .
+popd

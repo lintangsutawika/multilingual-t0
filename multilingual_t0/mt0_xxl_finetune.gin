@@ -6,6 +6,10 @@ from t5x import models
 from t5x import partitioning
 from t5x import utils
 
+#import seqio
+#GLOBAL_CACHE_DIR = ""
+#seqio.add_global_cache_dirs([%GLOBAL_CACHE_DIR])
+
 import tasks
 
 include "mt5_xxl.gin"
