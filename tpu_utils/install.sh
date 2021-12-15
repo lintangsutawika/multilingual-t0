@@ -8,10 +8,10 @@ pip3 install libtpu_tpuv4-0.1.dev*
 #cd ~/code
 
 git clone https://github.com/bigscience-workshop/t5x.git
-pushd t5x
+cd t5x
 #git checkout thomas/add_train_script_span_corruption
 pip3 install -e .
-popd
+cd ../
 
 # TODO: figure if this is actually important
 sudo rm /usr/local/lib/python3.8/dist-packages/tensorflow/core/kernels/libtfkernel_sobol_op.so
@@ -44,6 +44,6 @@ pip3 install tensorstore==0.1.13
 pip3 install jax==0.2.25 jaxlib==0.1.74
 
 git clone https://github.com/google-research/text-to-text-transfer-transformer.git
-pushd text-to-text-transfer-transformer
+cd text-to-text-transfer-transformer
 pip3 install -e .
-popd
+cd ../

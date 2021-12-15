@@ -173,15 +173,15 @@ def get_tf_dataset(split, shuffle_files, seed: Optional[int] = None, dataset_nam
     return hf_dataset_to_tf_dataset(dataset)
 
 
-def add_task(dataset_name, subset_name, split_mapping=None):
+def add_task(dataset_name, subset_name=None, split_mapping=None):
 
     dataset = all_templates.get_dataset(dataset_name, subset_name)
     num_templates = len(dataset.all_template_names)
 
     info = datasets.get_dataset_infos(dataset_name)
-    subset_name = subset_name or list(info.keys())[0]
-    split_mapping = split_mapping or {k: k for k in info[subset_name].splits.keys()}
-    dataset_splits = info[subset_name].splits
+    subset_info = subset_name or list(info.keys())[0]
+    split_mapping = split_mapping or {k: k for k in info[subset_info].splits.keys()}
+    dataset_splits = info[subset_info].splits
     train_size = dataset_splits['train'].num_examples
 
     if train_size > MAX_EXAMPLES_PER_DATASET:
