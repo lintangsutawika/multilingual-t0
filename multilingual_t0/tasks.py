@@ -395,13 +395,13 @@ def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dat
     return hf_dataset_to_tf_dataset(dataset)
 
 info = datasets.get_dataset_infos("opus100")
-subset_name = list(info.keys())[0]
-split_mapping = {k: k for k in info[subset_name].splits.keys()}
-dataset_splits = info[subset_name].splits
+# subset_name = list(info.keys())[0]
 
 for ori_lang in OPUS100_LANGS:
 
     lang_a, lang_b = ori_lang.split('-')
+    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
+    dataset_splits = info[subset_name].splits
 
     for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
 
