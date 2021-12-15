@@ -199,7 +199,7 @@ def add_task(dataset_name, subset_name, split_mapping=None):
             metrics = get_super_glue_metric(subset_name)
     else:
         # TODO what if metric is null?
-        metrics = [GET_METRICS[m] for m in template.metadata.metrics]
+        metrics = [] #[GET_METRICS[m] for m in dataset[dataset.all_template_names[0]].metadata.metrics]
 
     task_cap: Dict[str, int] = {}
     task_name_list = []
@@ -394,11 +394,16 @@ def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dat
     dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
     return hf_dataset_to_tf_dataset(dataset)
 
+info = datasets.get_dataset_infos("opus100")
+subset_name = list(info.keys())[0]
+split_mapping = {k: k for k in info[subset_name].splits.keys()}
+dataset_splits = info[subset_name].splits
+
 for ori_lang in OPUS100_LANGS:
 
     lang_a, lang_b = ori_lang.split('-')
 
-    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]
+    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
 
         lang = "{}-{}".format(src_lang, tgt_lang)
 
@@ -469,19 +474,19 @@ mixture_cap = {**mixture_cap, **task_cap}
 t0_train_mixture.extend(task_name_list)
 
 # ==================================== Closed-Book QA ======================================
-task_cap, task_name_list  = add_task("ai2_arc", "ARC_Challenge")
+task_cap, task_name_list  = add_task("ai2_arc", "ARC-Challenge")
 mixture_cap = {**mixture_cap, **task_cap}
 gpt_train_mixture.extend(task_name_list)
 
-task_cap, task_name_list  = add_task("ai2_arc", "ARC_Easy")
+task_cap, task_name_list  = add_task("ai2_arc", "ARC-Easy")
 mixture_cap = {**mixture_cap, **task_cap}
 gpt_train_mixture.extend(task_name_list)
 
-task_cap, task_name_list  = add_task("kilt tasks", "hotpotqa")
+task_cap, task_name_list  = add_task("kilt_tasks", "hotpotqa")
 mixture_cap = {**mixture_cap, **task_cap}
 t0_train_mixture.extend(task_name_list)
 
-task_cap, task_name_list  = add_task("trivia qa", "unfiltered")
+task_cap, task_name_list  = add_task("trivia_qa", "unfiltered")
 mixture_cap = {**mixture_cap, **task_cap}
 gpt_train_mixture.extend(task_name_list)
 
@@ -510,7 +515,7 @@ task_cap, task_name_list = add_task("duorc", "SelfRC")
 mixture_cap = {**mixture_cap, **task_cap}
 t0_train_mixture.extend(task_name_list)
 
-task_cap, task_name_list = add_task("duorc", "Paraphrase_IdentificationRC")
+task_cap, task_name_list = add_task("duorc", "ParaphraseRC")
 mixture_cap = {**mixture_cap, **task_cap}
 t0_train_mixture.extend(task_name_list)
 
@@ -628,7 +633,7 @@ sglue_train_mixture.extend(task_name_list)
 # task_cap, task_name_list = add_task("story_cloze", "2016")
 # mixture_cap = {**mixture_cap, **task_cap}
 
-task_cap, task_name_list = add_task("hellaswag", "subset_name")
+task_cap, task_name_list = add_task("hellaswag", None)
 mixture_cap = {**mixture_cap, **task_cap}
 gpt_train_mixture.extend(task_name_list)
 # ==================================== Structure-to-Text ======================================
