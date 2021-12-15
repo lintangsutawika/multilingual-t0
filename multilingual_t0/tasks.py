@@ -401,7 +401,7 @@ for ori_lang in OPUS100_LANGS:
 
     lang_a, lang_b = ori_lang.split('-')
     split_mapping = {k: k for k in info[ori_lang].splits.keys()}
-    dataset_splits = info[subset_name].splits
+    dataset_splits = info[ori_lang].splits
 
     for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
 
