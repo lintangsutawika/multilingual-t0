@@ -27,14 +27,9 @@ TRAIN_STEPS = 1025000  # 1000000 pre-trained steps + 25000 fine-tuning steps.
 LOSS_NORMALIZING_FACTOR = 234496
 INITIAL_CHECKPOINT_PATH = "gs://t5-data/pretrained_models/mt5/xxl/model.ckpt-1000000"
 
+BATCH_SIZE = 1024
 DROPOUT_RATE = 0.1
 USE_CACHED_TASKS = True
-
-train/utils.DatasetConfig:
-  batch_size = 1024
-
-train_eval/utils.DatasetConfig:
-  batch_size = 32
 
 train_script.train:
   eval_period = 500
