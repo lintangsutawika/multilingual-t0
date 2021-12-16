@@ -15,7 +15,7 @@ import promptsource.templates
 
 from t5x.partitioning import LogicalAxisRules
 
-seqio.add_global_cache_dirs(['gs://bigscience-t5x/multilingual_t0/v0.2'])
+seqio.add_global_cache_dirs(['gs://bigscience-t5x/multilingual_t0/v0.3'])
 
 def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
   """Fully sharded rules for P5X model in terms of logical axes names."""
