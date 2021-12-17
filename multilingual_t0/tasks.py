@@ -360,7 +360,7 @@ seqio.MixtureRegistry.add(
 
 seqio.MixtureRegistry.add(
     "oscar_no_en_lm_adaptation",
-    [lang if lang is not "en" for lang in oscar_lm_adaptation_mixture],
+    [lang for lang in oscar_lm_adaptation_mixture if lang !="en"],
     default_rate=DEFAULT_MIX_RATE,
 )
 
