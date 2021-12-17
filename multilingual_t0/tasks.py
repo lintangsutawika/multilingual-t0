@@ -254,110 +254,115 @@ all_templates = promptsource.templates.TemplateCollection()
 all_templates.remove("anli")  # Need to special-case ANLI due to weird split conventions
 
 
-# # ==================================== OSCAR LM Adaptation ======================================
+# ==================================== OSCAR LM Adaptation ======================================
 
-# OSCAR_LANGS = [
-#     'af', 'als', 'am', 'an', 'ar', 'arz', 'as', 'ast', 'av', 'az', 'azb', 'ba',
-#     'bar', 'bcl', 'be', 'bg', 'bh', 'bn', 'bo', 'bpy', 'br', 'bs', 'bxr', 'ca',
-#     'cbk', 'ce', 'ceb', 'ckb', 'cs', 'cv', 'cy', 'da', 'de', 'diq', 'dsb', 'dv', 
-#     'el', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'frr', 'fy', 
-#     'ga', 'gd', 'gl', 'gn', 'gom', 'gu', 'he', 'hi', 'hr', 'hsb', 'ht', 'hu',
-#     'hy', 'ia', 'id', 'ie', 'ilo', 'io', 'is', 'it', 'ja', 'jbo', 'jv', 'ka',
-#     'kk', 'km', 'kn', 'ko', 'krc', 'ku', 'kv', 'kw', 'ky', 'la', 'lb', 'lez',
-#     'li', 'lmo', 'lo', 'lrc', 'lt', 'lv', 'mai', 'mg', 'mhr', 'min', 'mk', 'ml',
-#     'mn', 'mr', 'mrj', 'ms', 'mt', 'mwl', 'my', 'myv', 'mzn', 'nah', 'nap', 'nds',
-#     'ne', 'new', 'nl', 'nn', 'no', 'oc', 'or', 'os', 'pa', 'pam', 'pl', 'pms', 
-#     'pnb', 'ps', 'pt', 'qu', 'rm', 'ro', 'ru', 'sa', 'sah', 'scn', 'sd', 'sh',
-#     'si', 'sk', 'sl', 'so', 'sq', 'sr', 'su', 'sv', 'sw', 'ta', 'te', 'tg',
-#     'th', 'tk', 'tl', 'tr', 'tt', 'tyv', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi',
-#     'vo', 'wa', 'war', 'wuu', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh'
-# ]
+OSCAR_LANGS = [
+    'af', 'als', 'am', 'an', 'ar', 'arz', 'as', 'ast', 'av', 'az', 'azb', 'ba',
+    'bar', 'bcl', 'be', 'bg', 'bh', 'bn', 'bo', 'bpy', 'br', 'bs', 'bxr', 'ca',
+    'cbk', 'ce', 'ceb', 'ckb', 'cs', 'cv', 'cy', 'da', 'de', 'diq', 'dsb', 'dv', 
+    'el', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'frr', 'fy', 
+    'ga', 'gd', 'gl', 'gn', 'gom', 'gu', 'he', 'hi', 'hr', 'hsb', 'ht', 'hu',
+    'hy', 'ia', 'id', 'ie', 'ilo', 'io', 'is', 'it', 'ja', 'jbo', 'jv', 'ka',
+    'kk', 'km', 'kn', 'ko', 'krc', 'ku', 'kv', 'kw', 'ky', 'la', 'lb', 'lez',
+    'li', 'lmo', 'lo', 'lrc', 'lt', 'lv', 'mai', 'mg', 'mhr', 'min', 'mk', 'ml',
+    'mn', 'mr', 'mrj', 'ms', 'mt', 'mwl', 'my', 'myv', 'mzn', 'nah', 'nap', 'nds',
+    'ne', 'new', 'nl', 'nn', 'no', 'oc', 'or', 'os', 'pa', 'pam', 'pl', 'pms', 
+    'pnb', 'ps', 'pt', 'qu', 'rm', 'ro', 'ru', 'sa', 'sah', 'scn', 'sd', 'sh',
+    'si', 'sk', 'sl', 'so', 'sq', 'sr', 'su', 'sv', 'sw', 'ta', 'te', 'tg',
+    'th', 'tk', 'tl', 'tr', 'tt', 'tyv', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi',
+    'vo', 'wa', 'war', 'wuu', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh'
+]
 
-# def get_tf_dataset_oscar(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
+def get_tf_dataset_oscar(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
 
-#     def map_fn(ex):
-#         return {"inputs": ex["text"]}
+    def map_fn(ex):
+        # return {"inputs": ex["text"], "targets": ex["text"]}
+        return ex
 
-#     def filter_fn(ex):
-#         return len(ex["inputs"]) > 0
+    def filter_fn(ex):
+        # return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+        return len(ex["text"]) > 0
 
-#     # HF datasets does not support file-level shuffling
-#     del shuffle_files, seed
-#     dataset = datasets.load_dataset(dataset_name, subset_name)
-#     dataset = dataset[split_mapping[split]]
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
 
-#     original_columns = dataset.column_names
-#     dataset = dataset.map(map_fn).filter(filter_fn)
-#     # map keeps original columns, remove them
-#     dataset = dataset.remove_columns(set(original_columns) - {"inputs", "text"})
-#     return hf_dataset_to_tf_dataset(dataset)
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    # dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets"})
+    dataset = dataset.remove_columns(set(original_columns) - {"text"})
+    return hf_dataset_to_tf_dataset(dataset)
 
 
-# info = datasets.get_dataset_infos("oscar")
-# subset_name = list(info.keys())[0]
-# split_mapping = {k: k for k in info[subset_name].splits.keys()}
-# dataset_splits = info[subset_name].splits
+info = datasets.get_dataset_infos("oscar")
 
-# for lang in OSCAR_LANGS:
 
-#     task_name = "oscar_{}_prefix_lm_objective_encoder_decoder_architecture".format(lang)
-#     oscar_lm_adaptation_mixture.append(task_name)
+for lang in OSCAR_LANGS:
 
-#     dataset_fn = functools.partial(
-#         get_tf_dataset_oscar,
-#         dataset_name="oscar",
-#         subset_name="unshuffled_deduplicated_{}".format(lang),
-#         split_mapping=split_mapping,
-#     )
-#     dataset_fn.__name__ = "dataset_fn"
+    task_name = "oscar_{}_prefix_lm_objective_encoder_decoder_architecture".format(lang)
+    subset_name = "unshuffled_deduplicated_{}".format(lang)
+    split_mapping = {k: k for k in info[subset_name].splits.keys()}
+    dataset_splits = info[subset_name].splits
 
-#     data_source = seqio.FunctionDataSource(
-#         dataset_fn=dataset_fn,
-#         splits=list(split_mapping.keys()),
-#         num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
-#     )
+    oscar_lm_adaptation_mixture.append(task_name)
 
-#     seqio.TaskRegistry.add(
-#         task_name,
-#         source=data_source,
-#         preprocessors=[
-#             functools.partial(
-#                 t5.data.preprocessors.rekey, key_map={
-#                     "inputs": None,
-#                     "targets": "text"
-#                 }),
-#             seqio.preprocessors.tokenize,
-#             seqio.CacheDatasetPlaceholder(),
-#             t5.data.preprocessors.targets_for_prefix_lm_objective,
-#             t5.data.preprocessors.pack_prefix_lm_encoder_decoder,
-#         ],
-#         output_features={
-#             "encoder_input_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             "decoder_target_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             "decoder_input_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             "encoder_segment_ids": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             "encoder_positions": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             "decoder_segment_ids": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             "decoder_positions": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             "decoder_loss_weights": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
-#             # All but the last stage of the preprocessing uses "targets" as the key,
-#             # so this output feature is necessary. It is not marked required because
-#             # the final preprocessor drops it.
-#             "targets": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=True),
-#         },
-#         metric_fns=[])
+    dataset_fn = functools.partial(
+        get_tf_dataset_oscar,
+        dataset_name="oscar",
+        subset_name=subset_name,
+        split_mapping=split_mapping,
+    )
+    dataset_fn.__name__ = "dataset_fn"
 
-# seqio.MixtureRegistry.add(
-#     "oscar_lm_adaptation",
-#     oscar_lm_adaptation_mixture,
-#     default_rate=DEFAULT_MIX_RATE,
-# )
+    data_source = seqio.FunctionDataSource(
+        dataset_fn=dataset_fn,
+        splits=list(split_mapping.keys()),
+        num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+    )
 
-# seqio.MixtureRegistry.add(
-#     "oscar_no_en_lm_adaptation",
-#     [lang if lang is not "en" for lang in oscar_lm_adaptation_mixture],
-#     default_rate=DEFAULT_MIX_RATE,
-# )
+    seqio.TaskRegistry.add(
+        task_name,
+        source=data_source,
+        preprocessors=[
+            functools.partial(
+                seqio.preprocessors.rekey, key_map={
+                    "inputs": None,
+                    "targets": "text"
+                }),
+            seqio.preprocessors.tokenize,
+            seqio.CacheDatasetPlaceholder(),
+            t5.data.preprocessors.targets_for_prefix_lm_objective,
+            t5.data.preprocessors.pack_prefix_lm_encoder_decoder,
+        ],
+        output_features={
+            "encoder_input_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_target_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_input_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "encoder_segment_ids": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "encoder_positions": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_segment_ids": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_positions": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_loss_weights": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            # All but the last stage of the preprocessing uses "targets" as the key,
+            # so this output feature is necessary. It is not marked required because
+            # the final preprocessor drops it.
+            "targets": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=True),
+        },
+        metric_fns=[])
+
+seqio.MixtureRegistry.add(
+    "oscar_lm_adaptation",
+    oscar_lm_adaptation_mixture,
+    default_rate=DEFAULT_MIX_RATE,
+)
+
+seqio.MixtureRegistry.add(
+    "oscar_no_en_lm_adaptation",
+    [lang if lang is not "en" for lang in oscar_lm_adaptation_mixture],
+    default_rate=DEFAULT_MIX_RATE,
+)
 
 
 # ==================================== OPUS100 ======================================
