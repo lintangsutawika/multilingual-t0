@@ -301,7 +301,7 @@ info = datasets.get_dataset_infos("oscar")
 
 for lang in OSCAR_LANGS:
 
-    task_name = "oscar_{}_prefix_lm_objective_encoder_decoder_architecture".format(lang)
+    task_name = "oscar_{}_lm_objective".format(lang)
     subset_name = "unshuffled_deduplicated_{}".format(lang)
     split_mapping = {k: k for k in info[subset_name].splits.keys()}
     dataset_splits = info[subset_name].splits
