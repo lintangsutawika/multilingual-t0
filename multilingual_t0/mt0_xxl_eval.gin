@@ -30,7 +30,10 @@ utils.DatasetConfig:
   shuffle = False
   seed = 42
 
-partitioning.ModelBasedPjitPartitioner.num_partitions = 2
+#partitioning.ModelBasedPjitPartitioner.num_partitions = 2
+partitioning.ModelBasedPjitPartitioner:
+  model_parallel_submesh = (4,1,1,1)
+  logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
 
 utils.RestoreCheckpointConfig:
   path = %CHECKPOINT_PATH
