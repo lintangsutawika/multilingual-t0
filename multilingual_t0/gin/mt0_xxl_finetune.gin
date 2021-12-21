@@ -15,7 +15,7 @@ import tasks
 include "mt5_xxl.gin"
 include "t5x/configs/runs/finetune.gin"
 
-MIXTURE_OR_TASK_NAME = "d4_gpt_sglue_train"
+MIXTURE_OR_TASK_NAME = "t0_train"
 
 TASK_FEATURE_LENGTHS = {"inputs": 1024, "targets": 256}
 TRAIN_STEPS = 1025000  # 1000000 pre-trained steps + 25000 fine-tuning steps.
