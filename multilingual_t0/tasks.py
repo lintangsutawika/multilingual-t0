@@ -820,7 +820,8 @@ for lang in LANGS:
 
 seqio.MixtureRegistry.add(
     "xcopa_eval",
-    xcopa_eval_mixture
+    xcopa_eval_mixture,
+    default_rate=1.0
 )
 
 # seqio.MixtureRegistry.add(
