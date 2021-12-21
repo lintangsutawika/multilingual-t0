@@ -476,7 +476,7 @@ t0_train_mixture.extend(task_name_list)
 
 task_cap, task_name_list  = add_task("paws", "labeled_final")
 mixture_cap = {**mixture_cap, **task_cap}
-t0_train_mixture.extend(task_name_list)
+#t0_train_mixture.extend(task_name_list)
 
 # ==================================== Closed-Book QA ======================================
 task_cap, task_name_list  = add_task("ai2_arc", "ARC-Challenge")
