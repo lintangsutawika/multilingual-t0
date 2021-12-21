@@ -451,7 +451,7 @@ seqio.MixtureRegistry.add(
 # ==================================== Coreference Resolution ======================================
 task_cap, task_name_list = add_task("super_glue", "wsc.fixed")
 mixture_cap = {**mixture_cap, **task_cap}
-sglue_train_mixture.extend(task_name_list)
+# sglue_train_mixture.extend(task_name_list)
 
 task_cap, task_name_list = add_task("winogrande", "winogrande_xl")
 mixture_cap = {**mixture_cap, **task_cap}
@@ -633,7 +633,7 @@ t0_train_mixture.extend(task_name_list)
 # ==================================== Sentence Completion ======================================
 task_cap, task_name_list = add_task("super_glue", "copa")
 mixture_cap = {**mixture_cap, **task_cap}
-sglue_train_mixture.extend(task_name_list)
+# sglue_train_mixture.extend(task_name_list)
 
 # task_cap, task_name_list = add_task("story_cloze", "2016")
 # mixture_cap = {**mixture_cap, **task_cap}
