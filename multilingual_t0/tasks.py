@@ -823,10 +823,78 @@ seqio.MixtureRegistry.add(
     default_rate=1.0
 )
 
-# seqio.MixtureRegistry.add(
-#     "xnli_eval",
-#     xnli_eval_mixture
-# )
+
+# ==================================== XCOPA ======================================
+xnli_eval_mixture: List[str] = []
+LANGS = ["ar", "bg", "de", "el", "en", "es", "fr", "hi", "ru", "sw", "th", "tr", "ur", "vi", "zh"]
+
+def get_tf_dataset_xnli(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
+
+    def map_fn(ex):
+        # return {"inputs": ex["text"], "targets": ex["text"]}
+        return {
+            "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? Yes, no, or maybe?".format(**ex),
+            "targets": ["Yes", "No", "Maybe"][ex["label"]]
+        }
+
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+
+info = datasets.get_dataset_infos("xnli")
+
+
+for lang in LANGS:
+
+    task_name = "xnli_{}".format(lang)
+    subset_name = lang
+    split_mapping = {k: k for k in info[subset_name].splits.keys()}
+    dataset_splits = info[subset_name].splits
+
+    xcopa_eval_mixture.append(task_name)
+
+    dataset_fn = functools.partial(
+        get_tf_dataset_xnli,
+        dataset_name="xnli",
+        subset_name=subset_name,
+        split_mapping=split_mapping,
+    )
+    dataset_fn.__name__ = "dataset_fn"
+
+    data_source = seqio.FunctionDataSource(
+        dataset_fn=dataset_fn,
+        splits=list(split_mapping.keys()),
+        num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+    )
+
+    seqio.TaskRegistry.add(
+        task_name,
+        source=data_source,
+        preprocessors=[
+            seqio.preprocessors.tokenize,
+            seqio.preprocessors.append_eos,
+            seqio.CacheDatasetPlaceholder(),
+        ],
+        output_features=MT5_OUTPUT_FEATURES,
+        metric_fns=[mt.accuracy]
+        )
+
+seqio.MixtureRegistry.add(
+    "xnli_eval",
+    xnli_eval_mixture,
+    default_rate=1.0
+)
 
 # seqio.MixtureRegistry.add(
 #     "pawsx_eval",
