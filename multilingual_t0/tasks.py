@@ -169,7 +169,6 @@ def get_tf_dataset(split, shuffle_files, seed: Optional[int] = None, dataset_nam
     dataset = datasets.load_dataset(dataset_name, subset_name)
     dataset = dataset[split_mapping[split]]
     dataset = apply_template(dataset, template)
-    print(dataset)
     return hf_dataset_to_tf_dataset(dataset)
 
 
