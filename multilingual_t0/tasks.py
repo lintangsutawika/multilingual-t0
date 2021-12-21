@@ -862,7 +862,7 @@ for lang in LANGS:
     split_mapping = {k: k for k in info[subset_name].splits.keys()}
     dataset_splits = info[subset_name].splits
 
-    xcopa_eval_mixture.append(task_name)
+    xnli_eval_mixture.append(task_name)
 
     dataset_fn = functools.partial(
         get_tf_dataset_xnli,
