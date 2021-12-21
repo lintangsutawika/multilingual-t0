@@ -10,7 +10,7 @@ LOGS_PATH="/home/lintang/logs"
 mkdir -p $LOGS_PATH
 
 python3 ${T5X_DIR}/t5x/train.py \
-  --gin_file=${PROJECT_DIR}"/gin/mt0_xl_finetune.gin" \
+  --gin_file=${PROJECT_DIR}"/gin_config/mt0_xl_finetune.gin" \
   --gin.MODEL_DIR="'${MODEL_DIR}'" \
   --gin.train.infer_eval_dataset_cfg=None \
   --gin.train.train_eval_dataset_cfg=None \
