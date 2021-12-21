@@ -886,6 +886,7 @@ for lang in LANGS:
             seqio.preprocessors.append_eos,
             seqio.CacheDatasetPlaceholder(),
         ],
+        postprocessors=t5.data.postprocessors.lower_text,
         output_features=MT5_OUTPUT_FEATURES,
         metric_fns=[mt.accuracy]
         )
