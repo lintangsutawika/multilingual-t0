@@ -833,10 +833,10 @@ def get_tf_dataset_xnli(split, shuffle_files, seed: Optional[int] = None, datase
     def map_fn(ex):
         # return {"inputs": ex["text"], "targets": ex["text"]}
         return {
-            # "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? Yes, no, or maybe?".format(**ex),
-            # "targets": ["Yes", "Maybe", "No"][ex["label"]]
-            "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? True, False, or Possibly?".format(**ex),
-            "targets": ["True", "Possibly", "False"][ex["label"]]
+            "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? Yes, no, or maybe?".format(**ex),
+            "targets": ["Yes", "Maybe", "No"][ex["label"]]
+            # "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? True, False, or Possibly?".format(**ex),
+            # "targets": ["True", "Possibly", "False"][ex["label"]]
         }
 
     def filter_fn(ex):
