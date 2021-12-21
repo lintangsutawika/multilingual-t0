@@ -760,7 +760,7 @@ def get_tf_dataset_xcopa(split, shuffle_files, seed: Optional[int] = None, datas
     def map_fn(ex):
         # return {"inputs": ex["text"], "targets": ex["text"]}
         return {
-            "inputs": "Given the premise \"{premise}\" which is the most likely {question}? A: \"{choice1}\" or B: \"{choice2}\"".format(**ex)
+            "inputs": "Given the premise \"{premise}\" which is the most likely {question}? A: \"{choice1}\" or B: \"{choice2}\"".format(**ex),
             "targets": ["A", "B"][ex["label"]]
         }
 
