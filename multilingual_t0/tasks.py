@@ -815,8 +815,8 @@ for lang in LANGS:
             seqio.CacheDatasetPlaceholder(),
         ],
         output_features=MT5_OUTPUT_FEATURES,
-        metric_fns=metrics,
-        postprocess_fn=maybe_get_class_id_postprocessor(template))
+        metric_fns=[mt.accuracy]
+        )
 
 seqio.MixtureRegistry.add(
     "xcopa_eval",
