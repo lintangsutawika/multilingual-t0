@@ -243,8 +243,6 @@ def add_task(dataset_name, subset_name=None, split_mapping=None):
     return task_cap, task_name_list
 
 # 3 stages of training/ablation: D4 -> GPT -> SuperGLUE
-oscar_lm_adaptation_mixture: List[str] = []
-opus100_lm_adaptation_mixture: List[str] = []
 t0_train_mixture: List[str] = []
 gpt_train_mixture: List[str] = []
 sglue_train_mixture: List[str] = []
@@ -255,7 +253,7 @@ all_templates.remove("anli")  # Need to special-case ANLI due to weird split con
 
 
 # ==================================== OSCAR LM Adaptation ======================================
-
+oscar_lm_adaptation_mixture: List[str] = []
 OSCAR_LANGS = [
     'af', 'als', 'am', 'an', 'ar', 'arz', 'as', 'ast', 'av', 'az', 'azb', 'ba',
     'bar', 'bcl', 'be', 'bg', 'bh', 'bn', 'bo', 'bpy', 'br', 'bs', 'bxr', 'ca',
@@ -366,7 +364,7 @@ seqio.MixtureRegistry.add(
 
 
 # ==================================== OPUS100 ======================================
-
+opus100_lm_adaptation_mixture: List[str] = []
 OPUS100_LANGS = [
     'af-en', 'am-en', 'an-en', 'ar-en', 'as-en', 'az-en', 'be-en', 'bg-en', 'bn-en', 'br-en', 'bs-en', 'ca-en',
     'cs-en', 'cy-en', 'da-en', 'de-en', 'dz-en', 'el-en', 'en-eo', 'en-es', 'en-et', 'en-eu', 'en-fa', 'en-fi',
@@ -751,3 +749,96 @@ seqio.MixtureRegistry.add(
     [task for task in t0_train_mixture + gpt_train_mixture + sglue_train_mixture if task not in TASK_BLACKLIST],
     default_rate=lambda t: mixture_cap[t.name],
 )
+
+
+# ==================================== XCOPA ======================================
+xcopa_eval_mixture: List[str] = []
+LANGS = ['et', 'ht', 'it', 'id', 'qu', 'sw', 'zh', 'ta', 'th', 'tr', 'vi']
+
+def get_tf_dataset_xcopa(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
+
+    def map_fn(ex):
+        # return {"inputs": ex["text"], "targets": ex["text"]}
+        return {
+            "inputs": "Given the premise \"{premise}\" which is the most likely {question}? A: \"{choice1}\" or B: \"{choice2}\"".format(**ex)
+            "targets": ["A", "B"][ex["label"]]
+        }
+
+
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+
+info = datasets.get_dataset_infos("xcopa")
+
+
+for lang in LANGS:
+
+    task_name = "xcopa_{}".format(lang)
+    subset_name = lang
+    split_mapping = {k: k for k in info[subset_name].splits.keys()}
+    dataset_splits = info[subset_name].splits
+
+    xcopa_eval_mixture.append(task_name)
+
+    dataset_fn = functools.partial(
+        get_tf_dataset_xcopa,
+        dataset_name="xcopa",
+        subset_name=subset_name,
+        split_mapping=split_mapping,
+    )
+    dataset_fn.__name__ = "dataset_fn"
+
+    data_source = seqio.FunctionDataSource(
+        dataset_fn=dataset_fn,
+        splits=list(split_mapping.keys()),
+        num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+    )
+
+    seqio.TaskRegistry.add(
+        task_name,
+        source=data_source,
+        preprocessors=[
+            seqio.preprocessors.tokenize,
+            seqio.preprocessors.append_eos,
+            seqio.CacheDatasetPlaceholder(),
+        ],
+        output_features=MT5_OUTPUT_FEATURES,
+        metric_fns=metrics,
+        postprocess_fn=maybe_get_class_id_postprocessor(template))
+
+seqio.MixtureRegistry.add(
+    "xcopa_eval",
+    xcopa_eval_mixture
+)
+
+# seqio.MixtureRegistry.add(
+#     "xnli_eval",
+#     xnli_eval_mixture
+# )
+
+# seqio.MixtureRegistry.add(
+#     "pawsx_eval",
+#     xnli_eval_mixture
+# )
+
+# seqio.MixtureRegistry.add(
+#     "xwino_eval",
+#     xnli_eval_mixture
+# )
+
+# seqio.MixtureRegistry.add(
+#     "xcopa_eval",
+#     xnli_eval_mixture
+# )
