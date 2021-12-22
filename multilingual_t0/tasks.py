@@ -824,7 +824,7 @@ seqio.MixtureRegistry.add(
 )
 
 
-# ==================================== XCOPA ======================================
+# ==================================== XNLI ======================================
 xnli_eval_mixture: List[str] = []
 LANGS = ["ar", "bg", "de", "el", "en", "es", "fr", "hi", "ru", "sw", "th", "tr", "ur", "vi", "zh"]
 
@@ -899,6 +899,77 @@ seqio.MixtureRegistry.add(
     default_rate=1.0
 )
 
+# ==================================== Flores ======================================
+flores_mixture: List[str] = []
+LANGS = [ "sien", "neen"]
+
+def get_tf_dataset_flores(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
+
+    def map_fn(ex):
+        return {"inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]), "targets": ex["translation"][tgt_lang]}
+
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+info = datasets.get_dataset_infos("flores")
+# subset_name = list(info.keys())[0]
+
+for lang in LANGS:
+
+    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
+    dataset_splits = info[lang].splits
+    lang_a, lang_b = lang[:2], lang[2:]
+
+    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
+
+        task_name = "flores_{}_{}_mt".format(src_lang, tgt_lang)
+        flores_mixture.append(task_name)
+
+        dataset_fn = functools.partial(
+            get_tf_dataset_flores,
+            dataset_name="flores",
+            subset_name=lang,
+            src_lang=src_lang,
+            tgt_lang=tgt_lang,
+            split_mapping=split_mapping,
+        )
+        dataset_fn.__name__ = "dataset_fn"
+
+        data_source = seqio.FunctionDataSource(
+            dataset_fn=dataset_fn,
+            splits=list(split_mapping.keys()),
+            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+        )
+
+        seqio.TaskRegistry.add(
+            task_name,
+            source=data_source,
+            preprocessors=[
+                seqio.preprocessors.tokenize,
+                seqio.preprocessors.append_eos,
+                seqio.CacheDatasetPlaceholder(),
+            ],
+            output_features=MT5_OUTPUT_FEATURES,
+            metric_fns=[mt.bleu]
+            )
+
+seqio.MixtureRegistry.add(
+    "flores_mt_mixture",
+    flores_mixture,
+    default_rate=1.0
+)
+
 # seqio.MixtureRegistry.add(
 #     "pawsx_eval",
 #     xnli_eval_mixture
@@ -906,10 +977,5 @@ seqio.MixtureRegistry.add(
 
 # seqio.MixtureRegistry.add(
 #     "xwino_eval",
-#     xnli_eval_mixture
-# )
-
-# seqio.MixtureRegistry.add(
-#     "xcopa_eval",
 #     xnli_eval_mixture
 # )
