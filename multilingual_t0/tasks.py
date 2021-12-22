@@ -927,7 +927,7 @@ info = datasets.get_dataset_infos("flores")
 
 for lang in LANGS:
 
-    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
+    split_mapping = {k: k for k in info[lang].splits.keys()}
     dataset_splits = info[lang].splits
     lang_a, lang_b = lang[:2], lang[2:]
 
