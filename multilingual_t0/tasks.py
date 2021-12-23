@@ -380,7 +380,10 @@ OPUS100_LANGS = [
 def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
 
     def map_fn(ex):
-        return {"inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]), "targets": ex["translation"][tgt_lang]}
+        return {
+            "inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]),
+            "targets": ex["translation"][tgt_lang]
+            }
 
     def filter_fn(ex):
         return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
