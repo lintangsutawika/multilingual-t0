@@ -1,14 +1,11 @@
 import re
-import csv
-import seqio
 import functools
 
 from typing import Dict, List, Optional, Tuple
 
+import seqio
 import datasets
-import pkg_resources
 import tensorflow as tf
-import tensorflow_datasets as tfds
 
 import t5
 from t5.evaluation import metrics as mt
@@ -18,7 +15,7 @@ import promptsource.templates
 
 from t5x.partitioning import LogicalAxisRules
 
-seqio.add_global_cache_dirs(['gs://bigscience-t5x/multilingual_t0/v0.2'])
+seqio.add_global_cache_dirs(['gs://bigscience-t5x/multilingual_t0/v0.3'])
 
 def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
   """Fully sharded rules for P5X model in terms of logical axes names."""
@@ -37,6 +34,37 @@ def fully_sharded_logical_axis_rules() -> LogicalAxisRules:
       ('stack', None),
   )
 
+MAX_EXAMPLES_PER_DATASET = 500_000
+
+DEFAULT_TEMPERATURE = 1.0 / 0.3
+DEFAULT_MIX_RATE = functools.partial(
+    t5.data.rate_num_examples, temperature=DEFAULT_TEMPERATURE)
+
+MT5_SPM_PATH = "gs://t5-data/vocabs/mc4.250000.100extra/sentencepiece.model"
+MT5_VOCAB = t5.data.SentencePieceVocabulary(MT5_SPM_PATH)
+MT5_OUTPUT_FEATURES = {
+    "inputs": t5.data.Feature(
+        vocabulary=MT5_VOCAB, add_eos=False, required=False),
+    "targets": t5.data.Feature(
+        vocabulary=MT5_VOCAB, add_eos=True)
+}
+
+GET_METRICS = {
+    "BLEU": mt.bleu,
+    "ROUGE": mt.rouge,
+    "Span Squad": mt.span_squad,
+    "Squad": mt.squad,
+    "Trivia QA": mt.trivia_qa,
+    "Accuracy": mt.accuracy,
+    "Sequence Accuracy": mt.sequence_accuracy,
+    "Pearson Correlation": mt.pearson_corrcoef,
+    "Spearman Correlation": mt.spearman_corrcoef,
+    "MultiRC": mt.multirc_f1_over_all_answers,
+    "AUC": mt.auc,
+    "COQA F1": mt.coqa_f1,
+    "Edit Distance": mt.edit_distance,
+    "Other": mt.accuracy,
+}
 
 def removeHyphen(example):
     example_clean = {}
@@ -106,55 +134,9 @@ def apply_template(dataset, template):
     return dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
 
 
-def get_dataset_splits(dataset_name, subset_name=None):
-    info = datasets.get_dataset_infos(dataset_name)
-    subset_name = subset_name or list(info.keys())[0]
-    return info[subset_name].splits
-
-
 def task_clean(text):
     # Clean the text according to allowed characters for a task name
     return re.sub(r"[^\w\d\._]+", "_", text)
-
-
-def get_task_name(dataset_name, subset_name, template_name):
-    return task_clean(dataset_name + (f"_{subset_name}_" if subset_name is not None else "_") + template_name)
-
-GET_METRICS = {
-    "BLEU": mt.bleu,
-    "ROUGE": mt.rouge,
-    "Span Squad": mt.span_squad,
-    "Squad": mt.squad,
-    "Trivia QA": mt.trivia_qa,
-    "Accuracy": mt.accuracy,
-    "Sequence Accuracy": mt.sequence_accuracy,
-    "Pearson Correlation": mt.pearson_corrcoef,
-    "Spearman Correlation": mt.spearman_corrcoef,
-    "MultiRC": mt.multirc_f1_over_all_answers,
-    "AUC": mt.auc,
-    "COQA F1": mt.coqa_f1,
-    "Edit Distance": mt.edit_distance,
-    "Other": mt.accuracy,
-}
-
-MAX_EXAMPLES_PER_DATASET = 500_000
-
-MT5_SPM_PATH = "gs://t5-data/vocabs/mc4.250000.100extra/sentencepiece.model"
-
-MT5_TEMPERATURE = 1.0 / 0.3
-MT5_MIX_RATE = functools.partial(
-    t5.data.rate_num_examples, temperature=MT5_TEMPERATURE)
-
-MT5_VOCAB = t5.data.SentencePieceVocabulary(MT5_SPM_PATH)
-MT5_OUTPUT_FEATURES = {
-    "inputs": t5.data.Feature(
-        vocabulary=MT5_VOCAB, add_eos=True, required=False),
-    "targets": t5.data.Feature(
-        vocabulary=MT5_VOCAB, add_eos=True)
-}
-
-
-MAX_EXAMPLES_PER_DATASET = 500_000
 
 
 def strip_whitespace(output_or_target, example=None, is_target=False):
@@ -177,6 +159,10 @@ def maybe_get_class_id_postprocessor(template):
         return strip_whitespace
 
 
+def get_task_name(dataset_name, subset_name, template_name):
+    return task_clean(dataset_name + (f"_{subset_name}_" if subset_name is not None else "_") + template_name)
+
+
 def get_tf_dataset(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, template=None, split_mapping=None):
     # HF datasets does not support file-level shuffling
     del shuffle_files, seed
@@ -186,9 +172,21 @@ def get_tf_dataset(split, shuffle_files, seed: Optional[int] = None, dataset_nam
     return hf_dataset_to_tf_dataset(dataset)
 
 
-def add_task(dataset_name, subset_name, template_name, task_name=None, split_mapping=None):
-    template = all_templates.get_dataset(dataset_name, subset_name)[template_name]
-    task_name = task_name or get_task_name(dataset_name, subset_name, template_name)
+def add_task(dataset_name, subset_name=None, split_mapping=None):
+
+    dataset = all_templates.get_dataset(dataset_name, subset_name)
+    num_templates = len(dataset.all_template_names)
+
+    info = datasets.get_dataset_infos(dataset_name)
+    subset_info = subset_name or list(info.keys())[0]
+    split_mapping = split_mapping or {k: k for k in info[subset_info].splits.keys()}
+    dataset_splits = info[subset_info].splits
+    train_size = dataset_splits['train'].num_examples
+
+    if train_size > MAX_EXAMPLES_PER_DATASET:
+        cap = MAX_EXAMPLES_PER_DATASET // num_templates
+    else:
+        cap = train_size
 
     if dataset_name == "glue":
         metrics = get_glue_metric(subset_name)
@@ -200,16 +198,117 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
             metrics = get_super_glue_metric(subset_name)
     else:
         # TODO what if metric is null?
-        metrics = [GET_METRICS[m] for m in template.metadata.metrics]
+        metrics = [] #[GET_METRICS[m] for m in dataset[dataset.all_template_names[0]].metadata.metrics]
 
-    dataset_splits = get_dataset_splits(dataset_name, subset_name)
-    split_mapping = split_mapping or {k: k for k in dataset_splits.keys()}
+    task_cap: Dict[str, int] = {}
+    task_name_list = []
+    for template_name in dataset.all_template_names:
+
+        task_name = get_task_name(dataset_name, subset_name, template_name)
+        task_cap[task_name] = cap
+        task_name_list.append(task_name)
+
+        template = dataset[template_name]
+
+        dataset_fn = functools.partial(
+            get_tf_dataset,
+            dataset_name=dataset_name,
+            subset_name=subset_name,
+            template=template,
+            split_mapping=split_mapping,
+        )
+        dataset_fn.__name__ = "dataset_fn"
+
+        data_source = seqio.FunctionDataSource(
+            dataset_fn=dataset_fn,
+            splits=list(split_mapping.keys()),
+            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+        )
+
+        # Add train and normal eval tasks
+        seqio.TaskRegistry.add(
+            task_name,
+            source=data_source,
+            preprocessors=[
+                seqio.preprocessors.tokenize,
+                seqio.preprocessors.append_eos,
+                seqio.CacheDatasetPlaceholder(),
+            ],
+            output_features=MT5_OUTPUT_FEATURES,
+            metric_fns=metrics,
+            postprocess_fn=maybe_get_class_id_postprocessor(template),
+        )
+
+    return task_cap, task_name_list
+
+# 3 stages of training/ablation: D4 -> GPT -> SuperGLUE
+t0_train_mixture: List[str] = []
+gpt_train_mixture: List[str] = []
+sglue_train_mixture: List[str] = []
+mixture_cap: Dict[str, int] = {}
+
+all_templates = promptsource.templates.TemplateCollection()
+all_templates.remove("anli")  # Need to special-case ANLI due to weird split conventions
+
+
+# ==================================== OSCAR LM Adaptation ======================================
+oscar_lm_adaptation_mixture: List[str] = []
+OSCAR_LANGS = [
+    'af', 'als', 'am', 'an', 'ar', 'arz', 'as', 'ast', 'av', 'az', 'azb', 'ba',
+    'bar', 'bcl', 'be', 'bg', 'bh', 'bn', 'bo', 'bpy', 'br', 'bs', 'bxr', 'ca',
+    'cbk', 'ce', 'ceb', 'ckb', 'cs', 'cv', 'cy', 'da', 'de', 'diq', 'dsb', 'dv', 
+    'el', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'frr', 'fy', 
+    'ga', 'gd', 'gl', 'gn', 'gom', 'gu', 'he', 'hi', 'hr', 'hsb', 'ht', 'hu',
+    'hy', 'ia', 'id', 'ie', 'ilo', 'io', 'is', 'it', 'ja', 'jbo', 'jv', 'ka',
+    'kk', 'km', 'kn', 'ko', 'krc', 'ku', 'kv', 'kw', 'ky', 'la', 'lb', 'lez',
+    'li', 'lmo', 'lo', 'lrc', 'lt', 'lv', 'mai', 'mg', 'mhr', 'min', 'mk', 'ml',
+    'mn', 'mr', 'mrj', 'ms', 'mt', 'mwl', 'my', 'myv', 'mzn', 'nah', 'nap', 'nds',
+    'ne', 'new', 'nl', 'nn', 'no', 'oc', 'or', 'os', 'pa', 'pam', 'pl', 'pms', 
+    'pnb', 'ps', 'pt', 'qu', 'rm', 'ro', 'ru', 'sa', 'sah', 'scn', 'sd', 'sh',
+    'si', 'sk', 'sl', 'so', 'sq', 'sr', 'su', 'sv', 'sw', 'ta', 'te', 'tg',
+    'th', 'tk', 'tl', 'tr', 'tt', 'tyv', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi',
+    'vo', 'wa', 'war', 'wuu', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh'
+]
+
+def get_tf_dataset_oscar(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
+
+    def map_fn(ex):
+        # return {"inputs": ex["text"], "targets": ex["text"]}
+        return ex
+
+    def filter_fn(ex):
+        # return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+        return len(ex["text"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    # dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets"})
+    dataset = dataset.remove_columns(set(original_columns) - {"text"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+
+info = datasets.get_dataset_infos("oscar")
+
+
+for lang in OSCAR_LANGS:
+
+    task_name = "oscar_{}_lm_objective".format(lang)
+    subset_name = "unshuffled_deduplicated_{}".format(lang)
+    split_mapping = {k: k for k in info[subset_name].splits.keys()}
+    dataset_splits = info[subset_name].splits
+
+    oscar_lm_adaptation_mixture.append(task_name)
 
     dataset_fn = functools.partial(
-        get_tf_dataset,
-        dataset_name=dataset_name,
+        get_tf_dataset_oscar,
+        dataset_name="oscar",
         subset_name=subset_name,
-        template=template,
         split_mapping=split_mapping,
     )
     dataset_fn.__name__ = "dataset_fn"
@@ -220,151 +319,383 @@ def add_task(dataset_name, subset_name, template_name, task_name=None, split_map
         num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
     )
 
-    preprocessors = [
-        seqio.preprocessors.tokenize,
-        seqio.preprocessors.append_eos,
-        seqio.CacheDatasetPlaceholder(),
-    ]
-
-    # Add train and normal eval tasks
     seqio.TaskRegistry.add(
         task_name,
         source=data_source,
-        preprocessors=preprocessors,
-        output_features=MT5_OUTPUT_FEATURES,
-        metric_fns=metrics,
-        postprocess_fn=maybe_get_class_id_postprocessor(template),
-    )
+        preprocessors=[
+            functools.partial(
+                seqio.preprocessors.rekey, key_map={
+                    "inputs": None,
+                    "targets": "text"
+                }),
+            seqio.preprocessors.tokenize,
+            seqio.CacheDatasetPlaceholder(),
+            t5.data.preprocessors.targets_for_prefix_lm_objective,
+            t5.data.preprocessors.pack_prefix_lm_encoder_decoder,
+        ],
+        output_features={
+            "encoder_input_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_target_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_input_tokens": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "encoder_segment_ids": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "encoder_positions": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_segment_ids": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_positions": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            "decoder_loss_weights": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=False),
+            # All but the last stage of the preprocessing uses "targets" as the key,
+            # so this output feature is necessary. It is not marked required because
+            # the final preprocessor drops it.
+            "targets": seqio.Feature(vocabulary=MT5_VOCAB, add_eos=True),
+        },
+        metric_fns=[])
 
-    # # Add rank classification eval task
-    # if template.answer_choices:
-    #     rank_classification_preprocessor = functools.partial(
-    #         t5.data.preprocessors.rank_classification,
-    #         inputs_fn=lambda ex: tf.fill((len(ex["answer_choices"]),), ex["inputs"]),
-    #         targets_fn=lambda ex: ex["answer_choices"],
-    #         is_correct_fn=lambda ex: tf.equal(ex["answer_choices"], tf.strings.strip(ex["targets"])),
-    #         weight_fn=lambda ex: 1.0,
-    #     )
+seqio.MixtureRegistry.add(
+    "oscar_lm_adaptation",
+    oscar_lm_adaptation_mixture,
+    default_rate=DEFAULT_MIX_RATE,
+)
 
-    #     fixed_choices = template.get_fixed_answer_choices_list()
-    #     num_classes = len(fixed_choices) if fixed_choices else None
-    #     seqio.TaskRegistry.add(
-    #         task_name + "_score_eval",
-    #         source=data_source,
-    #         preprocessors=[rank_classification_preprocessor] + preprocessors,
-    #         output_features=output_features,
-    #         metric_fns=[functools.partial(t5.evaluation.metrics.rank_classification, num_classes=num_classes)],
-    #         postprocess_fn=t5.data.postprocessors.rank_classification,
-    #     )
+seqio.MixtureRegistry.add(
+    "oscar_no_en_lm_adaptation",
+    [lang for lang in oscar_lm_adaptation_mixture if lang !="en"],
+    default_rate=DEFAULT_MIX_RATE,
+)
 
-datatset_subset_tuple = Tuple[str, Optional[str]]
-d4_train: List[datatset_subset_tuple] = []
-d4_eval: List[datatset_subset_tuple] = []
-d3_train_gpt: List[datatset_subset_tuple] = []
-d3_train_sglue: List[datatset_subset_tuple] = []
-bias_fairness_eval: List[datatset_subset_tuple] = []
-gsheet: Dict[datatset_subset_tuple, Dict] = {}
-experiment_path = pkg_resources.resource_filename(__name__, "experiment_D4.csv")
-with open(experiment_path) as exp_file:
-    reader = csv.DictReader(exp_file)
-    for row in reader:
-        if row["skip"]:
-            continue
-        if row["subset"] == "":
-            row["subset"] = None  # to match promptsource.Template object
-        dataset_subset = (row["HF_name"], row["subset"])
-        if row["do_train"] == "TRUE":
-            d4_train.append(dataset_subset)
-        if row["do_eval"] == "TRUE":
-            d4_eval.append(dataset_subset)
-        if row["D3_do_train"] == "TRUE" and "GPT" in row["seed_paper"]:
-            d3_train_gpt.append(dataset_subset)
-        if row["D3_do_train"] == "TRUE" and row["HF_name"] == "super_glue":
-            d3_train_sglue.append(dataset_subset)
-        if (
-            row["do_eval"] == "TRUE"
-            and row["task_by_convention"] == "bias_and_fairness"
-            and row["HF_name"] != "winogender"
-        ):
-            bias_fairness_eval.append(dataset_subset)
-        gsheet[dataset_subset] = row
-all_datasets = d4_train + d4_eval + d3_train_gpt + d3_train_sglue + bias_fairness_eval
 
-all_templates = promptsource.templates.TemplateCollection()
-all_templates.remove("anli")  # Need to special-case ANLI due to weird split conventions
+# ==================================== OPUS100 ======================================
+opus100_train_mixture: List[str] = []
+OPUS100_LANGS = [
+    'af-en', 'am-en', 'an-en', 'ar-en', 'as-en', 'az-en', 'be-en', 'bg-en', 'bn-en', 'br-en', 'bs-en', 'ca-en',
+    'cs-en', 'cy-en', 'da-en', 'de-en', 'dz-en', 'el-en', 'en-eo', 'en-es', 'en-et', 'en-eu', 'en-fa', 'en-fi',
+    'en-fr', 'en-fy', 'en-ga', 'en-gd', 'en-gl', 'en-gu', 'en-ha', 'en-he', 'en-hi', 'en-hr', 'en-hu', 'en-hy',
+    'en-id', 'en-ig', 'en-is', 'en-it', 'en-ja', 'en-ka', 'en-kk', 'en-km', 'en-ko', 'en-kn', 'en-ku', 'en-ky',
+    'en-li', 'en-lt', 'en-lv', 'en-mg', 'en-mk', 'en-ml', 'en-mn', 'en-mr', 'en-ms', 'en-mt', 'en-my', 'en-nb',
+    'en-ne', 'en-nl', 'en-nn', 'en-no', 'en-oc', 'en-or', 'en-pa', 'en-pl', 'en-ps', 'en-pt', 'en-ro', 'en-ru',
+    'en-rw', 'en-se', 'en-sh', 'en-si', 'en-sk', 'en-sl', 'en-sq', 'en-sr', 'en-sv', 'en-ta', 'en-te', 'en-tg',
+    'en-th', 'en-tk', 'en-tr', 'en-tt', 'en-ug', 'en-uk', 'en-ur', 'en-uz', 'en-vi', 'en-wa', 'en-xh', 'en-yi',
+    'en-yo', 'en-zh', 'en-zu', 'ar-de', 'ar-fr', 'ar-nl', 'ar-ru', 'ar-zh', 'de-fr', 'de-nl', 'de-ru', 'de-zh',
+    'fr-nl', 'fr-ru', 'fr-zh', 'nl-ru', 'nl-zh', 'ru-zh'
+    ]
 
-# 3 stages of training/ablation: D4 -> GPT -> SuperGLUE
-d4_train_mixture: List[str] = []  # strings are dataset_subset_template
-gpt_train_mixture: List[str] = []
-sglue_train_mixture: List[str] = []
-d4_eval_mixture: List[str] = []
-bias_fairness_eval_mixture: List[str] = []
-mixture_cap: Dict[str, int] = {}
-single_original_task: Dict[Tuple[str, str], str] = {}
-all_original_tasks: List[str] = []
-for dataset_name, subset_name in all_templates.keys:
-    if (dataset_name, subset_name) not in all_datasets:
-        all_templates.remove(dataset_name, subset_name)
-        continue
+def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
 
-    dataset = all_templates.get_dataset(dataset_name, subset_name)
-    num_templates = len(dataset.all_template_names)
-    train_size = gsheet[(dataset_name, subset_name)]["train_size"]
-    if train_size == "":
-        train_size = 0
-    else:
-        train_size = int(train_size)
-    if train_size > MAX_EXAMPLES_PER_DATASET:
-        cap = MAX_EXAMPLES_PER_DATASET // num_templates
-    else:
-        cap = train_size
-    for template_name in dataset.all_template_names:
-        add_task(dataset_name, subset_name, template_name)
+    def map_fn(ex):
+        return {
+            "inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]),
+            "targets": ex["translation"][tgt_lang]
+            }
 
-        template = dataset[template_name]
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
 
-        task_name = get_task_name(dataset_name, subset_name, template_name)
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
 
-        if (dataset_name, subset_name) not in single_original_task and template.metadata.original_task:
-            single_original_task[(dataset_name, subset_name)] = task_name
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
+    return hf_dataset_to_tf_dataset(dataset)
 
-        if template.metadata.original_task:
-            all_original_tasks.append(task_name)
+info = datasets.get_dataset_infos("opus100")
+# subset_name = list(info.keys())[0]
+task_cap: Dict[str, int] = {}
 
-        if (dataset_name, subset_name) in d4_train:
-            d4_train_mixture.append(task_name)
-            mixture_cap[task_name] = cap
-        if (dataset_name, subset_name) in d3_train_gpt:
-            gpt_train_mixture.append(task_name)
-            mixture_cap[task_name] = cap
-        if (dataset_name, subset_name) in d3_train_sglue:
-            sglue_train_mixture.append(task_name)
-            mixture_cap[task_name] = cap
-        if (dataset_name, subset_name) in d4_eval:
-            if template.metadata.original_task:
-                d4_eval_mixture.append(task_name)
-            # TODO use template.metadata.answer_choices here for rank eval
-        if (dataset_name, subset_name) in bias_fairness_eval:
-            bias_fairness_eval_mixture.append(task_name)
+for ori_lang in OPUS100_LANGS:
 
-# Special case for ANLI, which has weirdly-named splits and rounds that should be subsets
-dataset_name, subset_name = ("anli", None)
-dataset = all_templates.get_dataset(dataset_name, subset_name)
-for anli_round in ("r1", "r2", "r3"):
-    for template_name in all_templates.get_dataset(dataset_name, subset_name).all_template_names:
-        task_name = get_task_name(dataset_name, subset_name, template_name) + f"_{anli_round}"
-        split_mapping = {
-            "train": f"train_{anli_round}",
-            "validation": f"dev_{anli_round}",
-            "test": f"test_{anli_round}",
-        }
-        add_task(dataset_name, subset_name, template_name, task_name, split_mapping)
+    lang_a, lang_b = ori_lang.split('-')
+    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
+    dataset_splits = info[ori_lang].splits
 
-        template = dataset[template_name]
-        if template.metadata.original_task:
-            d4_eval_mixture.append(task_name)  # TODO or add to ANLI special mixture
-        # TODO use template.metadata.answer_choices here for rank eval
+    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
 
+        lang = "{}-{}".format(src_lang, tgt_lang)
+
+        task_name = "opus100_{}_mt".format(lang.replace("-", "_"))
+
+        if 'train' in dataset_splits:
+
+            train_size = dataset_splits['train'].num_examples
+            if train_size > MAX_EXAMPLES_PER_DATASET:
+                train_size = MAX_EXAMPLES_PER_DATASET
+
+            opus100_train_mixture.append(task_name)
+            task_cap[task_name] = train_size
+
+        dataset_fn = functools.partial(
+            get_tf_dataset_opus100,
+            dataset_name="opus100",
+            subset_name=ori_lang,
+            src_lang=src_lang,
+            tgt_lang=tgt_lang,
+            split_mapping=split_mapping,
+        )
+        dataset_fn.__name__ = "dataset_fn"
+
+        data_source = seqio.FunctionDataSource(
+            dataset_fn=dataset_fn,
+            splits=list(split_mapping.keys()),
+            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+        )
+
+        seqio.TaskRegistry.add(
+            task_name,
+            source=data_source,
+            preprocessors=[
+                seqio.preprocessors.tokenize,
+                seqio.preprocessors.append_eos,
+                seqio.CacheDatasetPlaceholder(),
+            ],
+            output_features=MT5_OUTPUT_FEATURES,
+            metric_fns=[])
+
+mixture_cap = {**mixture_cap, **task_cap}
+seqio.MixtureRegistry.add(
+    "opus100_train_mixture",
+    opus100_train_mixture,
+    default_rate=DEFAULT_MIX_RATE,
+)
+
+# ==================================== Coreference Resolution ======================================
+task_cap, task_name_list = add_task("super_glue", "wsc.fixed")
+mixture_cap = {**mixture_cap, **task_cap}
+# sglue_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("winogrande", "winogrande_xl")
+mixture_cap = {**mixture_cap, **task_cap}
+
+# ==================================== Natural Language Inference ======================================
+task_cap, task_name_list = add_task("super_glue", "cb")
+mixture_cap = {**mixture_cap, **task_cap}
+
+task_cap, task_name_list = add_task("super_glue", "rte")
+mixture_cap = {**mixture_cap, **task_cap}
+
+# ANLI
+# task_cap, task_name_list = add_task("dataset_name", "subset_name")
+# ==================================== Paraphrase Identification ======================================
+task_cap, task_name_list  = add_task("glue", "mrpc")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list  = add_task("glue", "qqp")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list  = add_task("paws", "labeled_final")
+mixture_cap = {**mixture_cap, **task_cap}
+#t0_train_mixture.extend(task_name_list)
+
+# ==================================== Closed-Book QA ======================================
+task_cap, task_name_list  = add_task("ai2_arc", "ARC-Challenge")
+mixture_cap = {**mixture_cap, **task_cap}
+gpt_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list  = add_task("ai2_arc", "ARC-Easy")
+mixture_cap = {**mixture_cap, **task_cap}
+gpt_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list  = add_task("kilt_tasks", "hotpotqa")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list  = add_task("trivia_qa", "unfiltered")
+mixture_cap = {**mixture_cap, **task_cap}
+gpt_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list  = add_task("web_questions", None)
+mixture_cap = {**mixture_cap, **task_cap}
+gpt_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list  = add_task("wiki_qa", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+# ==================================== Extractive QA ======================================
+task_cap, task_name_list = add_task("adversarial_qa", "dbidaf")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("adversarial_qa", "dbert")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("adversarial_qa", "droberta")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("duorc", "SelfRC")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("duorc", "ParaphraseRC")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("ropes", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("squad_v2", None)
+mixture_cap = {**mixture_cap, **task_cap}
+
+task_cap, task_name_list = add_task("super_glue", "record")
+mixture_cap = {**mixture_cap, **task_cap}
+sglue_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("quoref", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("tydiqa", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+# ==================================== Multiple-Choice QA ======================================
+task_cap, task_name_list = add_task("cos_e", "v1.11")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("cosmos_qa", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("dream", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("openbookqa", "main")
+mixture_cap = {**mixture_cap, **task_cap}
+
+task_cap, task_name_list = add_task("qasc", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("quail", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("quarel", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("quartz", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("race", "high")
+mixture_cap = {**mixture_cap, **task_cap}
+
+task_cap, task_name_list = add_task("race", "middle")
+mixture_cap = {**mixture_cap, **task_cap}
+
+task_cap, task_name_list = add_task("sciq", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("social_i_qa", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("super_glue", "boolq")
+mixture_cap = {**mixture_cap, **task_cap}
+sglue_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("super_glue", "multirc")
+mixture_cap = {**mixture_cap, **task_cap}
+sglue_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("wiki_hop", "original")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("wiqa", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("piqa", None)
+mixture_cap = {**mixture_cap, **task_cap}
+gpt_train_mixture.extend(task_name_list)
+
+# ==================================== Sentiment ======================================
+task_cap, task_name_list = add_task("amazon_polarity", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("app_reviews", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("imdb", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("rotten_tomatoes", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("yelp_review_full", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+# ==================================== Sentence Completion ======================================
+task_cap, task_name_list = add_task("super_glue", "copa")
+mixture_cap = {**mixture_cap, **task_cap}
+# sglue_train_mixture.extend(task_name_list)
+
+# task_cap, task_name_list = add_task("story_cloze", "2016")
+# mixture_cap = {**mixture_cap, **task_cap}
+
+task_cap, task_name_list = add_task("hellaswag", None)
+mixture_cap = {**mixture_cap, **task_cap}
+gpt_train_mixture.extend(task_name_list)
+# ==================================== Structure-to-Text ======================================
+task_cap, task_name_list = add_task("common_gen", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("wiki_bio", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+# ==================================== Summarization ======================================
+task_cap, task_name_list = add_task("cnn_dailymail", "3.0.0")
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("gigaword", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("multi_news", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("samsum", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("xsum", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+# ==================================== Topic Classification ======================================
+task_cap, task_name_list = add_task("ag_news", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("dbpedia_14", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+
+task_cap, task_name_list = add_task("trec", None)
+mixture_cap = {**mixture_cap, **task_cap}
+t0_train_mixture.extend(task_name_list)
+# ==================================== Word Sense Disambiguation ======================================
+task_cap, task_name_list = add_task("super_glue", "wic")
+mixture_cap = {**mixture_cap, **task_cap}
+sglue_train_mixture.extend(task_name_list)
 
 TASK_BLACKLIST = [
     # Tasks which often tokenize to > 1024 tokens currently
@@ -395,30 +726,15 @@ TASK_BLACKLIST = [
     "gigaword_summarize_",
 ]
 
-# Tasks that failed caching (won't try to fix them for now) - remove when we are done
-D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST = [
-    "amazon_polarity_Is_this_product_review_positive_score_eval",
-    "amazon_polarity_Is_this_review_negative_score_eval",
-    "amazon_polarity_Is_this_review_score_eval",
-    "amazon_polarity_User_recommend_this_product_score_eval",
-    "amazon_polarity_convey_negative_or_positive_sentiment_score_eval",
-    "amazon_polarity_flattering_or_not_score_eval",
-    "amazon_polarity_negative_or_positive_tone_score_eval",
-    "amazon_polarity_user_satisfied_score_eval",
-    "amazon_polarity_would_you_buy_score_eval",
-    "dbpedia_14_given_a_choice_of_categories__score_eval",
-    "dbpedia_14_given_list_what_category_does_the_paragraph_belong_to_score_eval",
-    "dbpedia_14_pick_one_category_for_the_following_text_score_eval",
-    "wiki_hop_original_choose_best_object_affirmative_1_score_eval",
-    "wiki_hop_original_choose_best_object_affirmative_2_score_eval",
-    "wiki_hop_original_choose_best_object_affirmative_3_score_eval",
-    "wiki_hop_original_choose_best_object_interrogative_1_score_eval",
-    "wiki_hop_original_choose_best_object_interrogative_2_score_eval",
-]
+seqio.MixtureRegistry.add(
+    "t0_train",
+    [task for task in t0_train_mixture if task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
 
 seqio.MixtureRegistry.add(
-    "d4_train",
-    [task for task in d4_train_mixture if task not in TASK_BLACKLIST],
+    "t0_train_plus_opus",
+    [task for task in t0_train_mixture+opus100_train_mixture if task not in TASK_BLACKLIST],
     default_rate=lambda t: mixture_cap[t.name],
 )
 
@@ -435,115 +751,250 @@ seqio.MixtureRegistry.add(
 )
 
 seqio.MixtureRegistry.add(
-    "d4_gpt_train",
-    [task for task in d4_train_mixture + gpt_train_mixture if task not in TASK_BLACKLIST],
+    "t0_plus_train",
+    [task for task in t0_train_mixture + gpt_train_mixture if task not in TASK_BLACKLIST],
     default_rate=lambda t: mixture_cap[t.name],
 )
 
 seqio.MixtureRegistry.add(
-    "d4_gpt_sglue_train",
-    [task for task in d4_train_mixture + gpt_train_mixture + sglue_train_mixture if task not in TASK_BLACKLIST],
+    "t0_plus_plus_train",
+    [task for task in t0_train_mixture + gpt_train_mixture + sglue_train_mixture if task not in TASK_BLACKLIST],
     default_rate=lambda t: mixture_cap[t.name],
 )
 
+
 seqio.MixtureRegistry.add(
-    "d4_eval",
-    [task for task in d4_eval_mixture if task not in TASK_BLACKLIST],
-    default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-)  # eval mixture does not need to be capped
-print(seqio.TaskRegistry.names())
-print(seqio.MixtureRegistry.names())
+    "t0pp_train_plus_opus",
+    [task for task in t0_train_mixture+gpt_train_mixture+sglue_train_mixture+opus100_train_mixture if task not in TASK_BLACKLIST],
+    default_rate=lambda t: mixture_cap[t.name],
+)
+
+# ==================================== XCOPA ======================================
+xcopa_eval_mixture: List[str] = []
+LANGS = ['et', 'ht', 'it', 'id', 'qu', 'sw', 'zh', 'ta', 'th', 'tr', 'vi']
+
+def get_tf_dataset_xcopa(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
+
+    def map_fn(ex):
+        # return {"inputs": ex["text"], "targets": ex["text"]}
+        return {
+            "inputs": "Given the premise \"{premise}\" which is the most likely {question}? A: \"{choice1}\" or B: \"{choice2}\"".format(**ex),
+            "targets": ["A", "B"][ex["label"]]
+        }
 
 
-cache_task = []
-for task in d4_train_mixture+gpt_train_mixture+sglue_train_mixture+d4_eval_mixture:
-    if (task not in TASK_BLACKLIST) and (task not in cache_task):
-        cache_task.append(task)
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
 
-with open('/tmp/cache_task.txt', 'w') as file:
-    file.writelines([i+'\n' for i in cache_task])
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+
+info = datasets.get_dataset_infos("xcopa")
+
+
+for lang in LANGS:
+
+    task_name = "xcopa_{}".format(lang)
+    subset_name = lang
+    split_mapping = {k: k for k in info[subset_name].splits.keys()}
+    dataset_splits = info[subset_name].splits
+
+    xcopa_eval_mixture.append(task_name)
+
+    dataset_fn = functools.partial(
+        get_tf_dataset_xcopa,
+        dataset_name="xcopa",
+        subset_name=subset_name,
+        split_mapping=split_mapping,
+    )
+    dataset_fn.__name__ = "dataset_fn"
+
+    data_source = seqio.FunctionDataSource(
+        dataset_fn=dataset_fn,
+        splits=list(split_mapping.keys()),
+        num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+    )
+
+    seqio.TaskRegistry.add(
+        task_name,
+        source=data_source,
+        preprocessors=[
+            seqio.preprocessors.tokenize,
+            seqio.preprocessors.append_eos,
+            seqio.CacheDatasetPlaceholder(),
+        ],
+        output_features=MT5_OUTPUT_FEATURES,
+        metric_fns=[mt.accuracy]
+        )
+
+seqio.MixtureRegistry.add(
+    "xcopa_eval",
+    xcopa_eval_mixture,
+    default_rate=1.0
+)
+
+
+# ==================================== XNLI ======================================
+xnli_eval_mixture: List[str] = []
+LANGS = ["ar", "bg", "de", "el", "en", "es", "fr", "hi", "ru", "sw", "th", "tr", "ur", "vi", "zh"]
+
+def get_tf_dataset_xnli(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
+
+    def map_fn(ex):
+        # return {"inputs": ex["text"], "targets": ex["text"]}
+        return {
+            "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? Yes, no, or maybe?".format(**ex),
+            "targets": ["Yes", "Maybe", "No"][ex["label"]]
+            # "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? True, False, or Possibly?".format(**ex),
+            # "targets": ["True", "Possibly", "False"][ex["label"]]
+        }
+
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+
+info = datasets.get_dataset_infos("xnli")
+
+
+for lang in LANGS:
+
+    task_name = "xnli_{}".format(lang)
+    subset_name = lang
+    split_mapping = {k: k for k in info[subset_name].splits.keys()}
+    dataset_splits = info[subset_name].splits
+
+    xnli_eval_mixture.append(task_name)
+
+    dataset_fn = functools.partial(
+        get_tf_dataset_xnli,
+        dataset_name="xnli",
+        subset_name=subset_name,
+        split_mapping=split_mapping,
+    )
+    dataset_fn.__name__ = "dataset_fn"
+
+    data_source = seqio.FunctionDataSource(
+        dataset_fn=dataset_fn,
+        splits=list(split_mapping.keys()),
+        num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+    )
+
+    seqio.TaskRegistry.add(
+        task_name,
+        source=data_source,
+        preprocessors=[
+            seqio.preprocessors.tokenize,
+            seqio.preprocessors.append_eos,
+            seqio.CacheDatasetPlaceholder(),
+        ],
+        postprocess_fn=t5.data.postprocessors.lower_text,
+        output_features=MT5_OUTPUT_FEATURES,
+        metric_fns=[mt.accuracy]
+        )
+
+seqio.MixtureRegistry.add(
+    "xnli_eval",
+    xnli_eval_mixture,
+    default_rate=1.0
+)
+
+# ==================================== Flores ======================================
+flores_mixture: List[str] = []
+LANGS = [ "sien", "neen"]
+
+def get_tf_dataset_flores(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
+
+    def map_fn(ex):
+        return {"inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]), "targets": ex["translation"][tgt_lang]}
+
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+info = datasets.get_dataset_infos("flores")
+# subset_name = list(info.keys())[0]
+
+for lang in LANGS:
+
+    split_mapping = {k: k for k in info[lang].splits.keys()}
+    dataset_splits = info[lang].splits
+    lang_a, lang_b = lang[:2], lang[2:]
+
+    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
+
+        task_name = "flores_{}_{}_mt".format(src_lang, tgt_lang)
+        flores_mixture.append(task_name)
+
+        dataset_fn = functools.partial(
+            get_tf_dataset_flores,
+            dataset_name="flores",
+            subset_name=lang,
+            src_lang=src_lang,
+            tgt_lang=tgt_lang,
+            split_mapping=split_mapping,
+        )
+        dataset_fn.__name__ = "dataset_fn"
+
+        data_source = seqio.FunctionDataSource(
+            dataset_fn=dataset_fn,
+            splits=list(split_mapping.keys()),
+            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+        )
+
+        seqio.TaskRegistry.add(
+            task_name,
+            source=data_source,
+            preprocessors=[
+                seqio.preprocessors.tokenize,
+                seqio.preprocessors.append_eos,
+                seqio.CacheDatasetPlaceholder(),
+            ],
+            output_features=MT5_OUTPUT_FEATURES,
+            metric_fns=[mt.bleu]
+            )
+
+seqio.MixtureRegistry.add(
+    "flores_mt_mixture",
+    flores_mixture,
+    default_rate=1.0
+)
 
 # seqio.MixtureRegistry.add(
-#     "d4_score_eval",
-#     [
-#         task
-#         for task in seqio.TaskRegistry.names()
-#         if task.endswith("_score_eval")
-#         and task.split("_score_eval")[0] in d4_eval_mixture
-#         and task.split("_score_eval")[0] not in TASK_BLACKLIST
-#     ],
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+#     "pawsx_eval",
+#     xnli_eval_mixture
 # )
 
-# # Train tasks we don't care about evaluating on
-# D4_TRAIN_SKIP_EVAL = [
-#     "paws_labeled_final",
-#     "adversarial_qa_dbidaf",
-#     "adversarial_qa_dbert",
-#     "duorc_ParaphraseRC",
-#     "dream",
-#     "amazon_polarity",
-#     "app_reviews",
-#     "imdb",
-#     "wiki_bio",
-#     "gigaword",
-#     "multi_news",
-#     "samsum",
-#     "dbpedia_14",
-#     "trec",
-# ]
-
 # seqio.MixtureRegistry.add(
-#     "d4_train_eval",
-#     [
-#         task
-#         for task in d4_train_mixture
-#         if task not in TASK_BLACKLIST
-#         and not any([skip in task for skip in D4_TRAIN_SKIP_EVAL])
-#         and task in all_original_tasks
-#     ],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
-
-# seqio.MixtureRegistry.add(
-#     "d4_train_score_eval",
-#     [
-#         task
-#         for task in seqio.TaskRegistry.names()
-#         if task.endswith("_score_eval")
-#         and task.split("_score_eval")[0] in d4_train_mixture
-#         and task.split("_score_eval")[0] not in TASK_BLACKLIST
-#         and task not in D4_TRAIN_SCORE_EVAL_TASK_BLACKLIST
-#         and not any([skip in task for skip in D4_TRAIN_SKIP_EVAL])
-#         and task.split("_score_eval")[0] in all_original_tasks
-#     ],
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-# )
-
-# seqio.MixtureRegistry.add(
-#     "d4_train_one_og_prompt",
-#     [task for task in single_original_task.values() if task in d4_train_mixture and task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
-
-# seqio.MixtureRegistry.add(
-#     "d4_train_all_og_prompts",
-#     [task for task in all_original_tasks if task in d4_train_mixture and task not in TASK_BLACKLIST],
-#     default_rate=lambda t: mixture_cap[t.name],
-# )
-
-# seqio.MixtureRegistry.add(
-#     "bias_fairness_eval",
-#     bias_fairness_eval_mixture,
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
-# )
-
-# seqio.MixtureRegistry.add(
-#     "bias_fairness_eval_score_eval",
-#     [
-#         task
-#         for task in seqio.TaskRegistry.names()
-#         if task.endswith("_score_eval") and task.split("_score_eval")[0] in bias_fairness_eval_mixture
-#     ],
-#     default_rate=functools.partial(seqio.mixing_rate_num_examples, maximum=500_000),
+#     "xwino_eval",
+#     xnli_eval_mixture
 # )
