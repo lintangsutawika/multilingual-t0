@@ -363,7 +363,7 @@ seqio.MixtureRegistry.add(
 
 
 # ==================================== OPUS100 ======================================
-opus100_lm_adaptation_mixture: List[str] = []
+opus100_train_mixture: List[str] = []
 OPUS100_LANGS = [
     'af-en', 'am-en', 'an-en', 'ar-en', 'as-en', 'az-en', 'be-en', 'bg-en', 'bn-en', 'br-en', 'bs-en', 'ca-en',
     'cs-en', 'cy-en', 'da-en', 'de-en', 'dz-en', 'el-en', 'en-eo', 'en-es', 'en-et', 'en-eu', 'en-fa', 'en-fi',
@@ -398,6 +398,7 @@ def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dat
 
 info = datasets.get_dataset_infos("opus100")
 # subset_name = list(info.keys())[0]
+task_cap: Dict[str, int] = {}
 
 for ori_lang in OPUS100_LANGS:
 
@@ -410,7 +411,11 @@ for ori_lang in OPUS100_LANGS:
         lang = "{}-{}".format(src_lang, tgt_lang)
 
         task_name = "opus100_{}_mt".format(lang.replace("-", "_"))
-        opus100_lm_adaptation_mixture.append(task_name)
+
+        if 'train' in dataset_splits:
+            train_size = dataset_splits['train'].num_examples
+            opus100_train_mixture.append(task_name)
+            task_cap[task_name] = train_size
 
         dataset_fn = functools.partial(
             get_tf_dataset_opus100,
@@ -439,9 +444,10 @@ for ori_lang in OPUS100_LANGS:
             output_features=MT5_OUTPUT_FEATURES,
             metric_fns=[])
 
+mixture_cap = {**mixture_cap, **task_cap}
 seqio.MixtureRegistry.add(
-    "opus100_lm_adaptation",
-    opus100_lm_adaptation_mixture,
+    "opus100_train_mixture",
+    opus100_train_mixture,
     default_rate=DEFAULT_MIX_RATE,
 )
 
@@ -721,7 +727,7 @@ seqio.MixtureRegistry.add(
 
 seqio.MixtureRegistry.add(
     "t0_train_plus_opus",
-    [task for task in t0_train_mixture+opus100_lm_adaptation_mixture if task not in TASK_BLACKLIST],
+    [task for task in t0_train_mixture+opus100_train_mixture if task not in TASK_BLACKLIST],
     default_rate=lambda t: mixture_cap[t.name],
 )
 
@@ -752,7 +758,7 @@ seqio.MixtureRegistry.add(
 
 seqio.MixtureRegistry.add(
     "t0pp_train_plus_opus",
-    [task for task in t0_train_mixture+gpt_train_mixture+sglue_train_mixture+opus100_lm_adaptation_mixture if task not in TASK_BLACKLIST],
+    [task for task in t0_train_mixture+gpt_train_mixture+sglue_train_mixture+opus100_train_mixture if task not in TASK_BLACKLIST],
     default_rate=lambda t: mixture_cap[t.name],
 )
 
