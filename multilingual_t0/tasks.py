@@ -413,7 +413,11 @@ for ori_lang in OPUS100_LANGS:
         task_name = "opus100_{}_mt".format(lang.replace("-", "_"))
 
         if 'train' in dataset_splits:
+
             train_size = dataset_splits['train'].num_examples
+            if train_size > MAX_EXAMPLES_PER_DATASET:
+                train_size = MAX_EXAMPLES_PER_DATASET
+
             opus100_train_mixture.append(task_name)
             task_cap[task_name] = train_size
 

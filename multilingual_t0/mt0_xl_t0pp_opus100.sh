@@ -16,4 +16,5 @@ python3 ${T5X_DIR}/t5x/train.py \
   --gin.train.train_eval_dataset_cfg=None \
   --gin.trainer.Trainer.num_microbatches=16 \
   --gin.MIXTURE_OR_TASK_NAME="'t0pp_train_plus_opus'" \
+  --gin.TRAIN_STEPS=1050000 \
   2>&1 | tee $LOGS_PATH/train_$EXPERIMENT_NAME.txt
