@@ -989,10 +989,80 @@ seqio.MixtureRegistry.add(
     default_rate=1.0
 )
 
-# seqio.MixtureRegistry.add(
-#     "pawsx_eval",
-#     xnli_eval_mixture
-# )
+# ==================================== PAWS-X ======================================
+pawsx_eval_mixture: List[str] = []
+LANGS = ['en', 'de', 'es', 'fr', 'ja', 'ko', 'zh']
+
+def get_tf_dataset_pawsx(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, split_mapping=None):
+
+    def map_fn(ex):
+        # return {"inputs": ex["text"], "targets": ex["text"]}
+        return {
+            "inputs": "Sentence 1: \"{sentence1}\", Sentence 2: \"{sentence2}\". Do both sentences have the same meaning? Yes or No?".format(**ex),
+            "targets": ["No", "Yes"][ex["label"]]
+            # "inputs": "{premise} Based on the previous passage, is it true that \"{hypothesis}\"? True, False, or Possibly?".format(**ex),
+            # "targets": ["True", "Possibly", "False"][ex["label"]]
+        }
+
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+
+info = datasets.get_dataset_infos("pawsx")
+
+
+for lang in LANGS:
+
+    task_name = "pawsx_{}".format(lang)
+    subset_name = lang
+    split_mapping = {k: k for k in info[subset_name].splits.keys()}
+    dataset_splits = info[subset_name].splits
+
+    pawsx_eval_mixture.append(task_name)
+
+    dataset_fn = functools.partial(
+        get_tf_dataset_pawsx
+        dataset_name="pawsx",
+        subset_name=subset_name,
+        split_mapping=split_mapping,
+    )
+    dataset_fn.__name__ = "dataset_fn"
+
+    data_source = seqio.FunctionDataSource(
+        dataset_fn=dataset_fn,
+        splits=list(split_mapping.keys()),
+        num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+    )
+
+    seqio.TaskRegistry.add(
+        task_name,
+        source=data_source,
+        preprocessors=[
+            seqio.preprocessors.tokenize,
+            seqio.preprocessors.append_eos,
+            seqio.CacheDatasetPlaceholder(),
+        ],
+        postprocess_fn=t5.data.postprocessors.lower_text,
+        output_features=MT5_OUTPUT_FEATURES,
+        metric_fns=[mt.accuracy]
+        )
+
+seqio.MixtureRegistry.add(
+    "pawsx_eval",
+    pawsx_eval_mixture,
+    default_rate=1.0
+)
 
 # seqio.MixtureRegistry.add(
 #     "xwino_eval",
