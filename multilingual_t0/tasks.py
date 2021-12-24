@@ -1032,7 +1032,7 @@ for lang in LANGS:
     pawsx_eval_mixture.append(task_name)
 
     dataset_fn = functools.partial(
-        get_tf_dataset_pawsx
+        get_tf_dataset_pawsx,
         dataset_name="paws-x",
         subset_name=subset_name,
         split_mapping=split_mapping,
