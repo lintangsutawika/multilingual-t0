@@ -1019,7 +1019,7 @@ def get_tf_dataset_pawsx(split, shuffle_files, seed: Optional[int] = None, datas
     return hf_dataset_to_tf_dataset(dataset)
 
 
-info = datasets.get_dataset_infos("pawsx")
+info = datasets.get_dataset_infos("paws-x")
 
 
 for lang in LANGS:
@@ -1033,7 +1033,7 @@ for lang in LANGS:
 
     dataset_fn = functools.partial(
         get_tf_dataset_pawsx
-        dataset_name="pawsx",
+        dataset_name="paws-x",
         subset_name=subset_name,
         split_mapping=split_mapping,
     )
