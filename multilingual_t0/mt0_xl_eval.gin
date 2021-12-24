@@ -6,7 +6,7 @@ from t5x import utils
 
 import tasks
 
-include "mt5_xxl.gin"  # defines %MODEL.
+include "mt5_xl.gin"  # defines %MODEL.
 include "t5x/configs/runs/eval.gin"
 
 CHECKPOINT_PATH = %gin.REQUIRED  # passed via commandline
