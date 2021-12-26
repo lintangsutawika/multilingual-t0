@@ -685,6 +685,7 @@ TASK_BLACKLIST = [
     "ecthr_cases_alleged_violation_prediction_silver_rationales",
     # Tasks with broken cached files
     "gigaword_summarize_",
+    "winogrande_winogrande_xl_True_or_False_score_eval"
 ]
 
 # ==================================== OPUS100 ======================================
