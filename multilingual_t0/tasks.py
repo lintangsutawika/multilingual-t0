@@ -195,6 +195,8 @@ def add_task(dataset_name, subset_name=None, split_mapping=None, template_list=N
             cap = MAX_EXAMPLES_PER_DATASET // num_templates
         else:
             cap = train_size
+    else:
+        cap = MAX_EXAMPLES_PER_DATASET
 
     if dataset_name == "glue":
         metrics = get_glue_metric(subset_name)
