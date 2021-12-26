@@ -215,9 +215,9 @@ def add_task(dataset_name, subset_name=None, split_mapping=None, template_list=N
         task_name = get_task_name(dataset_name, subset_name, template_name)
 
         if template_list is None:
-            template = template_list[template_name]
-        else:
             template = dataset[template_name]
+        else:
+            template = template_list[template_name]
 
         dataset_fn = functools.partial(
             get_tf_dataset,
