@@ -308,7 +308,7 @@ mt0_train_mixture["task_mixture_natural_language_inference"].extend(task_name_li
 # Special case for ANLI, which has weirdly-named splits and rounds that should be subsets
 dataset_name, subset_name = ("anli", None)
 dataset = all_templates.get_dataset(dataset_name, subset_name)
-for anli_round in ("r1", "r2", "r3"):
+for anli_round in ("r1_score_eval", "r2_score_eval", "r3_score_eval"):
 
     template_list: Dict[str, str] = {}
     
