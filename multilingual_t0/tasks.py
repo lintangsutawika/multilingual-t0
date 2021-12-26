@@ -177,7 +177,7 @@ def add_task(dataset_name, subset_name=None, split_mapping=None, template_list=N
 
     if template_list == None:
         dataset = all_templates.get_dataset(dataset_name, subset_name)
-        template_list = {t:dataset[t] for t in dataset.all_template_names}
+        template_list = {get_task_name(dataset_name, subset_name, t):dataset[t] for t in dataset.all_template_names}
         num_templates = len(dataset.all_template_names)
     else:
         template_list = template_list
@@ -212,10 +212,9 @@ def add_task(dataset_name, subset_name=None, split_mapping=None, template_list=N
 
     task_cap: Dict[str, int] = {}
     task_name_list = []
-    for template_name in template_list:
+    for task_name in template_list:
 
-        task_name = get_task_name(dataset_name, subset_name, template_name)
-        template = template_list[template_name]
+        template = template_list[task_name]
 
         dataset_fn = functools.partial(
             get_tf_dataset,
