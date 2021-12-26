@@ -144,19 +144,19 @@ def strip_whitespace(output_or_target, example=None, is_target=False):
     return output_or_target.strip()
 
 
-def maybe_get_class_id_postprocessor(template):
-    if template.get_fixed_answer_choices_list():
+# def maybe_get_class_id_postprocessor(template):
+#     if template.get_fixed_answer_choices_list():
 
-        def postprocess_fn(output_or_target, example=None, is_target=False):
-            output_or_target = strip_whitespace(output_or_target)
-            return t5.data.postprocessors.string_label_to_class_id(
-                output_or_target, label_classes=template.get_fixed_answer_choices_list()
-            )
+#         def postprocess_fn(output_or_target, example=None, is_target=False):
+#             output_or_target = strip_whitespace(output_or_target)
+#             return t5.data.postprocessors.string_label_to_class_id(
+#                 output_or_target, label_classes=template.get_fixed_answer_choices_list()
+#             )
 
-        return postprocess_fn
+#         return postprocess_fn
 
-    else:
-        return strip_whitespace
+#     else:
+#         return strip_whitespace
 
 
 def get_task_name(dataset_name, subset_name, template_name):
