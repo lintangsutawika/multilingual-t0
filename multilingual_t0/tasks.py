@@ -347,7 +347,7 @@ mnli_lang_templates = {
         ),
 }
 
-task_cap, task_name_list = add_task(dataset_name="multi_nli", subset_name=None, template_list=xnli_templates)
+task_cap, task_name_list = add_task(dataset_name="multi_nli", subset_name=None, template_list=mnli_lang_templates)
 target_lang_prompt_mixture.extend(task_name_list)
 
 # ==================================== Paraphrase Identification ======================================
