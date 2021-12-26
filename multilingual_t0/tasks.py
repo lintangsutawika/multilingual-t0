@@ -297,11 +297,13 @@ mt0_train_mixture["task_mixture_coreference_resolution"].extend(task_name_list)
 # ==================================== Natural Language Inference ======================================
 mt0_train_mixture["task_mixture_natural_language_inference"]: List[str] = []
 
-task_cap, task_name_list = add_task("super_glue", "cb")
+template_list = {get_task_name("super_glue", "cb", t)+"_score_eval":dataset[t] for t in all_templates.get_dataset("super_glue", "cb").all_template_names}
+task_cap, task_name_list = add_task("super_glue", "cb", template_list=template_list)
 mixture_cap = {**mixture_cap, **task_cap}
 mt0_train_mixture["task_mixture_natural_language_inference"].extend(task_name_list)
 
-task_cap, task_name_list = add_task("super_glue", "rte")
+template_list = {get_task_name("super_glue", "rte", t)+"_score_eval":dataset[t] for t in all_templates.get_dataset("super_glue", "rte").all_template_names}
+task_cap, task_name_list = add_task("super_glue", "rte", template_list=template_list)
 mixture_cap = {**mixture_cap, **task_cap}
 mt0_train_mixture["task_mixture_natural_language_inference"].extend(task_name_list)
 
