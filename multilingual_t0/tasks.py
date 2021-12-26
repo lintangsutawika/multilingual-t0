@@ -244,7 +244,7 @@ def add_task(dataset_name, subset_name=None, split_mapping=None, template_list=N
             ],
             output_features=MT5_OUTPUT_FEATURES,
             metric_fns=metrics,
-            postprocess_fn=maybe_get_class_id_postprocessor(template),
+            # postprocess_fn=maybe_get_class_id_postprocessor(template),
         )
 
         task_cap[task_name] = cap
