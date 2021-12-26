@@ -290,6 +290,7 @@ mixture_cap = {**mixture_cap, **task_cap}
 xtreme_en_mixture.extend(task_name_list)
 sglue_train_mixture.extend(task_name_list)
 
+dataset = all_templates.get_dataset("winogrande", "winogrande_xl")
 template_list = {get_task_name("winogrande", "winogrande_xl", t)+"_score_eval":dataset[t] for t in dataset.all_template_names}
 task_cap, task_name_list = add_task("winogrande", "winogrande_xl", template_list=template_list)
 mixture_cap = {**mixture_cap, **task_cap}
