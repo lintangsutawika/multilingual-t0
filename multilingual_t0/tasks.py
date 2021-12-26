@@ -682,6 +682,103 @@ TASK_BLACKLIST = [
     "gigaword_summarize_",
 ]
 
+# ==================================== OPUS100 ======================================
+opus100_train_mixture: List[str] = []
+OPUS100_LANGS = [
+    'af-en', 'am-en', 'an-en', 'ar-en', 'as-en', 'az-en', 'be-en', 'bg-en', 'bn-en', 'br-en', 'bs-en', 'ca-en',
+    'cs-en', 'cy-en', 'da-en', 'de-en', 'dz-en', 'el-en', 'en-eo', 'en-es', 'en-et', 'en-eu', 'en-fa', 'en-fi',
+    'en-fr', 'en-fy', 'en-ga', 'en-gd', 'en-gl', 'en-gu', 'en-ha', 'en-he', 'en-hi', 'en-hr', 'en-hu', 'en-hy',
+    'en-id', 'en-ig', 'en-is', 'en-it', 'en-ja', 'en-ka', 'en-kk', 'en-km', 'en-ko', 'en-kn', 'en-ku', 'en-ky',
+    'en-li', 'en-lt', 'en-lv', 'en-mg', 'en-mk', 'en-ml', 'en-mn', 'en-mr', 'en-ms', 'en-mt', 'en-my', 'en-nb',
+    'en-ne', 'en-nl', 'en-nn', 'en-no', 'en-oc', 'en-or', 'en-pa', 'en-pl', 'en-ps', 'en-pt', 'en-ro', 'en-ru',
+    'en-rw', 'en-se', 'en-sh', 'en-si', 'en-sk', 'en-sl', 'en-sq', 'en-sr', 'en-sv', 'en-ta', 'en-te', 'en-tg',
+    'en-th', 'en-tk', 'en-tr', 'en-tt', 'en-ug', 'en-uk', 'en-ur', 'en-uz', 'en-vi', 'en-wa', 'en-xh', 'en-yi',
+    'en-yo', 'en-zh', 'en-zu', 'ar-de', 'ar-fr', 'ar-nl', 'ar-ru', 'ar-zh', 'de-fr', 'de-nl', 'de-ru', 'de-zh',
+    'fr-nl', 'fr-ru', 'fr-zh', 'nl-ru', 'nl-zh', 'ru-zh'
+    ]
+
+def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
+
+    def map_fn(ex):
+        return {
+            "inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]),
+            "targets": ex["translation"][tgt_lang]
+            }
+
+    def filter_fn(ex):
+        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
+
+    # HF datasets does not support file-level shuffling
+    del shuffle_files, seed
+    dataset = datasets.load_dataset(dataset_name, subset_name)
+    dataset = dataset[split_mapping[split]]
+
+    original_columns = dataset.column_names
+    dataset = dataset.map(map_fn).filter(filter_fn)
+    # map keeps original columns, remove them
+    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
+    return hf_dataset_to_tf_dataset(dataset)
+
+info = datasets.get_dataset_infos("opus100")
+# subset_name = list(info.keys())[0]
+task_cap: Dict[str, int] = {}
+OPUS_MAX_EXAMPLES_PER_DATASET = 5000
+
+for ori_lang in OPUS100_LANGS:
+
+    lang_a, lang_b = ori_lang.split('-')
+    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
+    dataset_splits = info[ori_lang].splits
+
+    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
+
+        lang = "{}-{}".format(src_lang, tgt_lang)
+
+        task_name = "opus100_{}_mt".format(lang.replace("-", "_"))
+
+        if 'train' in dataset_splits:
+
+            train_size = dataset_splits['train'].num_examples
+            if train_size > OPUS_MAX_EXAMPLES_PER_DATASET:
+                train_size = OPUS_MAX_EXAMPLES_PER_DATASET
+
+            opus100_train_mixture.append(task_name)
+            task_cap[task_name] = train_size
+
+        dataset_fn = functools.partial(
+            get_tf_dataset_opus100,
+            dataset_name="opus100",
+            subset_name=ori_lang,
+            src_lang=src_lang,
+            tgt_lang=tgt_lang,
+            split_mapping=split_mapping,
+        )
+        dataset_fn.__name__ = "dataset_fn"
+
+        data_source = seqio.FunctionDataSource(
+            dataset_fn=dataset_fn,
+            splits=list(split_mapping.keys()),
+            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+        )
+
+        seqio.TaskRegistry.add(
+            task_name,
+            source=data_source,
+            preprocessors=[
+                seqio.preprocessors.tokenize,
+                seqio.preprocessors.append_eos,
+                seqio.CacheDatasetPlaceholder(),
+            ],
+            output_features=MT5_OUTPUT_FEATURES,
+            metric_fns=[])
+
+mixture_cap = {**mixture_cap, **task_cap}
+seqio.MixtureRegistry.add(
+    "opus100_train_mixture",
+    opus100_train_mixture,
+    default_rate=DEFAULT_MIX_RATE,
+)
+
 seqio.MixtureRegistry.add(
     "t0_train",
     [task for task in t0_train_mixture if task not in TASK_BLACKLIST],
@@ -1051,99 +1148,3 @@ seqio.MixtureRegistry.add(
 )
 
 
-# ==================================== OPUS100 ======================================
-opus100_train_mixture: List[str] = []
-OPUS100_LANGS = [
-    'af-en', 'am-en', 'an-en', 'ar-en', 'as-en', 'az-en', 'be-en', 'bg-en', 'bn-en', 'br-en', 'bs-en', 'ca-en',
-    'cs-en', 'cy-en', 'da-en', 'de-en', 'dz-en', 'el-en', 'en-eo', 'en-es', 'en-et', 'en-eu', 'en-fa', 'en-fi',
-    'en-fr', 'en-fy', 'en-ga', 'en-gd', 'en-gl', 'en-gu', 'en-ha', 'en-he', 'en-hi', 'en-hr', 'en-hu', 'en-hy',
-    'en-id', 'en-ig', 'en-is', 'en-it', 'en-ja', 'en-ka', 'en-kk', 'en-km', 'en-ko', 'en-kn', 'en-ku', 'en-ky',
-    'en-li', 'en-lt', 'en-lv', 'en-mg', 'en-mk', 'en-ml', 'en-mn', 'en-mr', 'en-ms', 'en-mt', 'en-my', 'en-nb',
-    'en-ne', 'en-nl', 'en-nn', 'en-no', 'en-oc', 'en-or', 'en-pa', 'en-pl', 'en-ps', 'en-pt', 'en-ro', 'en-ru',
-    'en-rw', 'en-se', 'en-sh', 'en-si', 'en-sk', 'en-sl', 'en-sq', 'en-sr', 'en-sv', 'en-ta', 'en-te', 'en-tg',
-    'en-th', 'en-tk', 'en-tr', 'en-tt', 'en-ug', 'en-uk', 'en-ur', 'en-uz', 'en-vi', 'en-wa', 'en-xh', 'en-yi',
-    'en-yo', 'en-zh', 'en-zu', 'ar-de', 'ar-fr', 'ar-nl', 'ar-ru', 'ar-zh', 'de-fr', 'de-nl', 'de-ru', 'de-zh',
-    'fr-nl', 'fr-ru', 'fr-zh', 'nl-ru', 'nl-zh', 'ru-zh'
-    ]
-
-def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
-
-    def map_fn(ex):
-        return {
-            "inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]),
-            "targets": ex["translation"][tgt_lang]
-            }
-
-    def filter_fn(ex):
-        return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
-
-    # HF datasets does not support file-level shuffling
-    del shuffle_files, seed
-    dataset = datasets.load_dataset(dataset_name, subset_name)
-    dataset = dataset[split_mapping[split]]
-
-    original_columns = dataset.column_names
-    dataset = dataset.map(map_fn).filter(filter_fn)
-    # map keeps original columns, remove them
-    dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
-    return hf_dataset_to_tf_dataset(dataset)
-
-info = datasets.get_dataset_infos("opus100")
-# subset_name = list(info.keys())[0]
-task_cap: Dict[str, int] = {}
-OPUS_MAX_EXAMPLES_PER_DATASET = 5000
-
-for ori_lang in OPUS100_LANGS:
-
-    lang_a, lang_b = ori_lang.split('-')
-    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
-    dataset_splits = info[ori_lang].splits
-
-    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
-
-        lang = "{}-{}".format(src_lang, tgt_lang)
-
-        task_name = "opus100_{}_mt".format(lang.replace("-", "_"))
-
-        if 'train' in dataset_splits:
-
-            train_size = dataset_splits['train'].num_examples
-            if train_size > OPUS_MAX_EXAMPLES_PER_DATASET:
-                train_size = OPUS_MAX_EXAMPLES_PER_DATASET
-
-            opus100_train_mixture.append(task_name)
-            task_cap[task_name] = train_size
-
-        dataset_fn = functools.partial(
-            get_tf_dataset_opus100,
-            dataset_name="opus100",
-            subset_name=ori_lang,
-            src_lang=src_lang,
-            tgt_lang=tgt_lang,
-            split_mapping=split_mapping,
-        )
-        dataset_fn.__name__ = "dataset_fn"
-
-        data_source = seqio.FunctionDataSource(
-            dataset_fn=dataset_fn,
-            splits=list(split_mapping.keys()),
-            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
-        )
-
-        seqio.TaskRegistry.add(
-            task_name,
-            source=data_source,
-            preprocessors=[
-                seqio.preprocessors.tokenize,
-                seqio.preprocessors.append_eos,
-                seqio.CacheDatasetPlaceholder(),
-            ],
-            output_features=MT5_OUTPUT_FEATURES,
-            metric_fns=[])
-
-mixture_cap = {**mixture_cap, **task_cap}
-seqio.MixtureRegistry.add(
-    "opus100_train_mixture",
-    opus100_train_mixture,
-    default_rate=DEFAULT_MIX_RATE,
-)
