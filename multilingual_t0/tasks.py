@@ -852,7 +852,8 @@ xcopa_templates = {
 }
 
 for lang in xcopa_langs:
-    task_cap, task_name_list = add_task(dataset_name="xcopa", subset_name=lang, template_list=xcopa_templates)
+    new_templates = {get_task_name("xcopa", lang, t): xcopa_templates[t] for t in xcopa_templates}
+    task_cap, task_name_list = add_task(dataset_name="xcopa", subset_name=lang, template_list=new_templates)
     xcopa_eval_mixture.extend(task_name_list)
 
 seqio.MixtureRegistry.add(
@@ -874,7 +875,8 @@ xnli_templates = {
 }
 
 for lang in xnli_langs:
-    task_cap, task_name_list = add_task(dataset_name="xnli", subset_name=lang, template_list=xnli_templates)
+    new_templates = {get_task_name("xnli", lang, t): xnli_templates[t] for t in xnli_templates}
+    task_cap, task_name_list = add_task(dataset_name="xnli", subset_name=lang, template_list=new_templates)
     xnli_eval_mixture.extend(task_name_list)
 
 seqio.MixtureRegistry.add(
