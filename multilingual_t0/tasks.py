@@ -208,7 +208,7 @@ def add_task(dataset_name, subset_name=None, split_mapping=None, template_list=N
             metrics = get_super_glue_metric(subset_name)
     else:
         # TODO what if metric is null?
-        metrics = [] #[GET_METRICS[m] for m in dataset[dataset.all_template_names[0]].metadata.metrics]
+        metrics = [mt.accuracy]
 
     task_cap: Dict[str, int] = {}
     task_name_list = []
