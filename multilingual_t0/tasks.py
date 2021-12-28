@@ -290,24 +290,18 @@ mixture_cap = {**mixture_cap, **task_cap}
 xtreme_en_mixture.extend(task_name_list)
 sglue_train_mixture.extend(task_name_list)
 
-dataset = all_templates.get_dataset("winogrande", "winogrande_xl")
-template_list = {get_task_name("winogrande", "winogrande_xl", t)+"_score_eval":dataset[t] for t in dataset.all_template_names}
-task_cap, task_name_list = add_task("winogrande", "winogrande_xl", template_list=template_list)
+task_cap, task_name_list = add_task("winogrande", "winogrande_xl")
 mixture_cap = {**mixture_cap, **task_cap}
 mt0_train_mixture["task_mixture_coreference_resolution"].extend(task_name_list)
 
 # ==================================== Natural Language Inference ======================================
 mt0_train_mixture["task_mixture_natural_language_inference"]: List[str] = []
 
-dataset = all_templates.get_dataset("super_glue", "cb")
-template_list = {get_task_name("super_glue", "cb", t)+"_score_eval":dataset[t] for t in dataset.all_template_names}
-task_cap, task_name_list = add_task("super_glue", "cb", template_list=template_list)
+task_cap, task_name_list = add_task("super_glue", "cb")
 mixture_cap = {**mixture_cap, **task_cap}
 mt0_train_mixture["task_mixture_natural_language_inference"].extend(task_name_list)
 
-dataset = all_templates.get_dataset("super_glue", "rte")
-template_list = {get_task_name("super_glue", "rte", t)+"_score_eval":dataset[t] for t in dataset.all_template_names}
-task_cap, task_name_list = add_task("super_glue", "rte", template_list=template_list)
+task_cap, task_name_list = add_task("super_glue", "rte")
 mixture_cap = {**mixture_cap, **task_cap}
 mt0_train_mixture["task_mixture_natural_language_inference"].extend(task_name_list)
 
@@ -320,7 +314,7 @@ for anli_round in ("r1", "r2", "r3"):
     
     for template_name in dataset.all_template_names:
 
-        task_name = get_task_name(dataset_name, subset_name, template_name) + f"_{anli_round}_score_eval"
+        task_name = get_task_name(dataset_name, subset_name, template_name) + f"_{anli_round}"
         template = dataset[template_name]
 
         if template.metadata.original_task:
@@ -685,7 +679,6 @@ TASK_BLACKLIST = [
     "ecthr_cases_alleged_violation_prediction_silver_rationales",
     # Tasks with broken cached files
     "gigaword_summarize_",
-    "winogrande_winogrande_xl_True_or_False_score_eval"
 ]
 
 # ==================================== OPUS100 ======================================
