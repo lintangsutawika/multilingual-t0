@@ -4,7 +4,9 @@ python main.py \
 	--do_train \
 	--preprocessing_num_workers 4 \
 	--per_device_train_batch_size 8 \
-	--gradient_accumulation 1\
+	--gradient_accumulation 1 \
+	--adafactor \
+	--learning_rate 1e-3 \
 	--overwrite_output_dir \
 	--output_dir checkpoints/ \
 	--max_steps 25000 \
