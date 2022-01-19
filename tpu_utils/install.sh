@@ -1,8 +1,8 @@
 sudo pip uninstall jax jaxlib -y
 pip3 install -U pip
 pip3 install jax jaxlib
-gsutil cp gs://cloud-tpu-tpuvm-v4-artifacts/wheels/libtpu/latest/libtpu_tpuv4-0.1.dev* .
-pip3 install libtpu_tpuv4-0.1.dev*
+#gsutil cp gs://cloud-tpu-tpuvm-v4-artifacts/wheels/libtpu/latest/libtpu_tpuv4-0.1.dev* .
+#pip3 install libtpu_tpuv4-0.1.dev*
 
 #mkdir -p ~/code
 #cd ~/code
