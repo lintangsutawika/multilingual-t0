@@ -6,7 +6,7 @@ from t5x import utils
 
 import tasks
 
-include "mt5_xxl.gin"  # defines %MODEL.
+include "mt5_xl.gin"  # defines %MODEL.
 include "t5x/configs/runs/eval.gin"
 
 CHECKPOINT_PATH = %gin.REQUIRED  # passed via commandline
@@ -32,7 +32,7 @@ utils.DatasetConfig:
 
 #partitioning.ModelBasedPjitPartitioner.num_partitions = 2
 partitioning.ModelBasedPjitPartitioner:
-  model_parallel_submesh = (4,1,1,1)
+  model_parallel_submesh = (2,1,1,1)
   logical_axis_rules = @tasks.fully_sharded_logical_axis_rules()
 
 utils.RestoreCheckpointConfig:
