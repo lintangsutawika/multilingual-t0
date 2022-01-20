@@ -5,7 +5,16 @@ Multilingual extension for multitask prompted training.
 ## mT5 + LM Adaptation
 - From the [Google's repo](https://github.com/google-research/text-to-text-transfer-transformer/blob/main/released_checkpoints.md#lm-adapted-t511lm100k) description, the "LM adapted" models are trained for an additional 100K steps on the LM objective discussed in the T5 paper.
 - In T5 paper section 3.2.3, the LM objective is to sample a span of text from the unlabeled data set and choose a random point to split it into prefix and target portions. 
+- T5: 100K Steps = 100,000 Steps * 2048 Batch Size * 512 Length = **104,857,600,000 Tokens** with [`pack_examples`](https://github.com/tensorflow/tensor2tensor/blob/2a33b152d7835af66a6d20afe7961751047e28dd/tensor2tensor/data_generators/generator_utils.py#L597) to "pack" multiple sequences into each entry of the batch.
 
+### Training Details
+- Tokenizer: mT5 (have 250,000 wordpieces, character coverage of 0.99999, and “byte-fallback” feature)
+- Language Sampling: probability p(L) ∝ |L|^α where α = 0.3
+- Batch size:
+- Sequence length:
+- Steps: 
+- Target length: 256
+- Dropout: None
 
 ## Installation
 
