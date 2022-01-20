@@ -2,6 +2,11 @@
 
 Multilingual extension for multitask prompted training.
 
+## mT5 + LM Adaptation
+- From the [Google's repo](https://github.com/google-research/text-to-text-transfer-transformer/blob/main/released_checkpoints.md#lm-adapted-t511lm100k) description, the "LM adapted" models are trained for an additional 100K steps on the LM objective discussed in the T5 paper.
+- In T5 paper section 3.2.3, the LM objective is to sample a span of text from the unlabeled data set and choose a random point to split it into prefix and target portions. 
+
+
 ## Installation
 
 This repository uses the following external repositories that need to be setup:
