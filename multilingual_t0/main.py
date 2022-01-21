@@ -463,20 +463,22 @@ def main():
             train_dataset = train_dataset.map(preprocess_function)
 
     if training_args.do_eval:
-        max_target_length = data_args.max_target_length
-        if "validation" not in raw_datasets:
-            raise ValueError("--do_eval requires a validation dataset")
-        eval_dataset = raw_datasets["validation"]
-        if data_args.max_eval_samples is not None:
-            eval_dataset = eval_dataset.select(range(data_args.max_eval_samples))
-        with training_args.main_process_first(desc="validation dataset map pre-processing"):
-            eval_dataset = eval_dataset.map(
-                preprocess_function,
-                num_proc=data_args.preprocessing_num_workers,
-                remove_columns=column_names,
-                load_from_cache_file=not data_args.overwrite_cache,
-                desc="Padding and Tensorize",
-            )
+        # max_target_length = data_args.max_target_length
+        # if "validation" not in raw_datasets:
+        #     raise ValueError("--do_eval requires a validation dataset")
+        # eval_dataset = raw_datasets["validation"]
+        # if data_args.max_eval_samples is not None:
+        #     eval_dataset = eval_dataset.select(range(data_args.max_eval_samples))
+        # with training_args.main_process_first(desc="validation dataset map pre-processing"):
+        #     eval_dataset = eval_dataset.map(
+        #         preprocess_function,
+        #         num_proc=data_args.preprocessing_num_workers,
+        #         remove_columns=column_names,
+        #         load_from_cache_file=not data_args.overwrite_cache,
+        #         desc="Padding and Tensorize",
+        #     )
+        eval_dataset = train_dataset.take(200)
+        train_dataset = train_dataset.skip(200)
 
     if training_args.do_predict:
         max_target_length = data_args.max_target_length
@@ -559,14 +561,16 @@ def main():
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics
-        max_train_samples = (
-            data_args.max_train_samples if data_args.max_train_samples is not None else len(train_dataset)
-        )
-        metrics["train_samples"] = min(max_train_samples, len(train_dataset))
+        ### comment out because TypeError: object of type 'TorchIterableDataset' has no len()
+        # max_train_samples = (
+        #     data_args.max_train_samples if data_args.max_train_samples is not None else len(train_dataset)
+        # )
+        # metrics["train_samples"] = min(max_train_samples, len(train_dataset))
 
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
         trainer.save_state()
+        print("Done:", trainer.save_state())
 
     # Evaluation
     results = {}
@@ -580,8 +584,8 @@ def main():
         logger.info("*** Evaluate ***")
 
         metrics = trainer.evaluate(max_length=max_length, num_beams=num_beams, metric_key_prefix="eval")
-        max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
-        metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+        # max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
+        # metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
 
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
