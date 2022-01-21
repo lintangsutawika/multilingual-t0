@@ -8,7 +8,7 @@ Multilingual extension for multitask prompted training.
 - T5: 100K Steps = 100,000 Steps * 2048 Batch Size * 512 Length = **104,857,600,000 Tokens** with [`pack_examples`](https://github.com/tensorflow/tensor2tensor/blob/2a33b152d7835af66a6d20afe7961751047e28dd/tensor2tensor/data_generators/generator_utils.py#L597) to "pack" multiple sequences into each entry of the batch.
 
 ### Training Details
-- Model: 
+- Model: [MT5ForConditionalGeneration](https://huggingface.co/docs/transformers/model_doc/mt5#transformers.MT5ForConditionalGeneration)
 - Tokenizer: mT5 (have 250,000 wordpieces, character coverage of 0.99999, and “byte-fallback” feature)
 - Language Sampling: probability p(L) ∝ |L|^α where α = 0.3
   - Use the [`datasets.interleave_datasets`](https://huggingface.co/docs/datasets/_modules/datasets/combine.html#interleave_datasets) function and `streaming` mode 
