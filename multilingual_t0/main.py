@@ -366,6 +366,7 @@ def main():
 
     def preprocess_function(examples):
         text = examples['text']
+        max_input_length_before_eos = data_args.max_input_length - 2
         tokenized_text = tokenizer.encode_plus(
             text,
             add_special_tokens=False,
@@ -374,19 +375,22 @@ def main():
 
         # following select_random_chunk function 
         # in https://github.com/google-research/text-to-text-transfer-transformer/blob/06a0f54bd02b6222399ccee0107a6f881b030fff/t5/data/preprocessors.py#L2075
-        if len(tokenized_text) > data_args.max_input_length:
-            num_segments = int(math.ceil(float(len(tokenized_text)) / float(data_args.max_input_length)))
-            start = data_args.max_input_length * random.randint(0, num_segments)
-            end = min(start + data_args.max_input_length, len(tokenized_text))
+        if len(tokenized_text['input_ids']) > max_input_length_before_eos:
+            num_segments = int(math.ceil(float(len(tokenized_text['input_ids'])) / float(max_input_length_before_eos)))
+            start = max_input_length_before_eos * random.randint(0, num_segments)
+            end = min(start + max_input_length_before_eos, len(tokenized_text['input_ids']))
             all_input_ids = tokenized_text['input_ids'][start:end]
         else:
             all_input_ids = tokenized_text['input_ids']
-        assert len(all_input_ids) <= data_args.max_input_length
+        assert len(all_input_ids) <= max_input_length_before_eos
 
         if len(all_input_ids) >= 2:
             split_idx = random.randint(1, len(all_input_ids) - 1)
-            split_input_ids = all_input_ids[:split_idx] + [tokenizer.eos_token_id]
-            split_label_ids = all_input_ids[split_idx:] + [tokenizer.eos_token_id]
+            split_input_ids = all_input_ids[:min(split_idx, data_args.max_input_length - 1)] 
+            split_input_ids += [tokenizer.eos_token_id]
+
+            split_label_ids = all_input_ids[split_idx:min(len(all_input_ids), split_idx + data_args.max_target_length - 1)] 
+            split_label_ids += [tokenizer.eos_token_id]
             # print("decode:", tokenizer.decode(tokenized_text['input_ids']))
             # print("decode input_ids:", tokenizer.decode(input_ids))
             # print("decode label_ids:", tokenizer.decode(label_ids))
@@ -395,26 +399,42 @@ def main():
             split_label_ids = [tokenizer.eos_token_id]
         
         # convert back to text 
+        assert len(split_input_ids) <= data_args.max_input_length
+        assert len(split_label_ids) <= data_args.max_target_length
+
         inputs = tokenizer.decode(split_input_ids) 
         targets = tokenizer.decode(split_label_ids)
+
+        # print("🔢 len(all_input_ids)", len(all_input_ids))
+        # print("len(split_input_ids)", len(split_input_ids))
+        # print("len(split_label_ids)", len(split_label_ids))
+        # print("split_label_ids", split_label_ids)
+        # print("targets:", targets)
 
         model_inputs = tokenizer.encode_plus(
             inputs,
             add_special_tokens=False,
             padding=padding,
             max_length=data_args.max_input_length,
-            )
+            truncation=True
+        )
 
         model_inputs['labels'] = tokenizer.encode(
             targets,
             add_special_tokens=False,
             padding=padding,
             max_length=data_args.max_target_length,
-            )
+            truncation=True
+        )
+
+        
         
         # print(tokenizer.decode(model_inputs['input_ids']))
         # print(tokenizer.decode(model_inputs['labels']))
-
+        # print(model_inputs['labels'])
+        # print("🐞 model_inputs", len(model_inputs['input_ids']))
+        # print("🐞 model_inputs labels", len(model_inputs['labels']))
+        
         if padding == "max_length" and data_args.ignore_pad_token_for_loss:
             model_inputs['labels'][model_inputs['labels'] == tokenizer.pad_token_id] = -100
         
@@ -427,6 +447,7 @@ def main():
         #     raise ValueError("--do_train requires a train dataset")
         # train_dataset = raw_datasets["train"]
         
+        raw_datasets = raw_datasets.with_format("torch")
         train_dataset = raw_datasets
         # print(list(islice(train_dataset, 1))) # [{'text': ..., 'timestamp': ..., 'url': ...}]
         if data_args.max_train_samples is not None:
