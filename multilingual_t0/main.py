@@ -59,7 +59,7 @@ import random
 logger = logging.getLogger(__name__)
 
 MT0_LANG_TO_PROBS = {
-    'en': 5.67,
+        'en': 5.67,
     'ru': 3.71,
     'es': 3.09,
     'de': 3.05,
@@ -112,8 +112,61 @@ MT0_LANG_TO_PROBS = {
     'mt': 0.64,
     'af': 0.63,
     'fil': 0.62,
-    'is': 0.62    
-    }
+    'is': 0.62,
+    'mk':0.62,
+    'ml':0.62,
+    'mn':0.62,
+    'ur':0.61,
+    'be':0.59,
+    'la':0.58,
+    'eu':0.57,
+    'tg':0.54,
+    'te':0.52,
+    'fy':0.51,
+    'kn':0.51,
+    'ky':0.50,
+    'sw':0.50,
+    'so':0.48,
+    'my':0.47,
+    'uz':0.46,
+    'km':0.46,
+    'ru-Latn':0.46,
+    'sd':0.45,
+    'gu':0.43,
+    'hi-Latn':0.43,
+    'jv':0.42,
+    'zu':0.42,
+    'si':0.41,
+    'ja-Latn':0.41,
+    'eo':0.40,
+    'co':0.40,
+    'ga':0.40,
+    'el-Latn':0.39,
+    'zh-Latn':0.37,
+    'pa':0.37,
+    'ceb':0.36,
+    'mg':0.36,
+    'ps':0.36,
+    'sn':0.35,
+    'gd':0.35,
+    'ku':0.34,
+    'hmn':0.34,
+    'su':0.34,
+    'ht':0.33,
+    'ha':0.33,
+    'ny':0.29,
+    'am':0.29,
+    'bg-Latn':0.29,
+    'yi':0.28,
+    'lo':0.28,
+    'mi':0.25,
+    'sm':0.25,
+    'ig':0.24,
+    'haw':0.24,
+    'xh':0.22,
+    'st':0.22,
+    'yo':0.20
+}
 
 @dataclass
 class ModelArguments:
@@ -479,8 +532,6 @@ def main():
             truncation=True
         )
 
-        
-        
         # print(tokenizer.decode(model_inputs['input_ids']))
         # print(tokenizer.decode(model_inputs['labels']))
         # print(model_inputs['labels'])
@@ -529,7 +580,7 @@ def main():
         #         load_from_cache_file=not data_args.overwrite_cache,
         #         desc="Padding and Tensorize",
         #     )
-        eval_dataset = train_dataset.take(data_args.max_eval_samples)
+        eval_dataset = train_dataset.take(data_args.max_eval_samples) # FIXME: convert to NON-iterable dataset or error in deepspeed.
         train_dataset = train_dataset.skip(data_args.max_eval_samples)
 
     if training_args.do_predict:

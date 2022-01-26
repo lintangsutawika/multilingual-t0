@@ -4,12 +4,11 @@ CACHE_DIR="/users/zyong2/data/zyong2/huggingface/mt5_xl"
 TRAIN_BSZ=1
 GRAD_ACC=16
 OUTPUT_DIR="/users/zyong2/data/zyong2/mt0/data/processed/001/mt5_xl"
-MAX_STEPS=30
+MAX_STEPS=100000
 LOGGING_DIR="/users/zyong2/data/zyong2/mt0/data/processed/001/runs/mt5_xl_${CUR_TIME}"
-LOGGING_STEPS=10
-SAVE_STEPS=10
+LOGGING_STEPS=1000
+SAVE_STEPS=1000
 DS_CONFIG="/users/zyong2/data/zyong2/mt0/data/external/mt0/multilingual_t0/ds_config_zero3.json"
-
 
 deepspeed \
 /users/zyong2/data/zyong2/mt0/data/external/mt0/multilingual_t0/main.py \
