@@ -59,9 +59,61 @@ import random
 logger = logging.getLogger(__name__)
 
 MT0_LANG_TO_PROBS = {
+    'en': 5.67,
+    'ru': 3.71,
+    'es': 3.09,
+    'de': 3.05,
+    'fr': 2.89,
+    'it': 2.43,
+    'pt': 2.36,
+    'pl': 2.15,
+    'nl': 1.98,
+    'tr': 1.93,
+    'ja': 1.92,
+    'vi': 1.87,
+    'id': 1.80,
+    'cs': 1.72,
+    'zh': 1.67,
+    'fa': 1.67,
+    'ar': 1.66,
+    'sv': 1.61,
+    'ro': 1.58,
+    'el': 1.54,
+    'uk': 1.51,
+    'hu': 1.48,
+    'da': 1.38,
+    'fi': 1.35,
+    'no': 1.33,
+    'bg': 1.29,
+    'hi': 1.21,
+    'sk': 1.19,
+    'ko': 1.14,
+    'th': 1.14,
+    'ca': 1.12,
+    'ms': 1.09,
+    'iw': 1.06,
+    'lt': 1.04,
+    'sl': 0.95,
+    'mr': 0.93,
+    'bn': 0.91,
+    'et': 0.89,
+    'lv': 0.87,
+    'az': 0.82,
+    'gl': 0.79,
+    'cy': 0.76,
+    'sq': 0.76,
+    'ta': 0.73,
+    'sr': 0.72,
+    'ne': 0.69,
+    'lb': 0.68,
+    'hy': 0.65,
+    'kk': 0.65,
+    'ka': 0.64,
+    'mt': 0.64,
     'af': 0.63,
+    'fil': 0.62,
     'is': 0.62    
-}
+    }
 
 @dataclass
 class ModelArguments:
@@ -160,7 +212,7 @@ class DataTrainingArguments:
         },
     )
     max_eval_samples: Optional[int] = field(
-        default=None,
+        default=1000,
         metadata={
             "help": "For debugging purposes or quicker training, truncate the number of evaluation examples to this "
             "value if set."
@@ -285,8 +337,8 @@ def main():
             probs_list = list()
             for lang, prob in MT0_LANG_TO_PROBS.items():
                 dataset_list.append(load_dataset(data_args.dataset_name, lang, split="train", streaming=True, cache_dir=model_args.cache_dir))
-                # probs_list.append(prob / 100)
-                probs_list.append(0.5)
+                probs_list.append(prob / 100)
+                # probs_list.append(0.5)
             raw_datasets = interleave_datasets(dataset_list, probabilities=probs_list, seed=42)
 
         # raw_datasets = load_dataset(
@@ -477,8 +529,8 @@ def main():
         #         load_from_cache_file=not data_args.overwrite_cache,
         #         desc="Padding and Tensorize",
         #     )
-        eval_dataset = train_dataset.take(200)
-        train_dataset = train_dataset.skip(200)
+        eval_dataset = train_dataset.take(data_args.max_eval_samples)
+        train_dataset = train_dataset.skip(data_args.max_eval_samples)
 
     if training_args.do_predict:
         max_target_length = data_args.max_target_length
