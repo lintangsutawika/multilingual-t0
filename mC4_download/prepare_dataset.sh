@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Request half an hour of runtime:
-#SBATCH --time=1-23:59:00
+#SBATCH --time=6-23:59:00
 
 # Ask for the GPU partition and 1 GPU
 #SBATCH --partition=3090-gcondo --gres=gpu:1
