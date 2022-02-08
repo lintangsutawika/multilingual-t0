@@ -1,8 +1,8 @@
 import os
 import datasets
-​
+
 _DATA_URL = "https://huggingface.co/datasets/allenai/c4/resolve/1ddc917116b730e1859edef32896ec5c16be51d0/multilingual/c4-{language}{split_suffix}.tfrecord-{index:05d}-of-{n_shards:05d}.json.gz"
-​
+
 _LANGUAGES = [
     "af",
     "am",
@@ -113,7 +113,7 @@ _LANGUAGES = [
     "zh-Latn",
     "zu",
 ]
-​
+
 _N_SHARDS_PER_SPLIT = {
     "af": {"train": 64, "validation": 1},
     "am": {"train": 16, "validation": 1},
@@ -224,7 +224,7 @@ _N_SHARDS_PER_SPLIT = {
     "zh-Latn": {"train": 8, "validation": 1},
     "zu": {"train": 8, "validation": 1},
 }
-​
+
 download_fraction = {
     "en": 0.2,
     "ru": 0.5,
@@ -232,19 +232,17 @@ download_fraction = {
     "de": 0.8,
     "fr": 0.9,    
 }
-​
+
 def download_mc4(languages=["id", "zu", "ja"], base_dir = "./", num_process=8):
-​
     mc4_datasets = {}
     for lang in languages:
-​
         n_shards = _N_SHARDS_PER_SPLIT[lang]['train']
         
         if lang in download_fraction:
             idx_shards = int(n_shards*download_fraction[lang])+1 # round up
         else:
             idx_shards = n_shards
-​
+
         data_urls = {
             'train': [
                 _DATA_URL.format(
@@ -254,50 +252,34 @@ def download_mc4(languages=["id", "zu", "ja"], base_dir = "./", num_process=8):
                     n_shards=n_shards) for idx in range(idx_shards)
             ]
         }
-​
-        # print("Downloading {}/{}".format(idx_shards, n_shards))
-        import urllib
-        total_bytes = 0
-        for _idx, link in enumerate(data_urls['train']):
-            # print(link)
-            site = urllib.request.urlopen(link)
-            bytes = site.info()['Content-Length']
-            total_bytes += int(bytes)
-            if _idx == 10:
-                break
-​
-        print(total_bytes/(_idx+1)*idx_shards)
-        # assert False
-​
-        # cache_dir = os.path.join(base_dir, lang)
-        # download_config = datasets.utils.DownloadConfig(
-        #         cache_dir=cache_dir,
-        #         num_proc=num_process
-        #         )
-        # dl_manager = datasets.DownloadManager(
-        #         download_config=download_config
-        #         )
-​
-        # train_dataset_files = dl_manager.download(data_urls["train"])
-        # mc4_datasets[lang] = {
-        #     "cache_dir": cache_dir,
-        #     }
-​
+
+        cache_dir = os.path.join(base_dir, lang)
+        download_config = datasets.utils.DownloadConfig(
+                cache_dir=cache_dir,
+                num_proc=num_process
+                )
+        dl_manager = datasets.DownloadManager(
+              download_config=download_config
+            )
+
+        train_dataset_files = dl_manager.download(data_urls["train"])
+        mc4_datasets[lang] = {
+            "cache_dir": cache_dir,
+            }
+
     return mc4_datasets
-​
-​
+
 if __name__ == '__main__':
     import argparse
-​
     parser = argparse.ArgumentParser(description='Arguments for download mC4')
     parser.add_argument('--languages', metavar='N', type=int, nargs='+',
                         help='an integer for the accumulator')
     parser.add_argument('--base_dir', help="Where to store the mC4 subsets")
     parser.add_argument('--num_process', help="Where to store the mC4 subsets")
-​
+    
     args = parser.parse_args()
     download_mc4(
         languages=_LANGUAGES,
         base_dir=args.base_dir,
         num_process=args.num_process
-        )
+    )
