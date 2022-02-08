@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Request half an hour of runtime:
-#SBATCH --time=1-23:59:00
+#SBATCH --time=6-23:59:00
 
-# Ask for the GPU partition and 1 GPU
-#SBATCH --partition=3090-gcondo --gres=gpu:1
+# Ask for the CPU partition and 16 cores
+#SBATCH --partition=batch
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
 
-# Default resources are 1 core with 2.8GB of memory.
-#SBATCH --ntasks=2
-
-# Use more memory (10GB) (CPU RAM):
+# Request for RAM memory (16GB) (CPU RAM):
+#SBATCH --mem-per-cpu=10G 
 
 # Specify a job name:
 #SBATCH -J exp-001-prepare_dataset
@@ -34,4 +34,4 @@ pip3 install -r "${CURRENT_DIR}/requirements.txt"
 # download data
 DATA_DIR="${CURRENT_DIR}/data"
 mkdir -p $DATA_DIR
-python3 prepare_dataset.py --base_dir $DATA_DIR --num_process 8
+python3 prepare_dataset.py --base_dir $DATA_DIR --num_process 16
