@@ -824,59 +824,44 @@ def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = 
     dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
     print(dataset)
     return hf_dataset_to_tf_dataset(dataset)
-    
-info = datasets.get_dataset_infos("opus100")
-# subset_name = list(info.keys())[0]
-task_cap: Dict[str, int] = {}
-OPUS_MAX_EXAMPLES_PER_DATASET = 5000
 
-for ori_lang in OPUS100_LANGS:
+info = datasets.get_dataset_infos("opus100")
+train_size=0
+for (ori_lang,s_rate) in OPUS100_LANGS.items():
 
     lang_a, lang_b = ori_lang.split('-')
-    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
     dataset_splits = info[ori_lang].splits
+    if 'train' in dataset_splits:
+        train_size += dataset_splits['train'].num_examples * s_rate
 
-    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
+        
+task_name = "opus100_mt"
+opus100_train_mixture.append(task_name)
+task_cap[task_name] = train_size
 
-        lang = "{}-{}".format(src_lang, tgt_lang)
+dataset_fn = functools.partial(
+    get_tf_dataset_opus100,
+    dataset_name="opus100",
+    split_mapping=split_mapping,
+)
+dataset_fn.__name__ = "dataset_fn"
 
-        task_name = "opus100_{}_mt".format(lang.replace("-", "_"))
+data_source = seqio.FunctionDataSource(
+    dataset_fn=dataset_fn,
+    splits=list(split_mapping.keys()),
+    num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+)
 
-        if 'train' in dataset_splits:
-
-            train_size = dataset_splits['train'].num_examples
-            if train_size > OPUS_MAX_EXAMPLES_PER_DATASET:
-                train_size = OPUS_MAX_EXAMPLES_PER_DATASET
-
-            opus100_train_mixture.append(task_name)
-            task_cap[task_name] = train_size
-
-        dataset_fn = functools.partial(
-            get_tf_dataset_opus100,
-            dataset_name="opus100",
-            subset_name=ori_lang,
-            src_lang=src_lang,
-            tgt_lang=tgt_lang,
-            split_mapping=split_mapping,
-        )
-        dataset_fn.__name__ = "dataset_fn"
-
-        data_source = seqio.FunctionDataSource(
-            dataset_fn=dataset_fn,
-            splits=list(split_mapping.keys()),
-            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
-        )
-
-        seqio.TaskRegistry.add(
-            task_name,
-            source=data_source,
-            preprocessors=[
-                seqio.preprocessors.tokenize,
-                seqio.preprocessors.append_eos,
-                seqio.CacheDatasetPlaceholder(),
-            ],
-            output_features=MT5_OUTPUT_FEATURES,
-            metric_fns=[])
+seqio.TaskRegistry.add(
+    task_name,
+    source=data_source,
+    preprocessors=[
+        seqio.preprocessors.tokenize,
+        seqio.preprocessors.append_eos,
+        seqio.CacheDatasetPlaceholder(),
+    ],
+    output_features=MT5_OUTPUT_FEATURES,
+    metric_fns=[])
 
 mixture_cap = {**mixture_cap, **task_cap}
 seqio.MixtureRegistry.add(
