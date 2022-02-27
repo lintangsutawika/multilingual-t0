@@ -783,28 +783,48 @@ OPUS100_LANGS = {'en-tk': 0.003739976949602965,
  'en-li': 0.004568029256046909,
  'en-fa': 0.013727394606023641}
 
-def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
+def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = None, dataset_name=None,split_mapping=None):
 
     def map_fn(ex):
         return {
-            "inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]),
-            "targets": ex["translation"][tgt_lang]
+            "inputs": "Translate from {} to {}: {}".format(ex['src'],ex['tgt'],ex['input']),
+            "targets": ex['target']
             }
 
     def filter_fn(ex):
         return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
 
+    def map_features(ex):
+        lang=list(ex['translation'].keys())
+        data=list(ex['translation'].keys())
+        
+        return {'src':lang[0],
+                'tgt':lang[1],
+                 'input':data[0],
+                  'target':data[1]}
     # HF datasets does not support file-level shuffling
+
     del shuffle_files, seed
-    dataset = datasets.load_dataset(dataset_name, subset_name)
-    dataset = dataset[split_mapping[split]]
+    
+    dataset_list=[]
+    probs_list=[]
+
+    for lang, prob in sampling.items():
+        data =datasets.load_dataset(dataset_name, lang,split=split_mapping[split])
+        #data = data[split_mapping[split]] 
+        to_be_remove = data.column_names
+        dataset_list.append(data.map(map_features).remove_columns(to_be_remove))
+        probs_list.append(prob)
+            
+    dataset = datasets.interleave_datasets(dataset_list, probabilities=probs_list, seed=42)
 
     original_columns = dataset.column_names
     dataset = dataset.map(map_fn).filter(filter_fn)
     # map keeps original columns, remove them
     dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
+    print(dataset)
     return hf_dataset_to_tf_dataset(dataset)
-
+    
 info = datasets.get_dataset_infos("opus100")
 # subset_name = list(info.keys())[0]
 task_cap: Dict[str, int] = {}
