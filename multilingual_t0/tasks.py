@@ -812,9 +812,9 @@ def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = 
     for lang, prob in sampling.items():
         data =datasets.load_dataset(dataset_name, lang,split=split_mapping[split])
         #data = data[split_mapping[split]] 
-        to_be_remove = data.column_names
+        orig_columns = data.column_names
         num_lines = int(len(data) * prob) ## comment this if interleave_datasets is fixed 
-        dataset_list.append(data.map(map_features).remove_columns(to_be_remove).select(range(num_lines))) ## no need for select if interleave_datasets is fixed 
+        dataset_list.append(data.map(map_features).remove_columns(orig_columns).select(range(num_lines))) ## no need for select if interleave_datasets is fixed 
         #probs_list.append(prob)
 
     dataset = datasets.concatenate_datasets(dataset_list) ## comment this if interleave_datasets is fixed
@@ -824,7 +824,6 @@ def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = 
     dataset = dataset.map(map_fn).filter(filter_fn)
     # map keeps original columns, remove them
     dataset = dataset.remove_columns(set(original_columns) - {"inputs", "targets", "answer_choices"})
-    print(dataset)
     return hf_dataset_to_tf_dataset(dataset)
 
 info = datasets.get_dataset_infos("opus100")
@@ -840,6 +839,7 @@ for (ori_lang,s_rate) in OPUS100_LANGS.items():
 task_name = "opus100_mt"
 opus100_train_mixture.append(task_name)
 task_cap[task_name] = train_size
+split_mapping = {k: k for k in info[ori_lang].splits.keys()}
 
 dataset_fn = functools.partial(
     get_tf_dataset_opus100,
