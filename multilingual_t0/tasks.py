@@ -813,10 +813,11 @@ def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = 
         data =datasets.load_dataset(dataset_name, lang,split=split_mapping[split])
         #data = data[split_mapping[split]] 
         to_be_remove = data.column_names
-        dataset_list.append(data.map(map_features).remove_columns(to_be_remove))
-        probs_list.append(prob)
+        num_lines = int(len(data) * prob)
+        dataset_list.append(data.map(map_features).remove_columns(to_be_remove).select(range(num_lines)))
+        #probs_list.append(prob)
             
-    dataset = datasets.interleave_datasets(dataset_list, probabilities=probs_list, seed=42)
+    #dataset = datasets.interleave_datasets(dataset_list, probabilities=probs_list, seed=42)
 
     original_columns = dataset.column_names
     dataset = dataset.map(map_fn).filter(filter_fn)
@@ -832,7 +833,7 @@ for (ori_lang,s_rate) in OPUS100_LANGS.items():
     lang_a, lang_b = ori_lang.split('-')
     dataset_splits = info[ori_lang].splits
     if 'train' in dataset_splits:
-        train_size += dataset_splits['train'].num_examples * s_rate
+        train_size += int(dataset_splits['train'].num_examples * s_rate)
 
         
 task_name = "opus100_mt"
