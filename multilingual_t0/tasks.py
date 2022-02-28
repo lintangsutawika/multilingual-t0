@@ -813,11 +813,12 @@ def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = 
         data =datasets.load_dataset(dataset_name, lang,split=split_mapping[split])
         #data = data[split_mapping[split]] 
         to_be_remove = data.column_names
-        num_lines = int(len(data) * prob)
-        dataset_list.append(data.map(map_features).remove_columns(to_be_remove).select(range(num_lines)))
+        num_lines = int(len(data) * prob) ## comment this if interleave_datasets is fixed 
+        dataset_list.append(data.map(map_features).remove_columns(to_be_remove).select(range(num_lines))) ## no need for select if interleave_datasets is fixed 
         #probs_list.append(prob)
-            
-    #dataset = datasets.interleave_datasets(dataset_list, probabilities=probs_list, seed=42)
+
+    dataset = datasets.concatenate_datasets(dataset_list) ## comment this if interleave_datasets is fixed
+    #dataset = datasets.interleave_datasets(dataset_list, probabilities=probs_list, seed=42) ##  uncomment if you want to use interleave
 
     original_columns = dataset.column_names
     dataset = dataset.map(map_fn).filter(filter_fn)
