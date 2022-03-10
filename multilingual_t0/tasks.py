@@ -782,7 +782,87 @@ OPUS100_LANGS = {'en-tk': 0.003739976949602965,
  'an-en': 0.003093068998856952,
  'en-li': 0.004568029256046909,
  'en-fa': 0.013727394606023641}
+def _interleave_map_style_datasets(
+    datasets: List["Dataset"],
+    probabilities: Optional[List[float]] = None,
+    seed: Optional[int] = None,
+    info: Optional[Any] = None,
+    split: Optional[Any] = None,
+    stop: Optional[str] = 'first_exhausted',
+    **kwargs,
+) -> "Dataset":
+    """
+    Interleave several map-style datasets (sources) into a single map-style dataset.
+    The new dataset is constructed by alternating between the sources to get the examples.
+    If `probabilities = None` (default) the new dataset is constructed by cycling between each source to get the examples.
+    If `probabilities` is not `None, the new dataset is constructed by getting examples from a random source at a time according to the provided probabilities.
 
+    Args:
+        datasets (:obj:`List[Dataset]`): list of datasets to interleave
+        probabilities (:obj:`List[float]`, optional, default None): If specified, the new dataset is constructued by sampling
+            examples from one source at a time according to these probabilities.
+        seed (:obj:`int`, optional, default None): The random seed used to choose a source for each example.
+        stop (:obj:`str`, optional, default 'first_exhausted'): If `stop = 'first_exhausted'`, the sampling ends when one of the source datasets runs out of examples.
+        **kwargs: Keyword arguments to be passed to :meth:`datasets.Datasets.select` when selecting the indices used to interleave the datasets.
+
+    Output:
+        :class:`datasets.Dataset`
+    """
+    from datasets import concatenate_datasets
+
+    # To interleave the datasets, we concatenate them and then we re-order the indices
+    concatenated_datasets = concatenate_datasets(datasets, info=info, split=split)
+
+    # Let's now build the indices to pass to .select()
+    # Here we create the length that will be sampled from each dataset based on its probability
+    lengths = [len(dset) for dset in datasets]
+    offsets = np.cumsum([0] + lengths[:-1])
+    if probabilities is None:
+        # Example: If lengths of the datasets are [3, 4, 5]
+        # Then the resulting indices should be [0, 3, 7, 1, 4, 8, 2, 6, 9]
+        # Note that we only have 3 examples per dataset since the first dataset ran out of examples
+        indices = (offsets.reshape(1, -1) + np.arange(min(lengths)).reshape(-1, 1)).flatten().tolist()
+    else:
+
+        def iter_random_indices():
+            """Get an infinite iterator that randomly samples the index of the source to pick examples from."""
+            rng = np.random.default_rng(seed)
+            while True:
+                yield from (int(i) for i in rng.choice(len(datasets), size=1000, p=probabilities))
+
+        current_index = [0] * len(datasets)
+        runout = []
+        indices = []
+        if stop== "first_exhausted":
+            for source_idx in iter_random_indices():
+                # we ran out of examples, let's stop
+                if current_index[source_idx] >= lengths[source_idx]:
+                    break
+                # let's add the example at the current index of the `source_idx`-th dataset
+                indices.append(current_index[source_idx] + offsets[source_idx])
+                current_index[source_idx] += 1
+        else:
+            # stop == "all_exhausted"
+            # This approach oversamples from runs out dataset
+            for source_idx in iter_random_indices():
+                # we ran out of examples from one of the datasets so we add the source_idx to the runout list
+                # we keep doing it until we run out of examples from all the datasets
+        
+                if current_index[source_idx] >= lengths[source_idx]:
+                    if source_idx not in runout:
+                        runout.append(source_idx)
+                    
+                    current_index[source_idx]=0
+
+                if len(runout)==len(probabilities):
+                    break
+
+
+                # let's add the example at the current index of the `source_idx`-th dataset
+                indices.append(current_index[source_idx] + offsets[source_idx])
+                current_index[source_idx] += 1
+    return concatenated_datasets.select(indices, **kwargs)
+    
 def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = None, dataset_name=None,split_mapping=None):
 
     def map_fn(ex):
@@ -811,15 +891,11 @@ def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = 
 
     for lang, prob in sampling.items():
         data =datasets.load_dataset(dataset_name, lang,split=split_mapping[split])
-        #data = data[split_mapping[split]] 
         orig_columns = data.column_names
-        num_lines = int(len(data) * prob) ## comment this if interleave_datasets is fixed 
-        dataset_list.append(data.map(map_features).remove_columns(orig_columns).select(range(num_lines))) ## no need for select if interleave_datasets is fixed 
-        #probs_list.append(prob)
+        dataset_list.append(data.map(map_features).remove_columns(orig_columns)) ## no need for select if interleave_datasets is fixed 
+        probs_list.append(prob)
 
-    dataset = datasets.concatenate_datasets(dataset_list) ## comment this if interleave_datasets is fixed
-    #dataset = datasets.interleave_datasets(dataset_list, probabilities=probs_list, seed=42) ##  uncomment if you want to use interleave
-
+    dataset = _interleave_map_style_datasets(dataset_list,probabilities=probs_list,seed=42,stop="all_exhausted")
     original_columns = dataset.column_names
     dataset = dataset.map(map_fn).filter(filter_fn)
     # map keeps original columns, remove them
