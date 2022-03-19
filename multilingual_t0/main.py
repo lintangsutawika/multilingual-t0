@@ -26,7 +26,8 @@ from typing import Optional
 
 import datasets
 import numpy as np
-from datasets import load_dataset, load_metric
+from datasets import load_dataset, load_metric, interleave_datasets
+from itertools import islice
 
 import transformers
 from transformers import (
@@ -44,8 +45,11 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 
-import tasks
-from p3 import p3
+import math
+import random
+
+# import tasks
+# from p3 import p3
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 # check_min_version("4.16.0.dev0")
@@ -53,6 +57,116 @@ from p3 import p3
 # require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/translation/requirements.txt")
 
 logger = logging.getLogger(__name__)
+
+MT0_LANG_TO_PROBS = {
+        'en': 5.67,
+    'ru': 3.71,
+    'es': 3.09,
+    'de': 3.05,
+    'fr': 2.89,
+    'it': 2.43,
+    'pt': 2.36,
+    'pl': 2.15,
+    'nl': 1.98,
+    'tr': 1.93,
+    'ja': 1.92,
+    'vi': 1.87,
+    'id': 1.80,
+    'cs': 1.72,
+    'zh': 1.67,
+    'fa': 1.67,
+    'ar': 1.66,
+    'sv': 1.61,
+    'ro': 1.58,
+    'el': 1.54,
+    'uk': 1.51,
+    'hu': 1.48,
+    'da': 1.38,
+    'fi': 1.35,
+    'no': 1.33,
+    'bg': 1.29,
+    'hi': 1.21,
+    'sk': 1.19,
+    'ko': 1.14,
+    'th': 1.14,
+    'ca': 1.12,
+    'ms': 1.09,
+    'iw': 1.06,
+    'lt': 1.04,
+    'sl': 0.95,
+    'mr': 0.93,
+    'bn': 0.91,
+    'et': 0.89,
+    'lv': 0.87,
+    'az': 0.82,
+    'gl': 0.79,
+    'cy': 0.76,
+    'sq': 0.76,
+    'ta': 0.73,
+    'sr': 0.72,
+    'ne': 0.69,
+    'lb': 0.68,
+    'hy': 0.65,
+    'kk': 0.65,
+    'ka': 0.64,
+    'mt': 0.64,
+    'af': 0.63,
+    'fil': 0.62,
+    'is': 0.62,
+    'mk':0.62,
+    'ml':0.62,
+    'mn':0.62,
+    'ur':0.61,
+    'be':0.59,
+    'la':0.58,
+    'eu':0.57,
+    'tg':0.54,
+    'te':0.52,
+    'fy':0.51,
+    'kn':0.51,
+    'ky':0.50,
+    'sw':0.50,
+    'so':0.48,
+    'my':0.47,
+    'uz':0.46,
+    'km':0.46,
+    'ru-Latn':0.46,
+    'sd':0.45,
+    'gu':0.43,
+    'hi-Latn':0.43,
+    'jv':0.42,
+    'zu':0.42,
+    'si':0.41,
+    'ja-Latn':0.41,
+    'eo':0.40,
+    'co':0.40,
+    'ga':0.40,
+    'el-Latn':0.39,
+    'zh-Latn':0.37,
+    'pa':0.37,
+    'ceb':0.36,
+    'mg':0.36,
+    'ps':0.36,
+    'sn':0.35,
+    'gd':0.35,
+    'ku':0.34,
+    'hmn':0.34,
+    'su':0.34,
+    'ht':0.33,
+    'ha':0.33,
+    'ny':0.29,
+    'am':0.29,
+    'bg-Latn':0.29,
+    'yi':0.28,
+    'lo':0.28,
+    'mi':0.25,
+    'sm':0.25,
+    'ig':0.24,
+    'haw':0.24,
+    'xh':0.22,
+    'st':0.22,
+    'yo':0.20
+}
 
 @dataclass
 class ModelArguments:
@@ -151,7 +265,7 @@ class DataTrainingArguments:
         },
     )
     max_eval_samples: Optional[int] = field(
-        default=None,
+        default=1000,
         metadata={
             "help": "For debugging purposes or quicker training, truncate the number of evaluation examples to this "
             "value if set."
@@ -226,8 +340,10 @@ def main():
         f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
         + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
     )
-    logger.info(f"Training/evaluation parameters {training_args}")
-
+    print(f"==== Model parameters ====\n {model_args}")
+    print(f"==== Data parameters ====\n {data_args}")
+    print(f"==== Training/evaluation parameters ====\n {training_args}")
+    
     if data_args.source_prefix is None and model_args.model_name_or_path in [
         "t5-small",
         "t5-base",
@@ -269,11 +385,20 @@ def main():
     # download the dataset.
     if data_args.dataset_name is not None:
         # Downloading and loading a dataset from the hub.
-        raw_datasets = load_dataset(
-            data_args.dataset_name,
-            data_args.dataset_config_name,
-            cache_dir=model_args.cache_dir
-        )
+        if data_args.dataset_name == "mc4":
+            dataset_list = list()
+            probs_list = list()
+            for lang, prob in MT0_LANG_TO_PROBS.items():
+                dataset_list.append(load_dataset(data_args.dataset_name, lang, split="train", streaming=True, cache_dir=model_args.cache_dir))
+                probs_list.append(prob / 100)
+                # probs_list.append(0.5)
+            raw_datasets = interleave_datasets(dataset_list, probabilities=probs_list, seed=42)
+
+        # raw_datasets = load_dataset(
+        #     data_args.dataset_name,
+        #     data_args.dataset_config_name,
+        #     cache_dir=model_args.cache_dir
+        # )
 
     elif data_args.seqio_mixture_name is not None:
         raw_datasets = load_dataset(
@@ -325,7 +450,9 @@ def main():
     # Preprocessing the datasets.
     # We need to tokenize inputs and targets.
     if training_args.do_train:
-        column_names = raw_datasets["train"].column_names
+        # column_names = raw_datasets["train"].column_names
+        # print(list(islice(raw_datasets, 1))[0].keys())
+        column_names = ['text', 'timestamp', 'url']
     elif training_args.do_eval:
         column_names = raw_datasets["validation"].column_names
     elif training_args.do_predict:
@@ -343,58 +470,118 @@ def main():
         )
 
     def preprocess_function(examples):
-        inputs = examples['inputs'][:data_args.max_input_length]
-        targets = examples['targets'][:data_args.max_target_length]
+        text = examples['text']
+        max_input_length_before_eos = data_args.max_input_length - 2
+        tokenized_text = tokenizer.encode_plus(
+            text,
+            add_special_tokens=False,
+            padding=False,
+        )
+
+        # following select_random_chunk function 
+        # in https://github.com/google-research/text-to-text-transfer-transformer/blob/06a0f54bd02b6222399ccee0107a6f881b030fff/t5/data/preprocessors.py#L2075
+        if len(tokenized_text['input_ids']) > max_input_length_before_eos:
+            num_segments = int(math.ceil(float(len(tokenized_text['input_ids'])) / float(max_input_length_before_eos)))
+            start = max_input_length_before_eos * random.randint(0, num_segments)
+            end = min(start + max_input_length_before_eos, len(tokenized_text['input_ids']))
+            all_input_ids = tokenized_text['input_ids'][start:end]
+        else:
+            all_input_ids = tokenized_text['input_ids']
+        assert len(all_input_ids) <= max_input_length_before_eos
+
+        if len(all_input_ids) >= 2:
+            split_idx = random.randint(1, len(all_input_ids) - 1)
+            split_input_ids = all_input_ids[:min(split_idx, data_args.max_input_length - 1)] 
+            split_input_ids += [tokenizer.eos_token_id]
+
+            split_label_ids = all_input_ids[split_idx:min(len(all_input_ids), split_idx + data_args.max_target_length - 1)] 
+            split_label_ids += [tokenizer.eos_token_id]
+            # print("decode:", tokenizer.decode(tokenized_text['input_ids']))
+            # print("decode input_ids:", tokenizer.decode(input_ids))
+            # print("decode label_ids:", tokenizer.decode(label_ids))
+        else:
+            split_input_ids = all_input_ids + [tokenizer.eos_token_id]
+            split_label_ids = [tokenizer.eos_token_id]
+        
+        # convert back to text 
+        assert len(split_input_ids) <= data_args.max_input_length
+        assert len(split_label_ids) <= data_args.max_target_length
+
+        inputs = tokenizer.decode(split_input_ids) 
+        targets = tokenizer.decode(split_label_ids)
+
+        # print("🔢 len(all_input_ids)", len(all_input_ids))
+        # print("len(split_input_ids)", len(split_input_ids))
+        # print("len(split_label_ids)", len(split_label_ids))
+        # print("split_label_ids", split_label_ids)
+        # print("targets:", targets)
 
         model_inputs = tokenizer.encode_plus(
             inputs,
             add_special_tokens=False,
             padding=padding,
             max_length=data_args.max_input_length,
-            )
+            truncation=True
+        )
 
         model_inputs['labels'] = tokenizer.encode(
             targets,
             add_special_tokens=False,
             padding=padding,
             max_length=data_args.max_target_length,
-            )
+            truncation=True
+        )
 
+        # print(tokenizer.decode(model_inputs['input_ids']))
+        # print(tokenizer.decode(model_inputs['labels']))
+        # print(model_inputs['labels'])
+        # print("🐞 model_inputs", len(model_inputs['input_ids']))
+        # print("🐞 model_inputs labels", len(model_inputs['labels']))
+        
         if padding == "max_length" and data_args.ignore_pad_token_for_loss:
             model_inputs['labels'][model_inputs['labels'] == tokenizer.pad_token_id] = -100
-
+        
         return model_inputs
 
     if training_args.do_train:
-        if "train" not in raw_datasets:
-            raise ValueError("--do_train requires a train dataset")
-        train_dataset = raw_datasets["train"]
+        # may need https://github.com/huggingface/datasets/issues/2583
+        
+        # if "train" not in raw_datasets:
+        #     raise ValueError("--do_train requires a train dataset")
+        # train_dataset = raw_datasets["train"]
+        
+        raw_datasets = raw_datasets.with_format("torch")
+        train_dataset = raw_datasets
+        # print(list(islice(train_dataset, 1))) # [{'text': ..., 'timestamp': ..., 'url': ...}]
         if data_args.max_train_samples is not None:
             train_dataset = train_dataset.select(range(data_args.max_train_samples))
         with training_args.main_process_first(desc="train dataset map pre-processing"):
-            train_dataset = train_dataset.map(
-                preprocess_function,
-                num_proc=data_args.preprocessing_num_workers,
-                remove_columns=column_names,
-                load_from_cache_file=not data_args.overwrite_cache,
-                desc="Padding and Tensorize",
-            )
+            # train_dataset = train_dataset.map(
+            #     preprocess_function,
+            #     num_proc=data_args.preprocessing_num_workers,
+            #     remove_columns=column_names,
+            #     load_from_cache_file=not data_args.overwrite_cache,
+            #     desc="Padding and Tensorize",
+            # )
+            train_dataset = train_dataset.map(preprocess_function)
 
     if training_args.do_eval:
-        max_target_length = data_args.max_target_length
-        if "validation" not in raw_datasets:
-            raise ValueError("--do_eval requires a validation dataset")
-        eval_dataset = raw_datasets["validation"]
-        if data_args.max_eval_samples is not None:
-            eval_dataset = eval_dataset.select(range(data_args.max_eval_samples))
-        with training_args.main_process_first(desc="validation dataset map pre-processing"):
-            eval_dataset = eval_dataset.map(
-                preprocess_function,
-                num_proc=data_args.preprocessing_num_workers,
-                remove_columns=column_names,
-                load_from_cache_file=not data_args.overwrite_cache,
-                desc="Padding and Tensorize",
-            )
+        # max_target_length = data_args.max_target_length
+        # if "validation" not in raw_datasets:
+        #     raise ValueError("--do_eval requires a validation dataset")
+        # eval_dataset = raw_datasets["validation"]
+        # if data_args.max_eval_samples is not None:
+        #     eval_dataset = eval_dataset.select(range(data_args.max_eval_samples))
+        # with training_args.main_process_first(desc="validation dataset map pre-processing"):
+        #     eval_dataset = eval_dataset.map(
+        #         preprocess_function,
+        #         num_proc=data_args.preprocessing_num_workers,
+        #         remove_columns=column_names,
+        #         load_from_cache_file=not data_args.overwrite_cache,
+        #         desc="Padding and Tensorize",
+        #     )
+        eval_dataset = train_dataset.take(data_args.max_eval_samples) # FIXME: convert to NON-iterable dataset or error in deepspeed.
+        train_dataset = train_dataset.skip(data_args.max_eval_samples)
 
     if training_args.do_predict:
         max_target_length = data_args.max_target_length
@@ -472,18 +659,21 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
+        logging.info("🚂 start training")
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics
-        max_train_samples = (
-            data_args.max_train_samples if data_args.max_train_samples is not None else len(train_dataset)
-        )
-        metrics["train_samples"] = min(max_train_samples, len(train_dataset))
+        ### comment out because TypeError: object of type 'TorchIterableDataset' has no len()
+        # max_train_samples = (
+        #     data_args.max_train_samples if data_args.max_train_samples is not None else len(train_dataset)
+        # )
+        # metrics["train_samples"] = min(max_train_samples, len(train_dataset))
 
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
         trainer.save_state()
+        print("Done:", trainer.save_state())
 
     # Evaluation
     results = {}
@@ -497,8 +687,8 @@ def main():
         logger.info("*** Evaluate ***")
 
         metrics = trainer.evaluate(max_length=max_length, num_beams=num_beams, metric_key_prefix="eval")
-        max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
-        metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+        # max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
+        # metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
 
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
