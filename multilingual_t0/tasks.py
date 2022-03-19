@@ -683,35 +683,219 @@ TASK_BLACKLIST = [
 
 # ==================================== OPUS100 ======================================
 opus100_train_mixture: List[str] = []
-OPUS100_LANGS = [
-    'af-en', 'am-en', 'an-en', 'ar-en', 'as-en', 'az-en', 'be-en', 'bg-en', 'bn-en', 'br-en', 'bs-en', 'ca-en',
-    'cs-en', 'cy-en', 'da-en', 'de-en', 'dz-en', 'el-en', 'en-eo', 'en-es', 'en-et', 'en-eu', 'en-fa', 'en-fi',
-    'en-fr', 'en-fy', 'en-ga', 'en-gd', 'en-gl', 'en-gu', 'en-ha', 'en-he', 'en-hi', 'en-hr', 'en-hu', 'en-hy',
-    'en-id', 'en-ig', 'en-is', 'en-it', 'en-ja', 'en-ka', 'en-kk', 'en-km', 'en-ko', 'en-kn', 'en-ku', 'en-ky',
-    'en-li', 'en-lt', 'en-lv', 'en-mg', 'en-mk', 'en-ml', 'en-mn', 'en-mr', 'en-ms', 'en-mt', 'en-my', 'en-nb',
-    'en-ne', 'en-nl', 'en-nn', 'en-no', 'en-oc', 'en-or', 'en-pa', 'en-pl', 'en-ps', 'en-pt', 'en-ro', 'en-ru',
-    'en-rw', 'en-se', 'en-sh', 'en-si', 'en-sk', 'en-sl', 'en-sq', 'en-sr', 'en-sv', 'en-ta', 'en-te', 'en-tg',
-    'en-th', 'en-tk', 'en-tr', 'en-tt', 'en-ug', 'en-uk', 'en-ur', 'en-uz', 'en-vi', 'en-wa', 'en-xh', 'en-yi',
-    'en-yo', 'en-zh', 'en-zu', 'ar-de', 'ar-fr', 'ar-nl', 'ar-ru', 'ar-zh', 'de-fr', 'de-nl', 'de-ru', 'de-zh',
-    'fr-nl', 'fr-ru', 'fr-zh', 'nl-ru', 'nl-zh', 'ru-zh'
-    ]
+OPUS100_LANGS = {'en-tk': 0.003739976949602965,
+ 'en-nn': 0.011055890852480528,
+ 'en-sl': 0.013727394606023641,
+ 'en-sv': 0.013727394606023641,
+ 'en-ku': 0.007688794807747724,
+ 'en-ms': 0.013727394606023641,
+ 'en-pa': 0.007026890363788932,
+ 'en-nb': 0.007657786553450173,
+ 'en-hr': 0.013727394606023641,
+ 'en-my': 0.004516862483923706,
+ 'en-yo': 0.0034864588979743216,
+ 'en-eu': 0.013727394606023641,
+ 'en-fy': 0.005729659365788825,
+ 'en-zu': 0.005171521133578267,
+ 'en-fr': 0.013727394606023641,
+ 'en-ml': 0.012946961361169853,
+ 'en-si': 0.013640724286609974,
+ 'br-en': 0.007823041581888672,
+ 'en-ko': 0.013727394606023641,
+ 'en-se': 0.005059899075943781,
+ 'en-ig': 0.004141328060002335,
+ 'en-hu': 0.013727394606023641,
+ 'en-is': 0.013727394606023641,
+ 'en-mr': 0.004645484564266176,
+ 'az-en': 0.009185922058808364,
+ 'ca-en': 0.013727394606023641,
+ 'en-id': 0.013727394606023641,
+ 'en-ta': 0.008798404214189343,
+ 'en-no': 0.013727394606023641,
+ 'en-hy': 0.003106068810044154,
+ 'en-ja': 0.013727394606023641,
+ 'en-ky': 0.004656189205077537,
+ 'en-hi': 0.011374394930855458,
+ 'bg-en': 0.013727394606023641,
+ 'en-xh': 0.010728190197038303,
+ 'en-he': 0.013727394606023641,
+ 'en-km': 0.007108053896238189,
+ 'de-en': 0.013727394606023641,
+ 'en-yi': 0.003894953935034027,
+ 'en-kk': 0.0064327425684939064,
+ 'en-ro': 0.013727394606023641,
+ 'en-lv': 0.013727394606023641,
+ 'cs-en': 0.013727394606023641,
+ 'en-gd': 0.003993670469892929,
+ 'af-en': 0.00932460135340488,
+ 'en-ps': 0.006413358661428621,
+ 'en-or': 0.003836566212521591,
+ 'en-sh': 0.009239413793793796,
+ 'en-et': 0.013727394606023641,
+ 'en-ur': 0.012612015263111717,
+ 'en-vi': 0.013727394606023641,
+ 'en-pt': 0.013727394606023641,
+ 'en-ka': 0.010246988091374224,
+ 'en-uk': 0.013727394606023641,
+ 'en-gl': 0.011251677746119465,
+ 'en-mg': 0.011722327984425011,
+ 'en-mt': 0.013727394606023641,
+ 'en-es': 0.013727394606023641,
+ 'en-rw': 0.008121201578674313,
+ 'en-ne': 0.010477752521383348,
+ 'en-lt': 0.013727394606023641,
+ 'en-te': 0.006027770832936231,
+ 'en-sq': 0.013727394606023641,
+ 'as-en': 0.007585833280327724,
+ 'en-fi': 0.013727394606023641,
+ 'en-it': 0.013727394606023641,
+ 'en-kn': 0.0038577186903621845,
+ 'en-tt': 0.00689734334127988,
+ 'en-sk': 0.013727394606023641,
+ 'en-mn': 0.0026757573685483745,
+ 'en-ga': 0.009464408765899032,
+ 'en-wa': 0.006971368150397784,
+ 'da-en': 0.013727394606023641,
+ 'cy-en': 0.009464379345198915,
+ 'en-oc': 0.005054989616739992,
+ 'en-gu': 0.00973736759958353,
+ 'en-nl': 0.013727394606023641,
+ 'ar-en': 0.013727394606023641,
+ 'el-en': 0.013727394606023641,
+ 'en-uz': 0.008111854157610622,
+ 'en-pl': 0.013727394606023641,
+ 'be-en': 0.006109643453642317,
+ 'bs-en': 0.013727394606023641,
+ 'bn-en': 0.013727394606023641,
+ 'en-th': 0.013727394606023641,
+ 'en-sr': 0.013727394606023641,
+ 'en-zh': 0.013727394606023641,
+ 'dz-en': 0.0015001804272129933,
+ 'en-tg': 0.008391688710810334,
+ 'en-ha': 0.006838066779690264,
+ 'en-ru': 0.013727394606023641,
+ 'en-tr': 0.013727394606023641,
+ 'en-eo': 0.009906450247711846,
+ 'en-mk': 0.013727394606023641,
+ 'am-en': 0.006644229723389183,
+ 'en-ug': 0.006238714758589733,
+ 'an-en': 0.003093068998856952,
+ 'en-li': 0.004568029256046909,
+ 'en-fa': 0.013727394606023641}
+def _interleave_map_style_datasets(
+    datasets: List["Dataset"],
+    probabilities: Optional[List[float]] = None,
+    seed: Optional[int] = None,
+    info: Optional[Any] = None,
+    split: Optional[Any] = None,
+    stop: Optional[str] = 'first_exhausted',
+    **kwargs,
+) -> "Dataset":
+    """
+    Interleave several map-style datasets (sources) into a single map-style dataset.
+    The new dataset is constructed by alternating between the sources to get the examples.
+    If `probabilities = None` (default) the new dataset is constructed by cycling between each source to get the examples.
+    If `probabilities` is not `None, the new dataset is constructed by getting examples from a random source at a time according to the provided probabilities.
 
-def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dataset_name=None, subset_name=None, src_lang=None, tgt_lang=None, split_mapping=None):
+    Args:
+        datasets (:obj:`List[Dataset]`): list of datasets to interleave
+        probabilities (:obj:`List[float]`, optional, default None): If specified, the new dataset is constructued by sampling
+            examples from one source at a time according to these probabilities.
+        seed (:obj:`int`, optional, default None): The random seed used to choose a source for each example.
+        stop (:obj:`str`, optional, default 'first_exhausted'): If `stop = 'first_exhausted'`, the sampling ends when one of the source datasets runs out of examples.
+        **kwargs: Keyword arguments to be passed to :meth:`datasets.Datasets.select` when selecting the indices used to interleave the datasets.
+
+    Output:
+        :class:`datasets.Dataset`
+    """
+    from datasets import concatenate_datasets
+
+    # To interleave the datasets, we concatenate them and then we re-order the indices
+    concatenated_datasets = concatenate_datasets(datasets, info=info, split=split)
+
+    # Let's now build the indices to pass to .select()
+    # Here we create the length that will be sampled from each dataset based on its probability
+    lengths = [len(dset) for dset in datasets]
+    offsets = np.cumsum([0] + lengths[:-1])
+    if probabilities is None:
+        # Example: If lengths of the datasets are [3, 4, 5]
+        # Then the resulting indices should be [0, 3, 7, 1, 4, 8, 2, 6, 9]
+        # Note that we only have 3 examples per dataset since the first dataset ran out of examples
+        indices = (offsets.reshape(1, -1) + np.arange(min(lengths)).reshape(-1, 1)).flatten().tolist()
+    else:
+
+        def iter_random_indices():
+            """Get an infinite iterator that randomly samples the index of the source to pick examples from."""
+            rng = np.random.default_rng(seed)
+            while True:
+                yield from (int(i) for i in rng.choice(len(datasets), size=1000, p=probabilities))
+
+        current_index = [0] * len(datasets)
+        runout = []
+        indices = []
+        if stop== "first_exhausted":
+            for source_idx in iter_random_indices():
+                # we ran out of examples, let's stop
+                if current_index[source_idx] >= lengths[source_idx]:
+                    break
+                # let's add the example at the current index of the `source_idx`-th dataset
+                indices.append(current_index[source_idx] + offsets[source_idx])
+                current_index[source_idx] += 1
+        else:
+            # stop == "all_exhausted"
+            # This approach oversamples from runs out dataset
+            for source_idx in iter_random_indices():
+                # we ran out of examples from one of the datasets so we add the source_idx to the runout list
+                # we keep doing it until we run out of examples from all the datasets
+        
+                if current_index[source_idx] >= lengths[source_idx]:
+                    if source_idx not in runout:
+                        runout.append(source_idx)
+                    
+                    current_index[source_idx]=0
+
+                if len(runout)==len(probabilities):
+                    break
+
+
+                # let's add the example at the current index of the `source_idx`-th dataset
+                indices.append(current_index[source_idx] + offsets[source_idx])
+                current_index[source_idx] += 1
+    return concatenated_datasets.select(indices, **kwargs)
+    
+def get_tf_dataset_opus100(split, shuffle_files,sampling, seed: Optional[int] = None, dataset_name=None,split_mapping=None):
 
     def map_fn(ex):
         return {
-            "inputs": "Translate to {}: {}".format(tgt_lang, ex["translation"][src_lang]),
-            "targets": ex["translation"][tgt_lang]
+            "inputs": "Translate from {} to {}: {}".format(ex['src'],ex['tgt'],ex['input']),
+            "targets": ex['target']
             }
 
     def filter_fn(ex):
         return len(ex["inputs"]) > 0 and len(ex["targets"]) > 0
 
+    def map_features(ex):
+        lang=list(ex['translation'].keys())
+        data=list(ex['translation'].keys())
+        
+        return {'src':lang[0],
+                'tgt':lang[1],
+                 'input':data[0],
+                  'target':data[1]}
     # HF datasets does not support file-level shuffling
-    del shuffle_files, seed
-    dataset = datasets.load_dataset(dataset_name, subset_name)
-    dataset = dataset[split_mapping[split]]
 
+    del shuffle_files, seed
+    
+    dataset_list=[]
+    probs_list=[]
+
+    for lang, prob in sampling.items():
+        data =datasets.load_dataset(dataset_name, lang,split=split_mapping[split])
+        orig_columns = data.column_names
+        dataset_list.append(data.map(map_features).remove_columns(orig_columns)) ## no need for select if interleave_datasets is fixed 
+        probs_list.append(prob)
+
+    dataset = _interleave_map_style_datasets(dataset_list,probabilities=probs_list,seed=42,stop="all_exhausted")
     original_columns = dataset.column_names
     dataset = dataset.map(map_fn).filter(filter_fn)
     # map keeps original columns, remove them
@@ -719,57 +903,43 @@ def get_tf_dataset_opus100(split, shuffle_files, seed: Optional[int] = None, dat
     return hf_dataset_to_tf_dataset(dataset)
 
 info = datasets.get_dataset_infos("opus100")
-# subset_name = list(info.keys())[0]
-task_cap: Dict[str, int] = {}
-OPUS_MAX_EXAMPLES_PER_DATASET = 5000
-
-for ori_lang in OPUS100_LANGS:
+train_size=0
+for (ori_lang,s_rate) in OPUS100_LANGS.items():
 
     lang_a, lang_b = ori_lang.split('-')
-    split_mapping = {k: k for k in info[ori_lang].splits.keys()}
     dataset_splits = info[ori_lang].splits
+    if 'train' in dataset_splits:
+        train_size += int(dataset_splits['train'].num_examples * s_rate)
 
-    for src_lang, tgt_lang in [[lang_a, lang_b], [lang_b, lang_a]]:
+        
+task_name = "opus100_mt"
+opus100_train_mixture.append(task_name)
+task_cap[task_name] = train_size
+split_mapping = {k: k for k in info[ori_lang].splits.keys()}
 
-        lang = "{}-{}".format(src_lang, tgt_lang)
+dataset_fn = functools.partial(
+    get_tf_dataset_opus100,
+    dataset_name="opus100",
+    split_mapping=split_mapping,
+)
+dataset_fn.__name__ = "dataset_fn"
 
-        task_name = "opus100_{}_mt".format(lang.replace("-", "_"))
+data_source = seqio.FunctionDataSource(
+    dataset_fn=dataset_fn,
+    splits=list(split_mapping.keys()),
+    num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
+)
 
-        if 'train' in dataset_splits:
-
-            train_size = dataset_splits['train'].num_examples
-            if train_size > OPUS_MAX_EXAMPLES_PER_DATASET:
-                train_size = OPUS_MAX_EXAMPLES_PER_DATASET
-
-            opus100_train_mixture.append(task_name)
-            task_cap[task_name] = train_size
-
-        dataset_fn = functools.partial(
-            get_tf_dataset_opus100,
-            dataset_name="opus100",
-            subset_name=ori_lang,
-            src_lang=src_lang,
-            tgt_lang=tgt_lang,
-            split_mapping=split_mapping,
-        )
-        dataset_fn.__name__ = "dataset_fn"
-
-        data_source = seqio.FunctionDataSource(
-            dataset_fn=dataset_fn,
-            splits=list(split_mapping.keys()),
-            num_input_examples={s: dataset_splits[split_mapping[s]].num_examples for s in split_mapping.keys()},
-        )
-
-        seqio.TaskRegistry.add(
-            task_name,
-            source=data_source,
-            preprocessors=[
-                seqio.preprocessors.tokenize,
-                seqio.preprocessors.append_eos,
-                seqio.CacheDatasetPlaceholder(),
-            ],
-            output_features=MT5_OUTPUT_FEATURES,
-            metric_fns=[])
+seqio.TaskRegistry.add(
+    task_name,
+    source=data_source,
+    preprocessors=[
+        seqio.preprocessors.tokenize,
+        seqio.preprocessors.append_eos,
+        seqio.CacheDatasetPlaceholder(),
+    ],
+    output_features=MT5_OUTPUT_FEATURES,
+    metric_fns=[])
 
 mixture_cap = {**mixture_cap, **task_cap}
 seqio.MixtureRegistry.add(
