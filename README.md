@@ -6,4 +6,11 @@ First install necessary packages from [t5x](https://github.com/google-research/t
 
 Then download the T5X checkpoints from Google Cloud bucket into a directory. 
 
-Run `main.py --hf_model "google/mt5-xl" --cache_dir "~/.cache/huggingface/transformers" --t5x_ckpt_dir "your/t5x_checkpoint_directory/" --save_dir "path/to/save_dir_of_transferred_checkpoint/"`
+Run 
+```
+python3 main.py \
+--hf_model "google/mt5-xl" \
+--cache_dir "~/.cache/huggingface/transformers" \
+--t5x_ckpt_dir "your/t5x_checkpoint_directory/" \
+--save_dir "path/to/save_dir_of_transferred_checkpoint/"
+```
