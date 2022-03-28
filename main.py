@@ -1,5 +1,5 @@
-import nest_asyncio
-nest_asyncio.apply()
+# import nest_asyncio
+# nest_asyncio.apply()
 
 import abc
 import asyncio
@@ -111,7 +111,7 @@ def flatten(d, parent_key='', sep='_'):
 # t5x_ckpt_dir = "/Users/zhengxinyong/Desktop/bigscience/mt0_weight_conversion"
 init_vars = t5x.checkpoints.load_t5x_checkpoint(args.t5x_ckpt_dir)
 
-print(f"Done loading T5X checkpoint from {args.t5x_ckpt_dir}.")
+print(f"✅ Done loading T5X checkpoint from {args.t5x_ckpt_dir}.")
 # print(init_vars)
 
 #### map T5X paramaeters' names to weights
@@ -122,7 +122,7 @@ tf_target_weights = {key: weight for key, weight in tf_weights.items() if 'targe
 #     print(name, tf_target_weights[name].shape)
 
 hf_model = transformers.AutoModel.from_pretrained(args.hf_model, cache_dir=args.cache_dir)
-print(f"Done loading HF model {args.hf_model} from {args.cache_dir}.")
+print(f"✅ Done loading HF model {args.hf_model} from {args.cache_dir}.")
 
 # for name, param in hf_model.named_parameters():
 #     print(name, param)
@@ -218,6 +218,8 @@ for name, param in hf_model.named_parameters():
     
     assert conversion_D[name] in tf_target_weights
 
+print(f"✅ Done mapping T5X checkpoint names to HF parameters")
+
 #### replace weights in HF model with T5X checkpoints' weights through conversion_D and tf_target_weights
 for name, param in hf_model.named_parameters():
     assert name in conversion_D
@@ -231,4 +233,4 @@ for name, param in hf_model.named_parameters():
         assert False
 
 hf_model.save_pretrained(args.save_dir)
-print(f"Done saving to {args.save_dir}.")
+print(f"✅ Done saving to {args.save_dir}.")
