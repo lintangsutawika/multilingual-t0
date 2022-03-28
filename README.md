@@ -2,7 +2,7 @@
 
 `main.py` transfer the checkpoints from T5X (such as [this](https://console.cloud.google.com/storage/browser/bigscience-t5x/multilingual_t0/mt0_xl_t0pp/checkpoint_1025000;tab=objects?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&prefix=&forceOnObjectsSortingFiltering=false)) to HF's PyTorch model.
 
-First install necessary packages from [t5x](https://github.com/google-research/t5x/) and [jax](https://github.com/google/jax).
+First install [t5x](https://github.com/google-research/t5x/), [jax](https://github.com/google/jax) and [transformers](https://github.com/huggingface/transformers).
 
 Then download the T5X checkpoints from Google Cloud bucket into a directory. 
 
