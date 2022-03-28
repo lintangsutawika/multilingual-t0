@@ -6,7 +6,7 @@ First install [t5x](https://github.com/google-research/t5x/), [jax](https://gith
 
 Then download the T5X checkpoints from Google Cloud bucket into a directory. 
 
-Run 
+Run the following code to transfer weights from `t5x_ckpt_dir` T5X checkpoint to its corresponding model `hf_model` and save the model to `save_dir`. 
 ```
 python3 main.py \
 --hf_model "google/mt5-xl" \
