@@ -231,6 +231,10 @@ for name, param in hf_model.named_parameters():
         param.data = t5x_weight.transpose(0, 1)
     else:
         assert False
+    
+    del conversion_D[name]
+
+print(f"✅ Done transferring T5X weights to HF model. Remaining weights from T5X (untransferred): {conversion_D}")
 
 hf_model.save_pretrained(args.save_dir)
 print(f"✅ Done saving to {args.save_dir}.")
