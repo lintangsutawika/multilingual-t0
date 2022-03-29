@@ -4,7 +4,7 @@
 
 First install [t5x](https://github.com/google-research/t5x/), [jax](https://github.com/google/jax) and [transformers](https://github.com/huggingface/transformers).
 
-Then download the T5X checkpoints from Google Cloud bucket into a directory. 
+Then download the T5X checkpoints from Google Cloud bucket into the directory `t5x_ckpt_dir`. 
 
 Run the following code to transfer weights from `t5x_ckpt_dir` T5X checkpoint to its corresponding model `hf_model` and save the model to `save_dir`. 
 ```
