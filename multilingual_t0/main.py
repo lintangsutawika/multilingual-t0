@@ -59,7 +59,7 @@ import random
 logger = logging.getLogger(__name__)
 
 MT0_LANG_TO_PROBS = {
-        'en': 5.67,
+    'en': 5.67,
     'ru': 3.71,
     'es': 3.09,
     'de': 3.05,
