@@ -8,7 +8,7 @@ Then download the T5X checkpoints from Google Cloud bucket into the directory `t
 
 Run the following code to transfer weights from `t5x_ckpt_dir` T5X checkpoint to its corresponding model `hf_model` and save the model to `save_dir`. 
 ```
-python3 main.py \
+python3 convert.py \
 --hf_model "google/mt5-xl" \
 --cache_dir "~/.cache/huggingface/transformers" \
 --t5x_ckpt_dir "your/t5x_checkpoint_directory/" \
