@@ -211,11 +211,11 @@ for name, param in hf_model.named_parameters():
                 assert False
             conversion_D[name] = t5x_layer
         else:
-            print(name)
             assert False
 
     elif name.startswith("decoder.final_layer_norm"):
         conversion_D[name] = "target/decoder/decoder_norm/scale"
+
     else:
         assert False
     
@@ -229,11 +229,10 @@ for name, param in hf_model.named_parameters():
     t5x_weight = torch.from_numpy(tf_target_weights[conversion_D[name]])
     if t5x_weight.shape == param.data.shape:
         if ("EncDecAttention" in name) or ("SelfAttention" in name):
-            t5x_weight = t5x_weight.transpose(1,0)
-
+            t5x_weight = t5x_weight.transpose(0, 1)
         param.data = t5x_weight
     elif t5x_weight.transpose(0, 1).shape == param.data.shape:
-        assert "DenseReluDense" in name
+        assert "DenseReluDense" in name or "lm_head" in name
         param.data = t5x_weight.transpose(0, 1)
     else:
         assert False
