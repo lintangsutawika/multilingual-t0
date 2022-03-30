@@ -121,7 +121,7 @@ tf_target_weights = {key: weight for key, weight in tf_weights.items() if 'targe
 # for name in tf_target_weights.keys():
 #     print(name, tf_target_weights[name].shape)
 
-hf_model = transformers.AutoModel.from_pretrained(args.hf_model, cache_dir=args.cache_dir)
+hf_model = transformers.AutoModelForSeq2SeqLM.from_pretrained(args.hf_model, cache_dir=args.cache_dir)
 print(f"✅ Done loading HF model {args.hf_model} from {args.cache_dir}.")
 
 # for name, param in hf_model.named_parameters():
@@ -167,6 +167,9 @@ for name, param in hf_model.named_parameters():
 
     elif name.startswith("encoder.final_layer_norm"):
         conversion_D[name] = "target/encoder/encoder_norm/scale"
+
+    elif name.startswith("lm_head"):
+        conversion_D[name] = "target/decoder/logits_dense/kernel"
 
     elif name.startswith("decoder.block"):
         if "SelfAttention" in name:
@@ -225,6 +228,9 @@ for name, param in hf_model.named_parameters():
     assert name in conversion_D
     t5x_weight = torch.from_numpy(tf_target_weights[conversion_D[name]])
     if t5x_weight.shape == param.data.shape:
+        if ("EncDecAttention" in name) or ("SelfAttention" in name):
+            t5x_weight = t5x_weight.transpose(1,0)
+
         param.data = t5x_weight
     elif t5x_weight.transpose(0, 1).shape == param.data.shape:
         assert "DenseReluDense" in name
@@ -232,9 +238,9 @@ for name, param in hf_model.named_parameters():
     else:
         assert False
     
-    del conversion_D[name]
+    #del conversion_D[name]
 
-print(f"✅ Done transferring T5X weights to HF model. Remaining weights from T5X (untransferred): {conversion_D}")
+#print(f"✅ Done transferring T5X weights to HF model. Remaining weights from T5X (untransferred): {conversion_D}")
 
 hf_model.save_pretrained(args.save_dir)
 print(f"✅ Done saving to {args.save_dir}.")
