@@ -1,1 +1,2 @@
 datasets>=1.7.0
+promptsource
