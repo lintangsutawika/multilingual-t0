@@ -227,16 +227,11 @@ print(f"✅ Done mapping T5X checkpoint names to HF parameters")
 for name, param in hf_model.named_parameters():
     assert name in conversion_D
     t5x_weight = torch.from_numpy(tf_target_weights[conversion_D[name]])
-    if t5x_weight.shape == param.data.shape:
-        if ("EncDecAttention" in name) or ("SelfAttention" in name):
-            t5x_weight = t5x_weight.transpose(0, 1)
-        param.data = t5x_weight
-    elif t5x_weight.transpose(0, 1).shape == param.data.shape:
-        assert "DenseReluDense" in name or "lm_head" in name
-        param.data = t5x_weight.transpose(0, 1)
-    else:
-        assert False
+    if "DenseReluDense" in name or "lm_head" in name or "EncDecAttention" in name or "SelfAttention" in name:
+        t5x_weight = t5x_weight.transpose(0, 1)
     
+    assert param.data.shape == t5x_weight.shape
+    param.data = t5x_weight
     #del conversion_D[name]
 
 #print(f"✅ Done transferring T5X weights to HF model. Remaining weights from T5X (untransferred): {conversion_D}")
