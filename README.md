@@ -14,3 +14,11 @@ python3 convert.py \
 --t5x_ckpt_dir "your/t5x_checkpoint_directory/" \
 --save_dir "path/to/save_dir_of_transferred_checkpoint/"
 ```
+
+Then run the following code to upload to Hub (https://huggingface.co/mT0).
+```
+python3 /users/zyong2/data/zyong2/mt0/scripts/exp-003/upload_to_hf.py \
+--model_path path/to/save_dir_of_transferred_checkpoint/ \
+--hub_model_name mt0_{model_size}_{mixture}_ckpt_{ckpt_number} \
+--hf_org mT0 
+```
