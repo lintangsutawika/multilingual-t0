@@ -4,6 +4,7 @@
 import abc
 import asyncio
 from concurrent.futures import thread
+import os
 import re
 from typing import Any, Callable, Mapping, MutableMapping, Optional, Sequence, Tuple, Union
 
@@ -19,6 +20,9 @@ import collections
 import torch
 import transformers
 
+from huggingface_hub import Repository
+from transformers.utils import get_full_repo_name
+
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -30,6 +34,10 @@ parser.add_argument('--t5x_ckpt_dir', type=str, default="",
                     help='T5X checkpoint directory')
 parser.add_argument('--save_dir', type=str, default="",
                     help='directory for saving the HF model with transferred checkpoint weight')
+parser.add_argument('--hub_model_name', type=str, default=None,
+                    help='If provided, pushes the model to Huggingface Hub with this name.')
+parser.add_argument('--hf_org', type=str, default=None,
+                    help='Huggingface Organization name')
 
 args = parser.parse_args()
 
@@ -236,5 +244,26 @@ for name, param in hf_model.named_parameters():
 
 #print(f"✅ Done transferring T5X weights to HF model. Remaining weights from T5X (untransferred): {conversion_D}")
 
+if args.hub_model_name is not None:
+    repo_name = get_full_repo_name(args.hf_model, organization=args.organization)
+    print(f"Creating HuggingFace Hub repository {repo_name}...")
+    repo = Repository(args.save_dir, clone_from=repo_name)
+
+    with open(os.path.join(args.save_dir, ".gitignore"), "w+") as gitignore:
+        if "step_*" not in gitignore:
+            gitignore.write("step_*\n")
+        if "epoch_*" not in gitignore:
+            gitignore.write("epoch_*\n")
+
 hf_model.save_pretrained(args.save_dir)
 print(f"✅ Done saving to {args.save_dir}.")
+
+tokenizer = transformers.AutoTokenizer.from_pretrained(args.hf_model, cache_dir=args.cache_dir)
+tokenizer.save_pretrained(args.save_dir)
+print(f"✅ Done saving tokenizer to {args.save_dir}.")
+
+if args.hub_model_name is not None:
+    repo.push_to_hub()
+    print(f"✅ Done pushing to HuggingFace Hub.")
+
+print(f"✅ Done.")
