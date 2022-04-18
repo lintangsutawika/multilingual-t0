@@ -1,0 +1,2835 @@
+template_name,template_string
+super_glue - wsc.fixed - GPT-3 Style,"Passage: {e1} 
+
+Question: In the passage above, does the pronoun ""{e2}"" refer to {e3}?
+
+Answer: ||| {e4}{e5}{e6}"
+super_glue - wsc.fixed - I think they mean,"{e1} I think they mean ""{e2}"" Yes or no? ||| {e3}{e4}{e5}"
+super_glue - wsc.fixed - Who or what is/are,"{e1} 
+{e2}
+Question: Who or what are ""{e3}""? {e4}?
+{e5}
+Question: Who or what is ""{e6}""? Is it {e7}?
+{e8}
+Answer: ||| {e9}{e10}{e11}"
+super_glue - wsc.fixed - by p they mean,"{e1} Here, by ""{e2}"" they mean ""{e3}"". Yes or no? ||| {e4}{e5}{e6}"
+super_glue - wsc.fixed - does p stand for,"{e1} Here, does ""{e2}"" stand for {e3}? Yes or no? ||| {e4}{e5}{e6}"
+super_glue - wsc.fixed - does the pronoun refer to,"{e1} In the previous sentence, does the pronoun ""{e2}"" refer to {e3}? Yes or no? ||| {e4}{e5}{e6}"
+super_glue - wsc.fixed - in other words,"{e1} 
+
+In other words, {e2} True or false? ||| {e3}{e4}{e5}"
+super_glue - wsc.fixed - p is/are r,"Context: {e1} 
+
+{e2}
+Question: ""{e3}"" are {e4}. True or false?
+{e5}
+Question: ""{e6}"" is {e7}. True or false?
+{e8}
+
+Answer: ||| {e9}{e10}{e11}"
+super_glue - wsc.fixed - replaced with,"{e1} In the previous sentence, can the pronoun ""{e2}"" be replaced with ""{e3}""? Yes or no? ||| {e4}{e5}{e6}"
+super_glue - wsc.fixed - the pronoun refers to,"{e1} 
+In the passage above, the pronoun ""{e2}"" refers to {e3}. True or false? ||| {e4}{e5}{e6}"
+glue - mrpc - equivalent,"Are the following two sentences ""{e1}"" or ""{e2}""?
+{e3}
+{e4}
+|||
+{e5}"
+glue - mrpc - generate_paraphrase,"{e1}
+Paraphrase the following sentence: {e2}
+|||
+{e3}
+{e4}"
+glue - mrpc - generate_sentence,"{e1}
+Generate a sentence that means the same thing as this one: {e2}
+|||
+{e3}
+{e4}"
+glue - mrpc - paraphrase,"Does the sentence
+{e1}
+paraphrase (that is, mean the same thing as) this sentence?
+{e2}
+|||
+{e3}"
+glue - mrpc - replace,"Can I replace the sentence
+{e1}
+with the sentence
+{e2}
+and have it mean the same thing?
+|||
+{e3}"
+glue - mrpc - same thing,"Do the following two sentences mean the same thing?
+{e1}
+{e2}
+|||
+{e3}"
+glue - mrpc - want to know,"I want to know whether the following two sentences mean the same thing.
+{e1}
+{e2}
+Do they?
+|||
+{e3}"
+glue - qqp - answer,"Can an answer to ""{e1}"" also be used to answer ""{e2}""? ||| {e3}"
+glue - qqp - duplicate,"I received the questions ""{e1}"" and ""{e2}"". Are they duplicates? ||| {e3}"
+glue - qqp - duplicate or not,"{e1}
+{e2}
+Pick one: These questions are ""{e3}"" or ""{e4}"".
+|||
+{e5}"
+glue - qqp - meaning,"Question 1: {e1}
+Question 2: {e2}
+
+Do these two questions convey the same meaning? Yes or no? ||| {e3}"
+glue - qqp - quora,"I'm an administrator on the website Quora. There are two posts, one that asks ""{e1}"" and another that asks ""{e2}"". I can merge questions if they are asking the same thing. Can I merge these two questions? ||| {e3}"
+glue - qqp - same thing,"Are the questions ""{e1}"" and ""{e2}"" asking the same thing? ||| {e3}"
+paws - labeled_final - Concatenation,"Sentence 1: {e1}
+Sentence 2: {e2}
+Question: Does Sentence 1 paraphrase Sentence 2? Yes or No? 
+||| 
+{e3}"
+paws - labeled_final - Concatenation-no-label,"Sentence 1: {e1}
+Sentence 2: {e2}
+Question: Does Sentence 1 paraphrase Sentence 2? 
+||| 
+{e3}"
+paws - labeled_final - Meaning,"Sentence 1: {e1}
+Sentence 2: {e2}
+Question: Do Sentence 1 and Sentence 2 express the same meaning? Yes or No? 
+||| 
+{e3}"
+paws - labeled_final - Meaning-no-label,"Sentence 1: {e1}
+Sentence 2: {e2}
+Question: Do Sentence 1 and Sentence 2 express the same meaning? 
+||| 
+{e3}"
+paws - labeled_final - PAWS-ANLI GPT3,"{e1} Question: {e2} True or False? 
+||| 
+{e3}"
+paws - labeled_final - PAWS-ANLI GPT3-no-label,"{e1} Question: {e2} Paraphrase or not?
+||| 
+{e3}"
+paws - labeled_final - Rewrite,"Sentence 1: {e1}
+Sentence 2: {e2}
+Question: Can we rewrite Sentence 1 to Sentence 2? Yes or No? 
+||| 
+{e3}"
+paws - labeled_final - Rewrite-no-label,"Sentence 1: {e1}
+Sentence 2: {e2}
+Question: Can we rewrite Sentence 1 to Sentence 2? 
+||| 
+{e3}"
+paws - labeled_final - context-question,"{e1}
+Is that a paraphrase of the following sentence?
+{e2}?
+Yes or No.
+||| 
+{e3}"
+paws - labeled_final - context-question-no-label,"{e1}
+Is that a paraphrase of the following sentence?
+{e2}?
+||| 
+{e3}"
+paws - labeled_final - paraphrase-task,"{e1} 
+Paraphrase the sentence: {e2} 
+||| 
+{e3} 
+{e4}"
+paws - labeled_final - task_description-no-label,"Determine if the following two sentences paraphrase each other or not.
+Sent 1: {e1}
+Sent 2: {e2}
+||| 
+{e3}"
+ai2_arc - ARC-Challenge - heres_a_problem,"Here's a problem to solve: {e1}
+
+Among the 4 following options, which is the correct answer?
+{e2}
+- {e3}: {e4}
+ {e5}|||{e6}"
+ai2_arc - ARC-Challenge - i_am_hesitating,"I am hesitating between 4 options to answer the following question, which option should I choose?
+Question: {e1}
+Possibilities:
+- {e2}|||
+{e3}"
+ai2_arc - ARC-Challenge - multiple_choice,"I gave my students this multiple choice question: {e1}
+
+Only one answer is correct among these 4 choices:
+- {e2}
+
+Could you tell me which one is correct?|||
+{e3}"
+ai2_arc - ARC-Challenge - pick_false_options,"Pick and copy all the incorrect options for the following question:
+
+{e1}
+
+Options:
+- {e2}|||
+{e3}
+{e4}
+- {e5}
+{e6}
+{e7}"
+ai2_arc - ARC-Challenge - pick_the_most_correct_option,"Pick the most correct option to answer the following question.
+
+{e1}
+
+Options:
+{e2}
+- {e3}: {e4}
+{e5} |||
+{e6}"
+ai2_arc - ARC-Challenge - qa_options,"{e1}
+
+Options:
+- {e2}|||
+{e3}"
+ai2_arc - ARC-Easy - heres_a_problem,"Here's a problem to solve: {e1}
+
+Among the 4 following options, which is the correct answer?
+{e2}
+- {e3}: {e4}
+ {e5}|||{e6}"
+ai2_arc - ARC-Easy - i_am_hesitating,"I am hesitating between 4 options to answer the following question, which option should I choose?
+Question: {e1}
+Possibilities:
+- {e2}|||
+{e3}"
+ai2_arc - ARC-Easy - multiple_choice,"I gave my students this multiple choice question: {e1}
+
+Only one answer is correct among these 4 choices:
+- {e2}
+
+Could you tell me which one is correct?|||
+{e3}"
+ai2_arc - ARC-Easy - pick_false_options,"Pick and copy all the incorrect options for the following question:
+
+{e1}
+
+Options:
+- {e2}|||
+{e3}
+{e4}
+- {e5}
+{e6}
+{e7}"
+ai2_arc - ARC-Easy - pick_the_most_correct_option,"Pick the most correct option to answer the following question.
+
+{e1}
+
+Options:
+{e2}
+- {e3}: {e4}
+{e5} |||
+{e6}"
+ai2_arc - ARC-Easy - qa_options,"{e1}
+
+Options:
+- {e2}|||
+{e3}"
+kilt_tasks - hotpotqa - combining_facts,"{e1}
+Combine facts and answer this: {e2}
+|||
+{e3}
+{e4}"
+kilt_tasks - hotpotqa - complex_question,"{e1}
+Here's a complex question that requires someone to reason about the input, can you answer it?
+{e2}
+|||
+{e3}
+{e4}"
+kilt_tasks - hotpotqa - final_exam,"{e1}
+FINAL EXAM
+
+Question 1. {e2}
+|||
+{e3}
+{e4}"
+kilt_tasks - hotpotqa - formulate,"{e1}
+Formulate an answer to this elaborate question: {e2}
+|||
+{e3}
+{e4}"
+kilt_tasks - hotpotqa - straighforward_qa,"{e1}
+{e2}
+|||
+{e3}
+{e4}"
+trivia_qa - unfiltered - first_person_context,"I've always wondered: {e1} 
+||| 
+{e2} 
+{e3}
+{e4}"
+trivia_qa - unfiltered - formal_description,"The goal is to predict an English answer string for an input English question. 
+Question : {e1}
+Answer : 
+||| 
+{e2} 
+{e3} 
+{e4}"
+trivia_qa - unfiltered - guess_question,"{e1} 
+    Guess a question that has the answer ""{e2}"" 
+    |||  
+    {e3} 
+{e4}"
+trivia_qa - unfiltered - question_answer,"Question : {e1}
+Answer : 
+||| 
+{e2} 
+{e3}
+{e4}"
+trivia_qa - unfiltered - question_with_instruction,"Answer the following question.
+{e1} 
+|||
+{e2} 
+{e3} 
+{e4}"
+web_questions - None - get_the_answer,Give me the correct facts to answer this: {e1} ||| {e2}
+web_questions - None - potential-correct-answer,"Give me a possible correct answer to the question ""{e1}"" ||| {e2}"
+web_questions - None - question-answer,{e1} ||| {e2}
+web_questions - None - short_general_knowledge_q,Short general knowledge question: {e1} ||| {e2}
+web_questions - None - whats_the_answer,What's the answer to that question: {e1} ||| {e2}
+wiki_qa - None - Decide_good_answer,"This is a correct answer to the following question about {e1}. Yes or no?
+Answer: {e2}
+Question: {e3}
+|||
+{e4}"
+wiki_qa - None - Direct Answer to Question,"{e1}
+Answer this question: {e2}?|||
+{e3}
+{e4}"
+wiki_qa - None - Generate Question from Topic,"{e1}
+Generate a question about the topic ""{e2}"" whose answer would be: {e3}.|||
+{e4}?
+{e5}
+"
+wiki_qa - None - Is This True?,"Question: {e1}?
+Would ""{e2}"" be a reasonable answer? |||
+{e3}"
+wiki_qa - None - Jeopardy style,"{e1}
+What is the question to: ""{e2}""? The topic is {e3}.|||
+""{e4}?""
+{e5}
+"
+wiki_qa - None - Topic Prediction - Answer Only,"{e1}
+Determine the topic of the passage.
+""{e2}""
+Topic:|||
+{e3}
+{e4}
+"
+wiki_qa - None - Topic Prediction - Question Only,"{e1}
+Determine the topic of the question.
+Question: ""{e2}?""
+Topic: |||
+{e3}
+{e4}"
+wiki_qa - None - Topic Prediction - Question and Answer Pair,"{e1}
+Determine the topic of the question-answer pair.
+Question: ""{e2}?"";  Answer: ""{e3}""? Topic: |||
+{e4}
+{e5}
+"
+wiki_qa - None - automatic_system,"I am verifying the answers generated by an automatic system to the following question: {e1}
+Suggested answer: {e2}
+Should I validate this answer?
+|||
+{e3}"
+wiki_qa - None - exercise,"The exercise is to decide whether the question accepts the proposed suggestion as a correct answer. If yes, write ""{e1}"", otherwise write ""{e2}"".
+Question: {e3}
+Suggestion: {e4}
+|||
+{e5}"
+wiki_qa - None - found_on_google,"Question: {e1}
+I found the following answer on Google: {e2}
+Is that a correct answer? Yes or no.
+|||
+{e3}"
+adversarial_qa - dbidaf - answer_the_following_q,"{e1}
+Given the following passage
+
+""{e2}"",
+
+answer the following question. Note that the answer is present within the text.
+
+Question: {e3} |||
+{e4}
+{e5}"
+adversarial_qa - dbidaf - based_on,"{e1}
+Extract the answer to the question from the following context.
+Question: {e2}
+Context: {e3}|||
+{e4}
+{e5}"
+adversarial_qa - dbidaf - generate_question,"I want to test the ability of students to read a passage and answer questions about it. Could you please come up with a good question for the passage ""{e1}""? |||
+{e2}"
+adversarial_qa - dbidaf - question_context_answer,"{e1}
+Question: ""{e2}""
+
+Context: ""{e3}""
+
+Answer:
+|||
+{e4}
+{e5}"
+adversarial_qa - dbidaf - tell_what_it_is,"{e1}
+I know that the answer to the question ""{e2}"" is in ""{e3}"". Can you tell me what it is? |||
+
+{e4}
+{e5}"
+adversarial_qa - dbert - answer_the_following_q,"{e1}
+Given the following passage
+
+""{e2}"",
+
+answer the following question. Note that the answer is present within the text.
+
+Question: {e3} |||
+{e4}
+{e5}"
+adversarial_qa - dbert - based_on,"{e1}
+Extract the answer to the question from the following context.
+Question: {e2}
+Context: {e3}|||
+{e4}
+{e5}"
+adversarial_qa - dbert - generate_question,"I want to test the ability of students to read a passage and answer questions about it. Could you please come up with a good question for the passage ""{e1}""? |||
+{e2}"
+adversarial_qa - dbert - question_context_answer,"{e1}
+Question: ""{e2}""
+
+Context: ""{e3}""
+
+Answer:
+|||
+{e4}
+{e5}"
+adversarial_qa - dbert - tell_what_it_is,"{e1}
+I know that the answer to the question ""{e2}"" is in ""{e3}"". Can you tell me what it is? |||
+
+{e4}
+{e5}"
+adversarial_qa - droberta - answer_the_following_q,"{e1}
+Given the following passage
+
+""{e2}"",
+
+answer the following question. Note that the answer is present within the text.
+
+Question: {e3} |||
+{e4}
+{e5}"
+adversarial_qa - droberta - based_on,"{e1}
+Extract the answer to the question from the following context.
+Question: {e2}
+Context: {e3}|||
+{e4}
+{e5}"
+adversarial_qa - droberta - generate_question,"I want to test the ability of students to read a passage and answer questions about it. Could you please come up with a good question for the passage ""{e1}""? |||
+{e2}"
+adversarial_qa - droberta - question_context_answer,"{e1}
+Question: ""{e2}""
+
+Context: ""{e3}""
+
+Answer:
+|||
+{e4}
+{e5}"
+adversarial_qa - droberta - tell_what_it_is,"{e1}
+I know that the answer to the question ""{e2}"" is in ""{e3}"". Can you tell me what it is? |||
+
+{e4}
+{e5}"
+duorc - SelfRC - answer_question,"Please answer the following question about this movie plot. If it's un-answerable, please output ""{e1}"".
+
+Question: {e2}
+Movie plot title: {e3}
+Movie plot: {e4}
+|||
+{e5}
+No answer
+{e6}
+{e7}
+{e8}"
+duorc - SelfRC - build_story_around_qa,"{e1}
+Build a movie plot around this: {e2} {e3}
+|||
+{e4}
+{e5}"
+duorc - SelfRC - decide_worth_it,"I am trying to decide whether it's worth it to invest in this film proposal. Can you help me answer a few questions? If you can't, please say ""{e1}"".
+
+Question: {e2}
+Movie title: {e3}
+Movie plot: {e4}
+|||
+{e5}
+No I can't
+{e6}
+{e7}
+{e8}"
+duorc - SelfRC - extract_answer,"Extract the answer to the following question from the movie plot. If the question isn't answerable, please output ""{e1}"".
+Question: {e2}
+Title: {e3}
+Movie plot: {e4}
+|||
+{e5}
+Can't answer
+{e6}
+{e7}
+{e8}"
+duorc - SelfRC - generate_question,"Generate a question about the following movie plot: {e1}
+|||
+{e2}"
+duorc - SelfRC - generate_question_by_answer,"{e1}
+Generate a question that has the following answer: 
+{e2} 
+for the following movie plot: 
+{e3}
+|||
+{e4}
+{e5}"
+duorc - SelfRC - movie_director,"I am a movie director and I just received the following movie plot. Could you help me answer this question? If not, let me know by writing ""{e1}"".
+
+Plot title: {e2}
+Movie plot: {e3}
+My question: {e4}
+|||
+{e5}
+Not answerable
+{e6}
+{e7}
+{e8}"
+duorc - SelfRC - question_answering,"Question: {e1}
+If there is no answer, please output ""{e2}"".
+Movie title: {e3}
+Context: {e4}
+|||
+{e5}
+Insufficient information to provide an answer.
+{e6}
+{e7}
+{e8}"
+duorc - SelfRC - title_generation,"Suggest a movie title for the following movie plot: {e1}
+|||
+{e2}"
+duorc - ParaphraseRC - answer_question,"Please answer the following question about this movie plot. If it's un-answerable, please output ""{e1}"".
+
+Question: {e2}
+Movie plot title: {e3}
+Movie plot: {e4}
+|||
+{e5}
+No answer
+{e6}
+{e7}
+{e8}"
+duorc - ParaphraseRC - build_story_around_qa,"{e1}
+Build a movie plot around this: {e2} {e3}
+|||
+{e4}
+{e5}"
+duorc - ParaphraseRC - decide_worth_it,"I am trying to decide whether it's worth it to invest in this film proposal. Can you help me answer a few questions? If you can't, please say ""{e1}"".
+
+Question: {e2}
+Movie title: {e3}
+Movie plot: {e4}
+|||
+{e5}
+No I can't
+{e6}
+{e7}
+{e8}"
+duorc - ParaphraseRC - extract_answer,"Extract the answer to the following question from the movie plot. If the question isn't answerable, please output ""{e1}"".
+Question: {e2}
+Title: {e3}
+Movie plot: {e4}
+|||
+{e5}
+Can't answer
+{e6}
+{e7}
+{e8}"
+duorc - ParaphraseRC - generate_question,"Generate a question about the following movie plot: {e1}
+|||
+{e2}"
+duorc - ParaphraseRC - generate_question_by_answer,"{e1}
+Generate a question that has the following answer: 
+{e2} 
+for the following movie plot: 
+{e3}
+|||
+{e4}
+{e5}"
+duorc - ParaphraseRC - movie_director,"I am a movie director and I just received the following movie plot. Could you help me answer this question? If not, let me know by writing ""{e1}"".
+
+Plot title: {e2}
+Movie plot: {e3}
+My question: {e4}
+|||
+{e5}
+Not answerable
+{e6}
+{e7}
+{e8}"
+duorc - ParaphraseRC - question_answering,"Question: {e1}
+If there is no answer, please output ""{e2}"".
+Movie title: {e3}
+Context: {e4}
+|||
+{e5}
+Insufficient information to provide an answer.
+{e6}
+{e7}
+{e8}"
+duorc - ParaphraseRC - title_generation,"Suggest a movie title for the following movie plot: {e1}
+|||
+{e2}"
+ropes - None - background_new_situation_answer,"{e1}
+I can use this background: {e2}
+
+Now, I have a new situation: {e3}
+
+Answer this question please: {e4}|||
+{e5}
+{e6}"
+ropes - None - background_situation_middle,"{e1}
+You are given a new situation: {e2}
+
+and a hint : {e3}
+
+Please answer this question : {e4}|||
+{e5}
+{e6}"
+ropes - None - given_background_situation,"{e1}
+Given the background: {e2}
+
+and the situation: {e3}
+
+Answer the following question: {e4}|||
+{e5}
+{e6}"
+ropes - None - new_situation_background_answer,"{e1}
+I have a new situation: {e2}
+
+But I can use this background: {e3}
+
+What is an answer for this question: {e4}|||
+{e5}
+{e6}"
+ropes - None - plain_background_situation,"{e1}
+{e2}
+
+{e3}
+
+{e4}
+|||
+{e5}
+{e6}"
+ropes - None - plain_bottom_hint,"{e1}
+{e2}
+
+{e3}
+
+Hint: {e4}
+|||
+{e5}
+{e6}"
+ropes - None - plain_no_background,"{e1}
+{e2}
+
+{e3}
+
+|||
+{e4}
+{e5}"
+ropes - None - prompt_beginning,"{e1}
+Please answer correctly the following question related to the paragraph below. 
+
+{e2}
+
+{e3}
+
+Hint: {e4}
+|||
+{e5}
+{e6}"
+ropes - None - prompt_bottom_hint_beginning,"{e1}
+Background: {e2}
+
+Paragraph: {e3}
+
+Given the paragraph above, please answer correctly the following question: {e4}
+|||
+{e5}
+{e6}"
+ropes - None - prompt_bottom_no_hint,"{e1}
+{e2}
+
+Given the paragraph above, please answer correctly the following question: 
+
+{e3}
+|||
+{e4}
+{e5}"
+ropes - None - prompt_mix,"{e1}
+{e2}
+
+Given the paragraph above, please answer correctly the following question: 
+
+{e3}
+
+Hint: {e4}
+|||
+{e5}
+{e6}"
+ropes - None - read_background_situation,"{e1}
+I read this background article the other day: {e2}
+
+I am facing a new situation today: {e3}
+
+Using the knowledge I acquired from the background article, how should I answer correctly the following question regarding my new situation: {e4}|||
+{e5}
+{e6}"
+squad_v2 - None - Jeopardy with Context,"{e1}
+Determine the question that you might have asked to get back the following answer for the given context
+Context: {e2};
+Answer: {e3};
+Question: |||
+{e4}
+{e5}
+"
+squad_v2 - None - Jeopardy without Context,"{e1}
+What is a question that would give the following answer?
+Answer: {e2};
+Question: |||
+{e3}
+{e4}
+"
+squad_v2 - None - Questions with Context,"{e1}
+
+{e2}
+Context: {e3};
+Question: {e4};
+Answer: |||
+{e5}
+Answer not in context
+{e6}
+{e7}
+{e8}"
+squad_v2 - None - Questions with Context +unanswerable,"{e1}
+
+{e2}
+Context: {e3};
+Question: {e4};
+If you can't find the answer, please respond ""unanswerable"".
+Answer: |||
+{e5}
+unanswerable
+{e6}
+{e7}
+{e8}"
+squad_v2 - None - Questions with Context - Without Prompt Keywords,"{e1}
+{e2} {e3}{e4}|||
+{e5}
+Answer not in context
+{e6}
+{e7}
+{e8}"
+squad_v2 - None - Questions with Context - Without Prompt Keywords +unanswerable,"{e1}
+{e2} {e3}{e4} If you can't find the answer, please respond ""unanswerable"". |||
+{e5}
+unanswerable
+{e6}
+{e7}
+{e8}"
+squad_v2 - None - Topic Prediction - Context,"What is the following passage about?
+{e1} |||
+{e2}"
+squad_v2 - None - Topic Prediction - Context with randomized prompt options,"{e1}
+{e2}
+{e3} |||
+{e4}"
+squad_v2 - None - Topic Prediction - Context with randomized prompt options placed in the end,"{e1}
+{e2}
+{e3}|||
+{e4}"
+squad_v2 - None - Topic Prediction - Question and Answer Pair,"{e1}
+{e2}
+{e3}
+Question: {e4};  Answer: {e5}; Topic: |||
+{e6}
+{e7}"
+squad_v2 - None - Trivia,"{e1}
+{e2}|||
+{e3}
+{e4}"
+squad_v2 - None - Unanwerable question,"Context: {e1}; 
+
+Question: {e2} 
+
+Is this question answerable? ||| 
+{e3}
+{e4}
+{e5}
+{e6}
+{e7}"
+super_glue - record - Add sentence after (continuation choices),"After reading the article, write another sentence to add to it.
+{e1}
+
+||| {e2}{e3}{e4}
+"
+super_glue - record - Add sentence after after (continuation choices),"Summary:
+
+- {e1} 
+
+Article:
+
+{e2}
+
+Now that you've read the article, please write a new sentence to add to it.
+
+||| {e3}{e4} {e5}"
+super_glue - record - Can you figure out…,"{e1} 
+{e2} 
+Can you figure out what does the ""{e3}"" mean? It means ||| {e4}{e5}{e6}"
+super_glue - record - GPT-3 style (continuation choices),"{e1} 
+
+ ||| {e2}- {e3} {e4}"
+super_glue - record - GPT-3 style summary only (continuation choices),"{e1}
+
+Summary:
+
+- {e2} 
+
+ ||| {e3}- {e4} {e5}"
+super_glue - record - GPT-3 style with labels (continuation choices),"Article:
+
+{e1}
+
+Highlights:
+
+- {e2} 
+
+ ||| {e3}- {e4} {e5}"
+super_glue - record - GPT-3 style with labels without hyphens (continuation choices),"Article:
+
+{e1}
+
+Highlights:
+
+{e2} 
+
+ ||| {e3}{e4} {e5}"
+super_glue - record - GPT-3 style without hyphens (continuation choices),"{e1} 
+ ||| {e2}{e3} {e4}"
+"super_glue - record - In the question above, the placeholder stands for","{e1} 
+{e2} 
+In the question above, the ""{e3}"" stands for ||| {e4}{e5}{e6}"
+super_glue - record - New highlight (continuation choices),"{e1}
+
+Highlights:
+
+- {e2} 
+
+Please write an additional highlight.
+ ||| {e3}- {e4} {e5}
+"
+super_glue - record - News article (continuation choices),"Please read the following news article and write another sentence to add to it.
+
+{e1} 
+ ||| {e2}{e3} {e4}
+"
+super_glue - record - Summary first (continuation choices),"Summary:
+
+- {e1} 
+
+Article:
+
+{e2}
+ ||| {e3}{e4} {e5}"
+super_glue - record - What could the placeholder be?,"{e1} 
+{e2} 
+What could the ""{e3}"" be? {e4}? ||| {e5}{e6}{e7}"
+super_glue - record - Which one is the placeholder?,"{e1} 
+{e2} 
+Which one is the ""{e3}""? {e4}? ||| {e5} {e6}
+{e7}"
+super_glue - record - choose_between,"{e1} 
+{e2} 
+
+You should decide what ""{e3}"" is referring to. Choose between:
+- {e4}
+||| {e5}{e6}
+{e7}"
+super_glue - record - corrupted,"The following document has been corrupted. Tell me what ""{e1}"" is referring to.
+
+Document: {e2} 
+{e3} 
+||| {e4}{e5}
+{e6}"
+super_glue - record - exercise,"Exercise: Extract from the text the correct entity that ""{e1}"" is referring to.
+
+{e2}
+{e3}
+||| {e4}
+{e5}
+{e6}"
+super_glue - record - pick_one_option,"{e1}
+{e2}
+
+Pick one option, ""{e3}"" refers to:
+- {e4}
+||| {e5}
+{e6}
+{e7}"
+super_glue - record - the placeholder refers to…,"{e1} 
+{e2} 
+Here, the placeholder refers to ||| {e3}{e4}
+{e5}"
+super_glue - record - trying_to_decide,"{e1}
+{e2}
+
+I am trying to decide what ""{e3}"" means in the previous text.
+Help by choosing an option between:
+- {e4}
+||| {e5}
+{e6}
+{e7}"
+quoref - None - Answer Friend Question,"A friend asked me to answer this question: {e1}, using the article: {e2}, what would be the answer ?
+
+|||
+{e3}
+"
+quoref - None - Answer Question Given Context,"Given the following context:
+
+{e1}
+
+answer the following question:
+
+{e2} |||
+{e3}"
+quoref - None - Answer Test,"I have a test where I am given the following article, what is an answer for the question: {e1} ?
+
+{e2}|||
+{e3}"
+quoref - None - Context Contains Answer,"This article: {e1} contains an answer for the question: {e2}, what is it ?
+|||
+{e3}"
+quoref - None - Find Answer,"The following article contains an answer for the question: {e1} , can you please find it? 
+
+{e2}|||
+{e3}"
+quoref - None - Found Context Online,"Found the following article online, use it to answer the question: {e1}
+
+{e2}|||
+{e3}
+"
+quoref - None - Given Context Answer Question,"{e1}
+
+Answer the above question based on the context below:
+
+{e2} |||
+{e3}"
+quoref - None - Guess Answer,"The answer to the question: {e1} is inside the article: {e2}, can you guess it ?
+
+|||
+{e3}
+"
+quoref - None - Guess Title For Context,"Given the below context:
+
+{e1}
+
+Guess a valid title for it! |||
+{e2}"
+quoref - None - Read And Extract ,"Read the following paragraph and extract the answer for the question: {e1}
+
+{e2} |||
+{e3}"
+quoref - None - What Is The Answer,"What is the answer for the question: {e1} from the following article ?
+
+{e2}|||
+{e3}
+"
+cos_e - v1.11 - aligned_with_common_sense,"Here's a question and a few possible answers: 
+
+Q: {e1}
+Possible A: {e2}
+
+Why is ""{e3}"" an answer aligned with human common sense? 
+|||
+{e4}"
+cos_e - v1.11 - description_question_option_id,"Pick the option in line with common sense to answer the question.
+Question: {e1}
+Options:
+{e2}
+{e3}
+{e4}
+|||
+{e5}"
+cos_e - v1.11 - description_question_option_text,"Pick the option in line with common sense to answer the question.
+Questions: {e1}
+Options:
+- {e2}
+|||
+{e3}"
+cos_e - v1.11 - explain_why_human,"Question: {e1}
+Options:
+- {e2}
+
+Explain why a human would choose ""{e3}"" to answer the question above:
+|||
+{e4}"
+cos_e - v1.11 - generate_explanation_given_text,"Question: {e1}
+Options:
+- {e2}
+
+The answer is ""{e3}"" because
+|||
+{e4}"
+cos_e - v1.11 - i_think,"Here's a question: {e1}
+
+Here are possible answers to this question:
+- {e2}
+
+I believe the correct choice is ""{e3}"", here's why:
+|||
+{e4}"
+cos_e - v1.11 - question_description_option_id,"{e1}
+Choose the most suitable option to answer the above question.
+Options：
+{e2}
+{e3}
+{e4}
+|||
+{e5}"
+cos_e - v1.11 - question_description_option_text,"{e1}
+Choose the most suitable option to answer the above question.
+Options:
+- {e2}
+|||
+{e3}"
+cos_e - v1.11 - question_option_description_id,"{e1}
+{e2}
+{e3}
+{e4}
+The best answer is
+|||
+{e5}"
+cos_e - v1.11 - question_option_description_text,"{e1}
+- {e2}
+
+The best answer is
+|||
+{e3}"
+cos_e - v1.11 - rationale,"Question: {e1}
+
+Choices: 
+- {e2}
+
+The rationale to choose ""{e3}"" as the answer is that: |||
+{e4}"
+cosmos_qa - None - context_answer_to_question,"Based on the context and the answer, generate a question. 
+
+Context: {e1}
+
+Answer:
+{e2}
+{e3}
+{e4}
+{e5}
+{e6}
+{e7}
+{e8}
+{e9}
+{e10}
+|||
+{e11}"
+cosmos_qa - None - context_description_question_answer_id,"{e1}
+According to the above context, choose the best option to answer the following question.
+Question: {e2}
+Options:
+A. {e3}
+B. {e4}
+C. {e5}
+D. {e6}
+|||
+{e7}"
+cosmos_qa - None - context_description_question_answer_text,"{e1}
+According to the above context, choose the best option to answer the following question.
+Question: {e2}
+Options:
+- {e3}
+|||
+{e4}"
+cosmos_qa - None - context_description_question_text,"{e1}
+According to the above context, answer the following question.
+{e2}
+|||
+{e3}"
+cosmos_qa - None - context_question_description_answer_id,"{e1}
+{e2}
+Pick the best answer from the following options:
+A. {e3}
+B. {e4}
+C. {e5}
+D. {e6}
+|||
+{e7}"
+cosmos_qa - None - context_question_description_answer_text,"{e1}
+{e2}
+Pick the best answer from the following options:
+- {e3}
+|||
+{e4}"
+cosmos_qa - None - context_question_description_text,"{e1}
+Question: {e2}
+The answer to the above question:
+|||
+{e3}"
+cosmos_qa - None - description_context_question_answer_id,"Read the following context and choose the best option to answer the question.
+Context: {e1}
+Question: {e2}
+Options: 
+A. {e3}
+B. {e4}
+C. {e5}
+D. {e6}
+|||
+{e7}"
+cosmos_qa - None - description_context_question_answer_text,"Read the following context and choose the best option to answer the question.
+Context: {e1}
+Question: {e2}
+Options: 
+- {e3}
+|||
+{e4}"
+cosmos_qa - None - description_context_question_text,"Read the following context and answer the question.
+Context: {e1}
+Question: {e2}
+Answer:
+|||
+{e3}"
+cosmos_qa - None - no_prompt_id,"{e1}
+{e2}
+A. {e3}
+B. {e4}
+C. {e5}
+D. {e6}
+|||
+{e7}"
+cosmos_qa - None - no_prompt_text,"{e1}
+{e2}
+- {e3}
+|||
+{e4}"
+cosmos_qa - None - only_question_answer,"{e1} 
+|||
+{e2}"
+dream - None - answer-to-dialogue,"Given the question ""{e1}"" and the answer ""{e2}"", write a conversation that might have happened.
+|||
+{e3}"
+dream - None - baseline,"Dialogue:
+
+{e1}
+
+Question: {e2} 
+
+- {e3}
+
+- {e4}
+
+- {e5}
+|||
+{e6}"
+dream - None - generate-first-utterance,"{e1}
+
+What was said before this conversation?
+|||
+{e2}"
+dream - None - generate-last-utterance,"Read the below conversation.
+
+{e1}
+
+What would the listener say?
+|||
+{e2}"
+dream - None - read_the_following_conversation_and_answer_the_question,"Read the following conversation and answer the question.
+
+{e1}
+
+Question: {e2} 
+
+- {e3}
+
+- {e4}
+
+- {e5}
+|||
+{e6}"
+openbookqa - main - choices,"{e1}
+
+Choices:
+- {e2}
+|||
+{e3}[answerKey]]}}"
+openbookqa - main - choose_an_answer_with_options,"{e1}
+
+Choose an answer from this list:
+- {e2}
+|||
+{e3}[answerKey]]}}"
+openbookqa - main - only_options,"{e1}
+- {e2}
+|||
+{e3}[answerKey]]}}"
+openbookqa - main - pick_answer_with_options,"{e1}
+
+Pick the right answer from the list:
+- {e2}
+|||
+{e3}[answerKey]]}}"
+openbookqa - main - pick_using_id,"{e1}
+{e2}
+{e3}
+{e4}
+Is the right answer {e5} ?
+|||
+{e6}"
+openbookqa - main - which_correct,"{e1}
+
+Which is the correct answer?
+- {e2}
+|||
+{e3}[answerKey]]}}"
+openbookqa - main - which_correct_inverse,"{e1}
+- {e2}
+
+Which is the correct answer?
+|||
+{e3}[answerKey]]}}"
+qasc - None - is_correct_1,"If I tell you that {e1}{e2}, and ask you the question ""{e3}{e4}"", is the correct answer ""{e5}{e6}""? 
+
+||| 
+
+{e7} Yes {e8} No {e9}"
+qasc - None - is_correct_2,"Do you think the right answer to the question ""{e1}{e2}"" is ""{e3}{e4}"", given that
+ {e5}{e6}?
+ ||| 
+{e7} Yes {e8} No {e9}   "
+qasc - None - qa_with_combined_facts_1,"If {e1}{e2}, then {e3}{e4}?
+
+Answer choices:
+- {e5}
+||| 
+
+{e6} {e7}{e8}{e9}{e10}  "
+qasc - None - qa_with_separated_facts_1,"{e1}{e2}, and {e3}{e4}. Given these facts, {e5}{e6} among the following options:
+- {e7}
+
+||| 
+
+{e8} {e9}{e10}{e11}{e12} "
+qasc - None - qa_with_separated_facts_2,"Fact 1: {e1}{e2}.
+
+Fact 2: {e3}{e4}.
+
+Given the two facts above, answer the question ""{e5}"" with the following options: 
+- {e6}
+
+||| 
+
+{e7} {e8}{e9}{e10}{e11} "
+qasc - None - qa_with_separated_facts_3,"Fact 1: {e1}{e2}.
+
+Fact 2: {e3}{e4}.
+
+Given the two facts above, {e5}{e6}?
+
+||| 
+
+{e7} {e8}{e9}{e10}{e11}  "
+qasc - None - qa_with_separated_facts_4,"You are presented with the question ""{e1}"" and the following answer choices: 
+- {e2}
+
+Now knowing that {e3}{e4} and {e5}{e6}, choose the best answer.
+
+||| 
+
+{e7} {e8}{e9}{e10}{e11} "
+qasc - None - qa_with_separated_facts_5,"You are presented with the quiz ""{e1}"" 
+
+But you don't know the answer, so you turn to your teacher to ask for hints. He says that ""{e2}{e3}"" and ""{e4}{e5}"". 
+
+So, what's the best answer to the question?
+
+||| 
+
+{e6} {e7}{e8}{e9}{e10}   "
+quail - None - context_description_question_answer_id,"{e1}
+According to the above context, choose the correct option to answer the following question.
+Question: {e2}
+Options:
+{e3}
+{e4}
+{e5}
+|||
+{e6}"
+quail - None - context_description_question_answer_text,"{e1}
+According to the above context, choose the correct option to answer the following question.
+Question: {e2}
+Options:
+- {e3}
+|||
+{e4}"
+quail - None - context_description_question_text,"{e1}
+According to the above context, answer the following question.
+{e2}
+|||
+{e3}"
+quail - None - context_question_answer_description_id,"{e1}
+Question: {e2}
+Options:
+{e3}
+{e4}
+{e5}
+===
+The correct answer is
+|||
+{e6}"
+quail - None - context_question_answer_description_text,"{e1}
+Question: {e2}
+Options:
+- {e3}
+===
+The correct answer is
+|||
+{e4}"
+quail - None - context_question_description_answer_id,"{e1}
+{e2}
+Pick the correct answer from the following options:
+{e3}
+{e4}
+{e5}
+|||
+{e6}"
+quail - None - context_question_description_answer_text,"{e1}
+{e2}
+Pick the correct answer from the following options:
+- {e3}
+|||
+{e4}"
+quail - None - context_question_description_text,"{e1}
+Question: {e2}
+===
+The answer to the above question is
+|||
+{e3}"
+quail - None - description_context_question_answer_id,"Read the following context and choose the correct option to answer the question.
+Context: {e1}
+Question: {e2}
+Options:
+{e3}
+{e4}
+{e5}
+|||
+{e6}"
+quail - None - description_context_question_answer_text,"Read the following context and choose the correct option to answer the question.
+Context: {e1}
+Question: {e2}
+Options:
+- {e3}
+|||
+{e4}"
+quail - None - description_context_question_text,"Read the following context and answer the question.
+Context: {e1}
+Question: {e2}
+Answer:
+|||
+{e3}"
+quail - None - no_prompt_id,"{e1}
+{e2}
+{e3}
+{e4}
+{e5}
+|||
+{e6}"
+quail - None - no_prompt_text,"{e1}
+{e2}
+- {e3}
+|||
+{e4}"
+quarel - None - choose_between,"Choose between ""{e1}"" and  ""{e2}"".
+Question: {e3}
+|||
+{e4}"
+quarel - None - do_not_use,"Question: {e1}
+
+Do not use {e2} and {e3} to answer the question but instead, choose between ""{e4}"" and  ""{e5}"".
+|||
+{e6}"
+quarel - None - heres_a_story,"Here's a short story: {e1}.
+
+What is the most sensical answer between ""{e2}"" and  ""{e3}""?
+|||
+{e4}"
+quarel - None - logic_test,"Here's a logic test: {e1}
+
+Choose the answer between ""{e2}"" and ""{e3}"".
+|||
+{e4}"
+quarel - None - testing_students,"I am testing my students' logic.
+What is the answer they should choose between ""{e1}"" and ""{e2}""?
+Logic test: {e3}
+|||
+{e4}"
+quartz - None - answer_question_based_on,"Answer the question based on the following text.
+
+Question:
+
+{e1}
+{e2}{e3} 
+{e4}
+{e5} {e6}{e7} 
+{e8}
+
+Text:
+
+{e9}|||
+{e10}"
+quartz - None - answer_question_below,"Answer the question below:
+
+{e1}
+{e2}{e3} 
+{e4}
+{e5} {e6}{e7} 
+{e8}
+
+Assuming that:
+
+{e9}|||
+{e10}"
+quartz - None - given_the_fact_answer_the_q,"Given the fact that:
+
+{e1}
+
+Answer the question:
+
+{e2}
+{e3}{e4} 
+{e5}
+{e6} {e7}{e8} 
+{e9}
+|||
+{e10}"
+quartz - None - having_read_above_passage,"{e1}
+
+Having read the above passage, choose the right answer to the following question (choices are {e2} ):
+
+{e3}
+{e4}{e5} 
+{e6}
+{e7} {e8}{e9} 
+{e10}
+|||
+{e11}"
+quartz - None - paragraph_question_plain_concat,"{e1}
+{e2}
+{e3}{e4} 
+{e5}
+{e6} {e7}{e8} 
+{e9}
+|||
+{e10}"
+quartz - None - read_passage_below_choose,"Read the passage below and choose the right answer to the following question (choices are {e1} ):
+
+{e2}
+
+{e3}
+{e4}{e5} 
+{e6}
+{e7} {e8}{e9} 
+{e10}
+|||
+{e11}"
+quartz - None - use_info_from_paragraph_question,"Use information from the paragraph to answer the question.
+
+Paragraph :
+
+{e1}
+
+Question:
+
+{e2}
+{e3}{e4} 
+{e5}
+{e6} {e7}{e8} 
+{e9}
+|||
+{e10}"
+quartz - None - use_info_from_question_paragraph,"Use information from the paragraph to answer the question.
+
+Question:
+
+{e1}
+{e2}{e3} 
+{e4}
+{e5} {e6}{e7} 
+{e8}
+
+Paragraph :
+
+{e9}
+|||
+{e10}"
+race - high - Is this the right answer,"{e1}
+Article: {e2}
+Question: {e3}
+Yes or no, is the answer ""{e4}[answer]] }}""?
+|||
+{e5}
+Yes
+{e6}
+No
+{e7}"
+race - high - Read the article and answer the question (no option),"Read the following article and answer the question.
+Article: {e1}
+Question: {e2}
+Answer:
+|||
+{e3}[answer]] }}"
+race - high - Select the best answer,"Read the article and select the best answer.
+Article: {e1}
+Question: {e2}
+Options: {e3}: {e4}
+{e5}: {e6}
+{e7}: {e8}
+{e9}: {e10}
+|||
+{e11}"
+race - high - Select the best answer (generate span),"Read the following article and select the best answer.
+Article: {e1}
+Question: {e2}
+- {e3}
+|||
+{e4}[answer]]}}"
+race - high - Select the best answer (no instructions),"{e1}
+{e2}
+{e3} {e4}
+{e5} {e6}
+{e7} {e8}
+{e9} {e10}
+|||
+{e11}"
+race - high - Taking a test,"I'm taking a test and have to guess the right answer to the question after the article.
+Article: {e1}
+Question: {e2}
+Options: {e3}: {e4}
+{e5}: {e6}
+{e7}: {e8}
+{e9}: {e10}
+|||
+{e11}"
+race - high - Write a multi-choice question (options given),"Write a multi-choice question for the following article, with the given choices and answer:
+Article: {e1}
+Options:
+{e2} {e3}
+{e4} {e5}
+{e6} {e7}
+{e8} {e9}
+Answer:
+{e10} {e11}[answer]] }}
+Question: 
+|||
+{e12}"
+race - high - Write a multi-choice question for the following article,"Write a multi-choice question for the following article:
+Article: {e1}
+|||
+Question: 
+{e2}
+Options:
+{e3} {e4}
+{e5} {e6}
+{e7} {e8}
+{e9} {e10}
+Answer:
+{e11}"
+race - middle - Is this the right answer,"{e1}
+Article: {e2}
+Question: {e3}
+Yes or no, is the answer ""{e4}[answer]] }}""?
+|||
+{e5}
+Yes
+{e6}
+No
+{e7}"
+race - middle - Read the article and answer the question (no option),"Read the following article and answer the question.
+Article: {e1}
+Question: {e2}
+Answer:
+|||
+{e3}[answer]] }}"
+race - middle - Select the best answer,"Read the article and select the best answer.
+Article: {e1}
+Question: {e2}
+Options: {e3}: {e4}
+{e5}: {e6}
+{e7}: {e8}
+{e9}: {e10}
+|||
+{e11}"
+race - middle - Select the best answer (generate span),"Read the following article and select the best answer.
+Article: {e1}
+Question: {e2}
+- {e3}
+|||
+{e4}[answer]]}}"
+race - middle - Select the best answer (no instructions),"{e1}
+{e2}
+{e3} {e4}
+{e5} {e6}
+{e7} {e8}
+{e9} {e10}
+|||
+{e11}"
+race - middle - Taking a test,"I'm taking a test and have to guess the right answer to the question after the article.
+Article: {e1}
+Question: {e2}
+Options: {e3}: {e4}
+{e5}: {e6}
+{e7}: {e8}
+{e9}: {e10}
+|||
+{e11}"
+race - middle - Write a multi-choice question (options given),"Write a multi-choice question for the following article, with the given choices and answer:
+Article: {e1}
+Options:
+{e2} {e3}
+{e4} {e5}
+{e6} {e7}
+{e8} {e9}
+Answer:
+{e10} {e11}[answer]] }}
+Question: 
+|||
+{e12}"
+race - middle - Write a multi-choice question for the following article,"Write a multi-choice question for the following article:
+Article: {e1}
+|||
+Question: 
+{e2}
+Options:
+{e3} {e4}
+{e5} {e6}
+{e7} {e8}
+{e9} {e10}
+Answer:
+{e11}"
+sciq - None - Direct Question,"Answer the following question given this paragraph: 
+
+{e1}
+
+
+Q: {e2}
+
+
+A:|||{e3}
+"
+sciq - None - Direct Question (Closed Book),"Q: {e1}
+
+
+A:|||{e2}
+"
+sciq - None - Multiple Choice,"{e1}
+Answer the following question given this paragraph: 
+
+{e2}
+
+
+Q: {e3}
+
+ Choices:
+
+- {e4}
+
+- {e5}
+
+- {e6}
+
+- {e7}
+
+A:|||{e8}
+
+"
+sciq - None - Multiple Choice (Closed Book),"{e1}
+Q: {e2}
+
+
+ Choices:
+
+- {e3}
+
+- {e4}
+
+- {e5}
+
+- {e6}
+
+A:|||{e7}"
+sciq - None - Multiple Choice Question First,"{e1}
+Q: {e2}
+
+
+Read this paragraph and choose the correct option from the provided answers:
+
+{e3}
+
+ Choices:
+
+- {e4}
+
+- {e5}
+
+- {e6}
+
+- {e7}
+
+
+A:|||{e8}
+"
+social_i_qa - None - Check if a random answer is valid or not,"{e1}
+{e2}
+{e3}
+
+Given the question ""{e4}"", is ""{e5}"" a valid answer?
+
+|||
+
+{e6}
+    Yes
+{e7}
+    No
+{e8}"
+social_i_qa - None - Generate answer,"{e1}
+
+Given the context: {e2}
+
+|||
+
+{e3}"
+social_i_qa - None - Generate the question from the answer,"{e1}
+
+Given that the answer to a question is ""{e2}[label]}}"", what is the question?
+
+|||
+
+{e3}"
+social_i_qa - None - I was wondering,"I heard that {e1}
+
+And I was wondering {e2}
+
+|||
+
+{e3}"
+social_i_qa - None - Show choices and generate answer,"{e1}
+
+Given the context: {e2}
+
+Possible answers: {e3}
+
+|||
+
+{e4}"
+social_i_qa - None - Show choices and generate index,"Context: {e1}
+
+Question: {e2}
+
+Which one of these answers best answers the question according to the context?
+
+A: {e3}
+
+B: {e4}
+
+C: {e5}
+
+|||
+
+{e6}[label]}}"
+super_glue - boolq - GPT-3 Style,"{e1} 
+Question: {e2}
+Answer: ||| 
+{e3}
+{e4}
+{e5}"
+super_glue - boolq - I wonder…,"{e1} 
+
+Having read that, I wonder {e2}? |||
+{e3}
+{e4} 
+{e5}"
+super_glue - boolq - after_reading,"Passage: {e1}
+
+After reading this passage, I have a question: {e2}? True or False? |||
+{e3}
+{e4}
+{e5}"
+super_glue - boolq - based on the following passage,"Based on the following passage, {e1}? {e2}
+
+|||
+{e3}
+{e4}
+{e5}"
+super_glue - boolq - based on the previous passage,"{e1}
+Based on the previous passage, {e2}? ||| {e3}{e4}
+{e5}"
+super_glue - boolq - could you tell me…,"{e1} 
+
+Having read that, could you tell me {e2}? ||| {e3}{e4}
+{e5}"
+super_glue - boolq - exam,"EXAM
+1. Answer by yes or no.
+
+Document: {e1}
+Question: {e2}? ||| 
+{e3}
+{e4}
+{e5}"
+super_glue - boolq - exercise,"Exercise: read the text and answer the question by True or False.
+
+Text: {e1}
+Question: {e2}? |||
+{e3}
+{e4}
+{e5}"
+super_glue - boolq - valid_binary,"{e1}
+
+Q: {e2}? True or False? |||
+{e3}
+{e4}
+{e5}"
+super_glue - boolq - yes_no_question,"Text: {e1}
+
+Answer the following yes/no question: {e2}? Yes or no? |||
+{e3}
+{e4}
+{e5}"
+"super_glue - copa - C1 or C2? premise, so/because…","""{e1}"" or ""{e2}""? {e3} {e4} because {e5} so {e6} ||| {e7}{e8}{e9}"
+super_glue - copa - best_option,"{e1} 
+
+What's the best option?
+- {e2}
+- {e3}
+
+We are looking for {e4} a cause {e5} an effect {e6}
+||| {e7}{e8}{e9}"
+super_glue - copa - cause_effect,"{e1}
+
+Select the most plausible {e2} cause: {e3} effect: {e4}
+- {e5}
+- {e6} ||| {e7}{e8}{e9}"
+super_glue - copa - choose,"{e1} {e2} because... {e3} so... {e4}
+Choose between:
+- {e5}
+- {e6} ||| {e7}{e8}{e9}"
+super_glue - copa - exercise,"Exercise: choose the most plausible alternative.
+
+{e1} {e2} because... {e3} so... {e4}
+- {e5}
+- {e6} ||| {e7}{e8}{e9}"
+super_glue - copa - i_am_hesitating,"{e1} 
+
+I am hesitating between two options. Help me choose the more likely {e2} cause: {e3} effect: {e4}
+- {e5}
+- {e6} ||| {e7}{e8}{e9}"
+super_glue - copa - more likely,"Pick the more likely continuation to the following sentence:
+{e1} {e2} as a result of: {e3} as a consequence: {e4}
+- {e5}
+- {e6} ||| {e7}{e8}{e9}"
+super_glue - copa - plausible_alternatives,"{e1} {e2} This happened because... {e3} As a consequence... {e4}
+Help me pick the more plausible option:
+- {e5}
+- {e6} ||| {e7}{e8}{e9}"
+"super_glue - copa - …As a result, C1 or C2?","{e1} 
+{e2} As a result, ""{e3}"" or ""{e4}""? ||| {e5}{e6}{e7}
+{e8}"
+"super_glue - copa - …What could happen next, C1 or C2?","{e1} 
+{e2} What could happen next, ""{e3}"" or ""{e4}""? ||| {e5}{e6}{e7}
+{e8}"
+super_glue - copa - …which may be caused by,"{e1} 
+{e2} Which may be caused by ""{e3}"" or ""{e4}""? ||| {e5}{e6}{e7}
+{e8}"
+super_glue - copa - …why? C1 or C2,"{e1} 
+{e2} Why? ""{e3}"" or ""{e4}""? ||| {e5}{e6}{e7}
+{e8}"
+super_glue - multirc - I was going to say…,"{e1}
+{e2} 
+I was going to say ""{e3}"". Does that sound right? ||| {e4}{e5}{e6}"
+super_glue - multirc - Would it be good to answer…,"{e1}
+{e2} 
+Would it be good to answer ""{e3}""? ||| {e4}{e5}{e6}"
+super_glue - multirc - confirm,"{e1}
+
+Question: {e2}
+I think ""{e3}"" is a valid answer. Could you confirm? Yes or no?
+|||
+{e4}{e5}{e6}"
+super_glue - multirc - correct,"Is ""{e1}"" a correct answer to the following question?
+Question: {e2}
+
+Rely on the following text: {e3}
+|||
+{e4}{e5}{e6}"
+super_glue - multirc - decide_valid,"{e1}
+
+Decide whether ""{e2}"" is a valid answer to the following question: {e3}
+Answer yes or no.
+|||
+{e4}{e5}{e6}"
+super_glue - multirc - found_this_answer,"{e1}
+
+Question: {e2}
+I found this answer ""{e3}"". Is that correct? Yes or no?
+|||
+{e4}{e5}{e6}"
+super_glue - multirc - grading,"{e1}
+Question: {e2}
+
+I am grading my students' exercises. Is the answer ""{e3}"" correct?
+|||
+{e4}{e5}{e6}"
+super_glue - multirc - is the correct answer…,"{e1}
+Question: {e2} 
+Is the correct answer {e3}? ||| {e4}{e5}{e6}"
+super_glue - multirc - is… a correct answer?,"{e1}
+Based on the previous passage, {e2} 
+Is ""{e3}"" a correct answer? ||| {e4}{e5}{e6}"
+super_glue - multirc - paragraph… question… is it… ?,"{e1}
+Question: {e2} 
+Is it {e3}? ||| {e4}{e5}{e6}"
+wiki_hop - original - choose_best_object_affirmative_1,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+Given the information above, choose from the list below the object entity that exhibits the relation '{e5}' with the subject '{e6}'.
+
+Choices:
+- {e7}
+
+|||
+{e8}"
+wiki_hop - original - choose_best_object_affirmative_2,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+After reading the paragraphs above, choose the best answer for the entity that related to '{e5}' with the relationship of '{e6}'.
+
+Choices:
+- {e7}
+
+|||
+{e8}"
+wiki_hop - original - choose_best_object_affirmative_3,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+After reading the paragraphs above, we are interested in knowing the entity with which '{e5}' exhibits the relationship of '{e6}'. Find the answer from the choices below.
+
+Choices:
+- {e7}
+
+|||
+{e8}"
+wiki_hop - original - choose_best_object_interrogative_1,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+What object entity has the relation of '{e5}' with the subject '{e6}'? 
+
+Choices:
+- {e7}
+
+|||
+{e8}"
+wiki_hop - original - choose_best_object_interrogative_2,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+'{e5}' is related to which object entity through the relation of '{e6}'?
+
+Choices:
+- {e7}
+
+|||
+{e8}"
+wiki_hop - original - explain_relation,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+What is the relationship between '{e5}' and '{e6}'?
+
+|||
+{e7}"
+wiki_hop - original - generate_object,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+What entity does '{e5}' has the relation '{e6}' with?
+
+|||
+{e7}"
+wiki_hop - original - generate_subject,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+Given the paragraphs above, decide what entity has the relation '{e5}' with '{e6}'.
+
+|||
+{e7}"
+wiki_hop - original - generate_subject_and_object,"Information:
+{e1}
+- {e2}
+{e3}
+
+{e4}
+Given the information, choose the subject and object entities that have the relation of '{e5}'.
+
+|||
+{e6} , {e7}"
+wiqa - None - does_the_supposed_perturbation_have_an_effect,"Process:
+
+- {e1}
+
+Perturbation hypothesis:
+{e2}
+
+Does the supposed perturbation have an effect (direct or indirect) on the process?
+
+|||
+
+{e3}[metadata_question_type]}}"
+wiqa - None - effect_with_label_answer,"Process:
+- {e1}
+
+Question:
+{e2}
+
+- {e3}
+- {e4}
+- {e5}
+
+|||
+
+{e6}"
+wiqa - None - effect_with_string_answer,"Process:
+- {e1}
+
+Question:
+{e2}
+
+How does the supposed perturbation influence the second effect mentioned. Answer by {e3}
+
+|||
+
+{e4}"
+wiqa - None - what_is_the_final_step_of_the_following_process," {e1}
+What is the final step of the following process:
+-  {e2}
+
+|||
+
+{e3}
+"
+wiqa - None - what_is_the_missing_first_step,"What is the missing first step of the following process:
+
+-  {e1}
+
+|||
+
+{e2}"
+wiqa - None - what_might_be_the_first_step_of_the_process,"-  {e1}
+
+What might be the first step of the process?
+
+|||
+
+{e2}
+"
+wiqa - None - what_might_be_the_last_step_of_the_process,"
+{e1}
+-  {e2}
+
+What might be the last step of the process?
+
+|||
+
+{e3}
+"
+wiqa - None - which_of_the_following_is_the_supposed_perturbation,"Process:
+
+- {e1}
+
+{e2}
+
+Which of the following is the supposed perturbation?
+
+- {e3}
+- {e4}
+- {e5}
+
+
+|||
+
+{e6}[metadata_question_type]}}"
+piqa - None - Correct the solution,"Given a goal and a wrong solution, rewrite it to give a correct solution.
+Goal: {e1} 
+Solution: {e2}
+Corrected solution:
+|||
+{e3}
+"
+piqa - None - Correct the solution if false: from sol 1,"Sentence: {e1} {e2}
+If the sentence does not make sense, correct it so that it does make sense. Otherwise, just copy it.
+Answer:
+|||
+{e3} {e4}
+"
+piqa - None - Correct the solution if false: from sol 2,"Given a sentence, correct it if it doesn't make sense. If it makes sense, just return it as the answer.
+Input: {e1} {e2}
+Output:
+|||
+{e3} {e4}
+"
+piqa - None - Does this solution make sense? sol1,"Does this phrase make sense?
+{e1} {e2}
+Answer with {e3} or {e4}
+|||
+{e5}"
+piqa - None - Does this solution make sense? sol2,"{e1} {e2}
+Does this phrase make sense?
+|||
+{e3}"
+piqa - None - choose the most appropriate solution,"Given a goal and 2 solutions, choose the most appropriate solution.
+Goal: {e1}
+- {e2}: {e3}
+- {e4}: {e5}
+
+Answer by returning either {e6} or {e7}
+|||
+{e8}"
+piqa - None - finish_sentence_with_correct_choice,"Finish the following sentence with the best choice: {e1}
+
+Choices:
+- {e2}
+- {e3}
+
+Answer:
+
+|||
+{e4}"
+piqa - None - no prompt needed,"{e1}
+|||
+{e2}"
+piqa - None - pick_correct_choice_index,"Sentence: {e1}
+
+Choice {e2}: {e3}
+
+Choice {e4}: {e5}
+
+What is the index of the correct choice for ending for the sentence?
+
+Answer:
+
+|||
+{e6}"
+piqa - None - pick_correct_choice_with_choice_given_before_goal,"{e1}: {e2}
+{e3}: {e4}
+
+Goal: {e5}
+
+Given the goal, what is the correct solution?
+
+Answer by copying the correct solution
+|||
+{e6}"
+piqa - None - what_is_the_correct_ending,"Goal: {e1}
+
+Which is the correct ending?
+- {e2}
+- {e3}
+
+Answer:
+|||
+{e4}"
+amazon_polarity - None - Is_this_product_review_positive,"Is this product review positive?
+Title: {e1}
+Review: {e2}
+Answer: |||
+{e3}"
+amazon_polarity - None - Is_this_review,"Title: {e1}
+Review: {e2}
+Is the review positive or negative? |||
+{e3}"
+amazon_polarity - None - Is_this_review_negative,"Title: {e1}
+Review: {e2}
+Is this product review negative?|||
+{e3}"
+amazon_polarity - None - User_recommend_this_product,"Based on this review, would the user recommend this product?
+===
+Review: {e1}
+Answer: |||
+{e2}"
+amazon_polarity - None - convey_negative_or_positive_sentiment,"Title: {e1}
+Review: {e2}
+Does this product review convey a negative or positive sentiment?|||
+{e3}"
+amazon_polarity - None - flattering_or_not,"Title: {e1}
+Product review: {e2}
+Would you say this review depicts the product in a {e3} or {e4} light?
+|||
+{e5} "
+amazon_polarity - None - negative_or_positive_tone,"Is there a negative or positive tone to this product review?
+===
+Title: {e1}
+Review: {e2}
+Answer: |||
+{e3}"
+amazon_polarity - None - user_satisfied,"Here is a review left by a customer on a product. Would you say he was {e1} or {e2}?
+Title: {e3}
+Review: {e4}
+|||
+{e5} "
+amazon_polarity - None - would_you_buy,"You are considering whether to buy a product. You look at the reviews. Would the following review {e1} or {e2} the chances of you buying the product?
+Review title: {e3}
+Product review: {e4}
+|||
+{e5} "
+app_reviews - None - categorize_rating_using_review,"Given this review: ""{e1}""
+Would you recommend this app to a friend? {e2}, {e3}, {e4}, {e5}, or {e6}?
+|||
+{e7}"
+app_reviews - None - convert_to_rating,"On a scale of 1-5 (with 1 being least favorable and 5 being most favorable), how would you rate this review? ""{e1}""
+|||
+{e2}"
+app_reviews - None - convert_to_star_rating,"What would be the ★-rating of this review (★ being the lowest and ★★★★★ being the highest)? ""{e1}""
+|||
+{e2}"
+app_reviews - None - generate_review,"Generate a {e1}-star review (1 being lowest and 5 being highest) about an app with package {e2}.
+|||
+{e3}"
+imdb - None - Movie Expressed Sentiment,{e1} The sentiment expressed for the movie is ||| {e2}
+imdb - None - Movie Expressed Sentiment 2,The following movie review expresses what sentiment? {e1} ||| {e2}
+imdb - None - Negation template for positive and negative,{e1} This is definitely not a ||| {e2} review.
+imdb - None - Reviewer Enjoyment,{e1} How does the reviewer feel about the movie? ||| {e2}
+imdb - None - Reviewer Enjoyment Yes No,{e1} Did the reviewer enjoy the movie? ||| {e2}
+imdb - None - Reviewer Expressed Sentiment,{e1} What is the sentiment expressed by the reviewer for the movie? ||| {e2}
+imdb - None - Reviewer Opinion bad good choices,{e1} Did the reviewer find this movie {e2}? ||| {e3}
+imdb - None - Reviewer Sentiment Feeling,{e1} How does the viewer feel about the movie? ||| {e2}
+imdb - None - Sentiment with choices ,"{e1} 
+Is this review {e2}? ||| 
+{e3}"
+imdb - None - Text Expressed Sentiment,{e1} What is the sentiment expressed in this text? ||| {e2}
+imdb - None - Writer Expressed Sentiment,{e1} What sentiment does the writer express for the movie? ||| {e2}
+rotten_tomatoes - None - Movie Expressed Sentiment,{e1} The sentiment expressed for the movie is ||| {e2}
+rotten_tomatoes - None - Movie Expressed Sentiment 2,The following movie review expresses what sentiment? {e1} ||| {e2}
+rotten_tomatoes - None - Reviewer Enjoyment,{e1} How does the reviewer feel about the movie? ||| {e2}
+rotten_tomatoes - None - Reviewer Enjoyment Yes No,{e1} Did the reviewer enjoy the movie? ||| {e2}
+rotten_tomatoes - None - Reviewer Expressed Sentiment,{e1} What is the sentiment expressed by the reviewer for the movie? ||| {e2}
+rotten_tomatoes - None - Reviewer Opinion bad good choices,{e1} Did the reviewer find this movie {e2}? ||| {e3}
+rotten_tomatoes - None - Reviewer Sentiment Feeling,{e1} How does the viewer feel about the movie? ||| {e2}
+rotten_tomatoes - None - Sentiment with choices ,"{e1} 
+Is this review {e2}? ||| 
+{e3}"
+rotten_tomatoes - None - Text Expressed Sentiment,{e1} What is the sentiment expressed in this text? ||| {e2}
+rotten_tomatoes - None - Writer Expressed Sentiment,{e1} What sentiment does the writer express for the movie? ||| {e2}
+yelp_review_full - None - based_on_that,"{e1}
+===
+Based on that, my rating is ||| {e2}"
+yelp_review_full - None - format_rating,"Review text:
+{e1}
+
+Review rating: |||
+{e2}"
+yelp_review_full - None - format_score,"Review text:
+{e1}
+
+Review score (between 1 and 5): |||
+{e2}"
+yelp_review_full - None - format_star,"Review text:
+{e1}
+
+Stars: |||
+{e2}"
+yelp_review_full - None - on_a_scale,"Review: {e1}
+On a scale of 1 to 5, I would give this product ||| {e2}"
+yelp_review_full - None - so_i_would,"{e1}
+So I would like to give it ||| {e2}"
+yelp_review_full - None - this_place,{e1} My rating for this place is ||| {e2}
+hellaswag - None - Appropriate continuation - Yes or No,"{e1}
+Consider the following description: {e2}
+Is the following an appropriate continuation?
+{e3} {e4}
+Yes or No?
+||| 
+{e5}
+{e6}
+{e7} 
+{e8}
+{e9}"
+hellaswag - None - Open-ended completion,"Complete the sentence: {e1}
+|||
+{e2}"
+hellaswag - None - Open-ended start,"How would you start the sentence:
+{e1}
+|||
+{e2}"
+hellaswag - None - Predict ending with hint,"How does this sentence end?
+{e1}
+
+(a)  {e2}
+
+(b)  {e3}
+
+(c)  {e4}
+
+(d)  {e5}
+
+Hint: the topic of the sentence is {e6}
+|||
+{e7}"
+hellaswag - None - Randomized prompts template,"{e1}
+{e2}
+{e3}
+
+(a)  {e4}
+
+(b)  {e5}
+
+(c)  {e6}
+
+(d)  {e7}
+|||
+{e8}"
+hellaswag - None - Reversed appropriate continuation - Yes or No,"{e1}
+Consider the following text: {e2} {e3}
+Is it an appropriate continuation of the following text: 
+{e4} ?
+Yes or No?
+||| 
+{e5}
+{e6}
+{e7} 
+{e8}
+{e9}"
+hellaswag - None - Topic of the context,"{e1} {e2}
+Can you identify the topic of the paragraph? 
+|||
+{e3}"
+hellaswag - None - Topic without the ending answer,"What is the topic of the sentence: {e1} 
+|||
+{e2} "
+hellaswag - None - complete_first_then,"Complete the description with an appropriate ending:
+First, {e1} Then, {e2} ...
+
+(a) {e3}
+
+(b) {e4}
+
+(c) {e5}
+
+(d) {e6}
+|||
+{e7}"
+hellaswag - None - how_ends,"{e1}...
+How does the description likely end?
+
+Ending 1: {e2}
+
+Ending 2: {e3}
+
+Ending 3: {e4}
+
+Ending 4: {e5}
+||| {e6}"
+hellaswag - None - if_begins_how_continues,"If a description of a situation begins like this: {e1}... Then how
+does it continue? 
+
+Ending 1: {e2}
+
+Ending 2: {e3}
+
+Ending 3: {e4}
+
+Ending 4: {e5}
+|||{e6}"
+common_gen - None - Example prompt,"Humans can easily string together abstract concepts to form a coherent sentence. 
+For example, with the concepts {e1}, a simple sentence can be  
+|||
+{e2}"
+common_gen - None - Given concepts - type 2,"Ignoring the order of the concepts: {e1}; 
+Generate a sentence with all the concepts :
+|||
+{e2}"
+common_gen - None - Given concepts type 1,"Given the list of concepts: {e1}; 
+Generate a sentence with all the concepts :
+|||
+{e2}"
+common_gen - None - Put together,"Put the concepts together to form a sentence: {e1}.
+|||
+{e2}"
+common_gen - None - choice in concept centric sentence generation,"Construct a sentence with the word {e1}. 
+
+Hint: Use {e2} to restrict the output sentence.
+|||
+{e3}"
+common_gen - None - random task template prompt,"{e1} 
+{e2}
+{e3}
+|||
+{e4}"
+common_gen - None - sentence to concepts,"We have the sentence: {e1}; 
+Extract all the key concepts: 
+|||
+{e2}"
+common_gen - None - topic to sentence,"Can you write a sentence about the topic {e1}?
+|||
+{e2}"
+common_gen - None - topics from the sentence,"What are the topics in the sentence: {e1}
+|||
+{e2}"
+wiki_bio - None - comprehension,"Read the bio below and try to give details on {e1}'s: 
+{e2} {e3}
+- {e4} 
+{e5} {e6}
+
+Bio: {e7} |||
+{e8}
+{e9}
+- {e10} is {e11}
+{e12}
+{e13}
+"
+wiki_bio - None - guess_person,"{e1}
+{e2}
+- {e3} is {e4}
+{e5}
+{e6}
+
+Given the details above, guess who could this information be about. |||
+{e7}
+"
+wiki_bio - None - key_content,"What key details about {e1} can be extracted from the following bio?
+
+Bio: {e2} |||
+{e3}
+{e4}
+- {e5} is {e6}
+{e7}
+{e8}"
+wiki_bio - None - what_content,"What type of details about {e1} can be gathered from the following bio?
+
+Bio: {e2} |||
+{e3}
+{e4}
+- {e5} 
+{e6}
+{e7}"
+wiki_bio - None - who,"Facts:
+{e1}
+{e2}
+- {e3}: {e4}
+{e5}
+{e6}
+Based on these bullet points, write a short biography describing the life of {e7}. |||
+{e8}"
+cnn_dailymail - 3.0.0 - 2_or_3_sentences,"In 2 or 3 sentences, what are the main points one should remember from this news article?
+
+Article: {e1} |||
+{e2}"
+cnn_dailymail - 3.0.0 - generate_story,"Generate a story from key plot points:
+
+{e1} |||
+{e2}"
+cnn_dailymail - 3.0.0 - news_card_view,"Condense the article down to the essentials to present it in the form of short cards in mobile news apps:
+
+{e1} |||
+{e2}"
+cnn_dailymail - 3.0.0 - news_stock,"Extract key points from the article based on which the stock market could react:
+
+{e1} |||
+{e2}"
+cnn_dailymail - 3.0.0 - news_summary,"Summarise the article:
+
+{e1} |||
+{e2}"
+cnn_dailymail - 3.0.0 - spice_up_story,"What details would you include in a storyline to make it more engaging and informative?
+
+{e1} |||
+{e2}"
+cnn_dailymail - 3.0.0 - sum_in_brief,Sum the following article in brief: {e1}|||{e2}
+cnn_dailymail - 3.0.0 - tldr_summary,"Could you please generate a TLDR (Too Long Didn't Read) summary of the following news article?
+
+Article: {e1} |||
+{e2}"
+cnn_dailymail - 3.0.0 - write_an_outline,"Can you write an outline of the following article in a few points?
+
+Article: {e1}|||
+{e2}"
+gigaword - None - TLDR,"{e1}
+
+TL;DR: ||| {e2}"
+gigaword - None - first_sentence_title,"First sentence of the article: {e1}
+
+Title: ||| {e2}"
+gigaword - None - generate_summary_for_this,"{e1}
+
+===
+
+Generate a title for this article: ||| {e2}"
+gigaword - None - in_a_nutshell,"{e1} In a nutshell, ||| {e2}"
+gigaword - None - make_a_title,"Make a title for this article: {e1} |||
+
+{e2}"
+gigaword - None - reverse_writing,"Title: {e1}
+
+||| {e2}"
+gigaword - None - write_a_title_for_this_sentence,"Write a title for this sentence: {e1} 
+
+Title: ||| {e2}"
+gigaword - None - write_an_article,"Title: {e1}
+
+===
+
+Write an article with the given title: ||| {e2}"
+gigaword - None - write_its_sentence,"{e1}
+
+===
+
+Given the above sentence, write its title: ||| {e2}"
+multi_news - None - distill,"{e1}
+I'm trying to distill these articles down into one:
+{e2}
+
+Article: {e3}
+{e4}
+|||
+{e5}"
+multi_news - None - expand (reverse task),"{e1}
+Write an expanded news article with plausible details from the following summary:
+{e2}
+|||
+{e3}"
+multi_news - None - summarize,"{e1}
+Write a summary of the following articles:
+{e2}
+
+Document: {e3}
+{e4}
+|||
+{e5}"
+multi_news - None - summary scenario,"{e1}
+I want to edit the following articles into a more concise summary:
+{e2}
+
+Article: {e3}
+{e4}
+|||
+{e5}"
+multi_news - None - synthesize,"{e1}
+Synthesize these documents into a single one:
+{e2}
+
+- {e3}
+{e4}
+|||
+{e5}"
+multi_news - None - what are the key points,"{e1}
+What are the key points across these news articles:
+{e2}
+
+Article: {e3}
+{e4}
+|||
+{e5}"
+samsum - None - Generate a summary for this dialogue,"Generate a summary for this dialogue:
+{e1}
+|||{e2}"
+samsum - None - Given the above dialogue write a summary,"{e1}
+Given the above dialogue, write a summary. |||
+{e2}"
+samsum - None - Sum up the following dialogue,"Sum up the following dialogue: 
+{e1}
+|||{e2}"
+samsum - None - Summarize this dialogue:,"Summarize this dialogue: {e1} |||
+{e2}"
+samsum - None - Summarize:,"Summarize: {e1}|||
+{e2}"
+samsum - None - To sum up this dialog,"{e1}
+To sum up this dialog:
+|||{e2}"
+samsum - None - Write a dialogue that match this summary,"Write a dialogue that matches this summary: {e1} |||
+{e2}"
+xsum - None - DOC_boils_down_to_simple_idea_that,"{e1}
+This boils down to the simple idea that ||| {e2}"
+xsum - None - DOC_given_above_write_one_sentence,"{e1}
+
+===
+
+Given the above document, write one sentence to summarize: ||| {e2}"
+xsum - None - DOC_how_would_you_rephrase_few_words,"{e1}
+How would you rephrase that in a few words? ||| {e2}"
+xsum - None - DOC_tldr,"{e1}
+
+TL;DR: ||| {e2}"
+xsum - None - DOC_write_summary_of_above,"{e1}
+
+===
+
+Write a summary of the text above : ||| {e2}"
+xsum - None - article_DOC_summary,"Article: {e1}
+
+Summary: ||| {e2}"
+xsum - None - college_roommate_asked_DOC_so_I_recap,"My college roommate asked me what this article means:
+
+{e1}
+
+So I recapped it in layman's terms: ||| {e2}"
+xsum - None - read_below_DOC_write_abstract,"First, please read the article below.
+
+{e1}
+
+Now, can you write me an extremely short abstract for it?  ||| {e2}"
+xsum - None - summarize_DOC,"Summarize: {e1}|||
+{e2}"
+xsum - None - summarize_this_DOC_summary,"Summarize this document: {e1}
+Summary: ||| {e2}"
+ag_news - None - classify,"{e1} 
+What label best describes this news article? ||| 
+{e2}"
+ag_news - None - classify_question_first,"What label best describes this news article?
+{e1} ||| 
+{e2}"
+ag_news - None - classify_with_choices,"{e1} 
+Is this a piece of news regarding {e2}? ||| 
+{e3}"
+ag_news - None - classify_with_choices_question_first,"Is this a piece of news regarding {e1}?
+{e2} 
+||| 
+{e3}"
+ag_news - None - recommend,"Would you recommend the following article to a {e1}, an {e2}, a {e3}, or a {e4}?
+
+{e5}
+|||
+{e6}"
+ag_news - None - which_section,"{e1} 
+
+Which section of a newspaper would this article likely appear in? ||| 
+{e2}"
+ag_news - None - which_section_choices,"{e1} 
+
+Which of the following sections of a newspaper would this article likely appear in? {e2}, {e3}, {e4}, or {e5}? ||| 
+{e6}"
+dbpedia_14 - None - given_a_choice_of_categories ,"{e1} - {e2} Given a choice of categories {e3}, the text refers to which one? ||| {e4}"
+dbpedia_14 - None - given_a_list_of_category_what_does_the_title_belong_to,"""{e1}"", given a list of categories: {e2}, what category does the title belong to? ||| {e3}
+
+"
+dbpedia_14 - None - given_list_what_category_does_the_paragraph_belong_to,"{e1} Given a list of categories: {e2}, what category does the paragraph belong to? ||| {e3}
+
+"
+dbpedia_14 - None - pick_one_category_for_the_following_text,Pick one category for the following text. The options are - {e1}. {e2} - {e3} ||| {e4}
+trec - None - fine_grained_ABBR,"{e1} %} 
+{e2}
+Is this question asking for an {e3}?
+{e4}
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_ABBR_context_first,"{e1} %} 
+{e2}
+{e3}
+
+Is this question asking for an {e4}?
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_DESC,"{e1} %}
+{e2}
+Is this question asking for {e3}?
+{e4}
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_DESC_context_first,"{e1} %}
+{e2}
+{e3}
+
+Is this question asking for {e4}?
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_ENTY,"{e1} %}
+{e2}
+Is this question asking for {e3}?
+{e4}
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_HUM,"{e1} %}
+{e2}
+Is this question asking for {e3}?
+{e4}
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_HUM_context_first,"{e1} %}
+{e2}
+{e3}
+
+Is this question asking for {e4}?
+|||
+{e5}{e6}"
+trec - None - fine_grained_LOC,"{e1} %}
+{e2}
+Is this question asking for {e3}?
+{e4}
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_LOC_context_first,"{e1} %}
+{e2}
+{e3}
+
+Is this question asking for {e4}?
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_NUM,"{e1} %}
+{e2}
+Is this question asking for {e3}?
+{e4}
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_NUM_context_first,"{e1} %}
+{e2}
+{e3}
+
+Is this question asking for {e4}?
+|||
+{e5}
+{e6}"
+trec - None - fine_grained_open,"What is this question asking for?
+
+{e1}
+|||
+{e2}"
+trec - None - fine_grained_open_context_first,"{e1}
+
+What is this question asking for?
+|||
+{e2}"
+trec - None - pick_the_best_descriptor,"Question: {e1}
+
+Descriptors: {e2}
+
+Best Descriptor?
+|||
+{e3}"
+trec - None - trec1,"{e1}
+
+Is this asking about {e2}?
+|||
+{e3}"
+trec - None - trec2,"Is the following question asking about {e1}?
+
+{e2}
+|||
+{e3}"
+trec - None - what_category_best_describe,"Categories: {e1}
+
+What category best describes: {e2} 
+Answer: ||| {e3}"
+trec - None - which_category_best_describes,"Which category best describes the following question: {e1} 
+
+Choose from the following list: 
+{e2}
+ ||| {e3}"
+super_glue - wic - GPT-3-prompt,"{e1}
+{e2}
+Question: Is the word '{e3}' used in the same sense in the two sentences above?
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - GPT-3-prompt-with-label,"{e1}
+{e2}
+Question: Is the word '{e3}' used in the same sense in the two sentences above? Yes, No?
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - affirmation_true_or_false,"Sentence A: {e1}
+Sentence B: {e2}
+
+""{e3}"" has a similar meaning in sentences A and B. True or False?
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - grammar_homework,"Homework
+
+Decide whether the word ""{e1}"" is used with the same meaning in the two following sentences. Answer by yes or no.
+{e2}
+{e3}
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - polysemous,"The word ""{e1}"" has multiple meanings. Does it have the same meaning in sentences 1 and 2? Yes or no?
+
+Sentence 1: {e2}
+Sentence 2: {e3}
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - question-context,"Determine if the word '{e1}' is used in the same way in the two sentences below. 
+{e2}
+{e3}
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - question-context-meaning,"Does the word ""{e1}"" have the same meaning in these two sentences?
+{e2}
+{e3}
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - question-context-meaning-with-label,"Does the word ""{e1}"" have the same meaning in these two sentences? Yes, No?
+{e2}
+{e3}
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - same_sense,"Sentence 1: {e1}
+Sentence 2: {e2}
+
+Determine whether the word ""{e3}"" is used in the same sense in both sentences. Yes or no?
+||| {e4}
+{e5}
+{e6}"
+super_glue - wic - similar-sense,"{e1}
+{e2}
+Similar sense of {e3}?
+||| {e4}
+{e5}
+{e6}"
