@@ -186,44 +186,44 @@ class CustomTemplate(object):
         return inputs, targets
 
 t0_task_list = [
-    # ["wiki_hop", "original"], # (# Multiple-Choice QA)
+    ["wiki_hop", "original"], # (# Multiple-Choice QA)
     ["glue", "mrpc"], #Paraphrase Identification
-    # ["glue", "qqp"],
-    # ["paws", "labeled_final"],
+    ["glue", "qqp"],
+    ["paws", "labeled_final"],
     ["kilt_tasks", "hotpotqa"], # Closed-Book QA
-    # ["wiki_qa", None],
-    # ["adversarial_qa", "dbidaf"], # Extractive QA
-    # ["adversarial_qa", "dbert"],
-    # ["adversarial_qa", "droberta"],
-    # ["duorc", "SelfRC"],
-    # ["duorc", "ParaphraseRC"],
-    # ["ropes", None],
-    # ["quoref", None],
-    # ["cos_e", "v1.11"], # Multiple-Choice QA
-    # ["cosmos_qa", None],
-    # ["dream", None],
-    # ["qasc", None],
-    # ["quail", None],
-    # ["quarel", None],
-    # ["quartz", None],
-    # ["sciq", None],
-    # ["social_i_qa", None],
-    # ["wiqa", None],
-    # ["amazon_polarity", None], # Sentiment
-    # ["app_reviews", None],
-    # ["imdb", None],
-    # ["rotten_tomatoes", None],
-    # ["yelp_review_full", None],
-    # ["common_gen", None], # Structure-to-Text
-    # ["wiki_bio", None],
-    # ["cnn_dailymail", "3.0.0"], # Summarization
-    # ["gigaword", None],
-    # ["multi_news", None],
-    # ["samsum", None],
-    # ["xsum", None],
-    # ["ag_news", None], # Topic Classification
-    # ["dbpedia_14", None],
-    # ["trec", None], 
+    ["wiki_qa", None],
+    ["adversarial_qa", "dbidaf"], # Extractive QA
+    ["adversarial_qa", "dbert"],
+    ["adversarial_qa", "droberta"],
+    ["duorc", "SelfRC"],
+    ["duorc", "ParaphraseRC"],
+    ["ropes", None],
+    ["quoref", None],
+    ["cos_e", "v1.11"], # Multiple-Choice QA
+    ["cosmos_qa", None],
+    ["dream", None],
+    ["qasc", None],
+    ["quail", None],
+    ["quarel", None],
+    ["quartz", None],
+    ["sciq", None],
+    ["social_i_qa", None],
+    ["wiqa", None],
+    ["amazon_polarity", None], # Sentiment
+    ["app_reviews", None],
+    ["imdb", None],
+    ["rotten_tomatoes", None],
+    ["yelp_review_full", None],
+    ["common_gen", None], # Structure-to-Text
+    ["wiki_bio", None],
+    ["cnn_dailymail", "3.0.0"], # Summarization
+    ["gigaword", None],
+    ["multi_news", None],
+    ["samsum", None],
+    ["xsum", None],
+    ["ag_news", None], # Topic Classification
+    ["dbpedia_14", None],
+    ["trec", None], 
 ]
 
 gpt_task_list = [
