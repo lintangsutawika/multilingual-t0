@@ -16,7 +16,7 @@ MAX_EXAMPLES_PER_DATASET = 500_000
 DEFAULT_TEMPERATURE = 1.0 / 0.3
 _num_proc = multiprocessing.cpu_count()
 
-add_translated_prompt_templates()
+# add_translated_prompt_templates()
 
 class MixtureRegistry:
     """docstring for MixtureRegistry"""
