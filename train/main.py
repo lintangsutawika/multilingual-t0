@@ -337,7 +337,7 @@ def main():
         )
 
     def preprocess_function(examples):
-        text = examples['text']
+        text = examples['inputs']
         max_input_length_before_eos = data_args.max_input_length - 2
         tokenized_text = tokenizer.encode_plus(
             text,
@@ -407,8 +407,32 @@ def main():
         
         if padding == "max_length" and data_args.ignore_pad_token_for_loss:
             model_inputs['labels'][model_inputs['labels'] == tokenizer.pad_token_id] = -100
+        print(model_inputs)
+
         
         return model_inputs
+
+    def seq2seq_preprocess(examples):
+
+        tokenized_inputs = {}
+        tokenized_inputs = tokenizer(
+                examples['inputs'],
+                add_special_tokens=True,
+                padding='max_length',
+                max_length=data_args.max_input_length,
+                truncation=True
+                )
+
+        tokenized_inputs['label_ids'] = tokenizer(
+            examples['labels'],
+            add_special_tokens=False,
+            padding='max_length',
+            max_length=data_args.max_target_length,
+            truncation=True
+            )['input_ids']
+
+        tokenized_inputs["label_ids"] = [-100 if t == tokenizer.pad_token_id else t for t in tokenized_inputs["label_ids"]]
+        return tokenized_inputs
 
     if training_args.do_train:
         # may need https://github.com/huggingface/datasets/issues/2583
@@ -429,7 +453,12 @@ def main():
             #     load_from_cache_file=not data_args.overwrite_cache,
             #     desc="Padding and Tensorize",
             # )
-            train_dataset = train_dataset.map(preprocess_function)
+            pass
+            #train_dataset = train_dataset.map(
+            #    #preprocess_function,
+            #    seq2seq_preprocess,
+            #    num_proc=2, #os.cpu_count()
+            #)
 
     if training_args.do_eval:
         # max_target_length = data_args.max_target_length

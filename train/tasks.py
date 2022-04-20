@@ -18,6 +18,31 @@ _num_proc = multiprocessing.cpu_count()
 
 # add_translated_prompt_templates()
 
+from transformers import AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained('google/mt5-xl')
+
+def seq2seq_preprocess(examples):
+
+    tokenized_inputs = {}
+    tokenized_inputs = tokenizer(
+                examples['inputs'],
+                add_special_tokens=True,
+                padding='max_length',
+                max_length=1024,
+                truncation=True
+                )
+
+    tokenized_inputs['label_ids'] = tokenizer(
+            examples['labels'],
+            add_special_tokens=False,
+            padding='max_length',
+            max_length=256,
+            truncation=True
+            )['input_ids']
+
+    tokenized_inputs["label_ids"] = [-100 if t == tokenizer.pad_token_id else t for t in tokenized_inputs["label_ids"]]
+    return tokenized_inputs
+
 class MixtureRegistry:
     """docstring for MixtureRegistry"""
     def __init__(self,
@@ -44,7 +69,7 @@ class MixtureRegistry:
 
 
         if dataset_name is not None:
-
+            print(dataset_name, "-", subset_name)
             dataset_templates = DatasetTemplates(
                 dataset_name=dataset_name,
                 subset_name=subset_name
@@ -88,7 +113,8 @@ class MixtureRegistry:
                             'datasets': self._apply_template(dataset, dataset_templates[template]),
                             'probabilities': cap,
                         }
-                    except:
+                    except Exception as e:
+                        print(e)
                         print("Failed to cached this template")
                         print(dataset_templates[template].jinja)
 
@@ -158,9 +184,13 @@ class MixtureRegistry:
         original_columns = dataset.column_names
         dataset = dataset.map(
             map_fn,
-            # num_proc=_num_proc,
+            #num_proc=_num_proc,
         ).filter(filter_fn)
-        
+
+        dataset = dataset.map(
+            seq2seq_preprocess,
+        )
+
         # map keeps original columns, remove them
         dataset = dataset.remove_columns(set(original_columns) - {"inputs", "labels", "answer_choices"})
 
@@ -186,44 +216,44 @@ class CustomTemplate(object):
         return inputs, targets
 
 t0_task_list = [
-    ["wiki_hop", "original"], # (# Multiple-Choice QA)
+    # ["wiki_hop", "original"], # (# Multiple-Choice QA)
     ["glue", "mrpc"], #Paraphrase Identification
     ["glue", "qqp"],
-    ["paws", "labeled_final"],
-    ["kilt_tasks", "hotpotqa"], # Closed-Book QA
-    ["wiki_qa", None],
-    ["adversarial_qa", "dbidaf"], # Extractive QA
-    ["adversarial_qa", "dbert"],
-    ["adversarial_qa", "droberta"],
-    ["duorc", "SelfRC"],
-    ["duorc", "ParaphraseRC"],
-    ["ropes", None],
-    ["quoref", None],
-    ["cos_e", "v1.11"], # Multiple-Choice QA
-    ["cosmos_qa", None],
-    ["dream", None],
-    ["qasc", None],
-    ["quail", None],
-    ["quarel", None],
-    ["quartz", None],
-    ["sciq", None],
-    ["social_i_qa", None],
-    ["wiqa", None],
-    ["amazon_polarity", None], # Sentiment
-    ["app_reviews", None],
-    ["imdb", None],
-    ["rotten_tomatoes", None],
-    ["yelp_review_full", None],
-    ["common_gen", None], # Structure-to-Text
-    ["wiki_bio", None],
-    ["cnn_dailymail", "3.0.0"], # Summarization
-    ["gigaword", None],
-    ["multi_news", None],
-    ["samsum", None],
-    ["xsum", None],
-    ["ag_news", None], # Topic Classification
-    ["dbpedia_14", None],
-    ["trec", None], 
+    #["paws", "labeled_final"],
+    #["kilt_tasks", "hotpotqa"], # Closed-Book QA
+    #["wiki_qa", None],
+    #["adversarial_qa", "dbidaf"], # Extractive QA
+    #["adversarial_qa", "dbert"],
+    #["adversarial_qa", "droberta"],
+    #["duorc", "SelfRC"],
+    #["duorc", "ParaphraseRC"],
+    #["ropes", "plain_text"],
+    #["quoref", None],
+    #["cos_e", "v1.11"], # Multiple-Choice QA
+    #["cosmos_qa", None],
+    #["dream", None],
+    #["qasc", None],
+    #["quail", None],
+    #["quarel", None],
+    #["quartz", None],
+    #["sciq", None],
+    #["social_i_qa", None],
+    #["wiqa", None],
+    #["amazon_polarity", None], # Sentiment
+    #["app_reviews", None],
+    #["imdb", None],
+    #["rotten_tomatoes", None],
+    #["yelp_review_full", None],
+    #["common_gen", None], # Structure-to-Text
+    #["wiki_bio", None],
+    #["cnn_dailymail", "3.0.0"], # Summarization
+    #["gigaword", None],
+    #["multi_news", None],
+    #["samsum", None],
+    #["xsum", None],
+    #["ag_news", None], # Topic Classification
+    #["dbpedia_14", None],
+    #["trec", None], 
 ]
 
 gpt_task_list = [
