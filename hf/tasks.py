@@ -1,8 +1,9 @@
+import os
 import re
 import functools
+import multiprocessing
 
 import numpy as np
-import multiprocessing
 
 from typing import Dict, List, Optional, Tuple, Any
 
@@ -12,22 +13,26 @@ from promptsource.templates import DatasetTemplates
 
 from translation import add_translated_prompt_templates
 
-MAX_EXAMPLES_PER_DATASET = 500_000
+MAX_EXAMPLES_PER_TASK = 500_000
 DEFAULT_TEMPERATURE = 1.0 / 0.3
 _num_proc = multiprocessing.cpu_count()
 
-add_translated_prompt_templates()
+# add_translated_prompt_templates()
 
 class MixtureRegistry:
     """docstring for MixtureRegistry"""
     def __init__(self,
+        mixture_name=None,
+        mixture=[],
         temperature=DEFAULT_TEMPERATURE,
-        max_examples=MAX_EXAMPLES_PER_DATASET,
+        max_examples=MAX_EXAMPLES_PER_TASK,
         include_translated=False,
-        save_to_disk=None, #"~/.cache",
-        mixture=None,
+        save_to_disk="~/.cache/mt0_tasks/",
         ):
         super(MixtureRegistry, self).__init__()
+
+        self.mixture_name = mixture_name
+        self.mixture = mixture
         self.temperature = temperature
         self.max_examples = max_examples
         self.include_translated = include_translated
@@ -36,24 +41,23 @@ class MixtureRegistry:
         # Dict to hold all task datasets and sampling probabilities
         self.task_dict = {}
 
-        if mixture is not None:
-            self.add_task(mixture=mixture)
+        # def add_task(self, dataset_name=None, subset_name=None, mixture=None):
+        for dataset_name, subset_name in self.mixture:
 
-
-    def add_task(self, dataset_name=None, subset_name=None, mixture=None):
-
-
-        if dataset_name is not None:
+            if subset_name is not None:
+                task_name = "{}_{}".format(dataset_name, subset_name)
+            else:
+                task_name = dataset_name
 
             dataset_templates = DatasetTemplates(
                 dataset_name=dataset_name,
                 subset_name=subset_name
                 )
 
-            if subset_name is not None:
-                task_name = "{}_{}".format(dataset_name, subset_name)
-            else:
-                task_name = dataset_name
+            dataset_samples = load_dataset(
+                dataset_name,
+                subset_name
+            )
 
             if self.include_translated:
                 template_list = dataset_templates.all_template_names
@@ -67,56 +71,68 @@ class MixtureRegistry:
             subset_info = subset_name or list(info.keys())[0]
             dataset_splits = info[subset_info].splits
 
-            if 'train' in dataset_splits:
-                train_size = dataset_splits['train'].num_examples
+            train_size = dataset_splits['train'].num_examples
 
-                if train_size*num_templates > MAX_EXAMPLES_PER_DATASET:
-                    cap = MAX_EXAMPLES_PER_DATASET // num_templates
-                else:
-                    cap = train_size
+            if train_size*num_templates > self.max_examples:
+                cap = self.max_examples // num_templates
+            else:
+                cap = train_size
 
-                task_dataset = load_dataset(
-                    dataset_name,
-                    subset_name
-                )
-
-                for template in template_list:
+            for idx, template in enumerate(template_list):
+                template_save_path = os.path.join(
+                    self.save_to_disk,
+                    'tasks/{}/{}'.format(task_name, template)
+                    )
+                try:
+                    dataset = load_from_disk(
+                        template_save_path
+                        )
+                    print("Dataset+prompt already cached, loading from disk")
+                except:
+                    print("Dataset+prompt not yet cached")
                     try:
-                        dataset = task_dataset['train'].shuffle(seed=42).select(range(0,cap))
-                        self.task_dict["{}_{}".format(task_name,template)] = {
-                            'datasets': self._apply_template(dataset, dataset_templates[template]),
-                            'probabilities': cap,
-                        }
-                    except:
+                        dataset_sub_samples = dataset_samples['train'].shuffle(seed=42+idx).select(range(0,cap))
+                        dataset = self._apply_template(dataset_sub_samples, dataset_templates[template])
+                        dataset.save_to_disk(template_save_path)
+
+                    except Exception as e:
+                        print(e)
                         print("Failed to cached this template")
                         print(dataset_templates[template].jinja)
 
-        elif mixture is not None:
-            for mix in mixture:
-                self.task_dict = {**self.task_dict, **mix.task_dict}
+                self.task_dict["{}_{}".format(task_name,template)] = {
+                    'datasets': dataset,
+                    'probabilities': cap,
+                }
 
+    def create_dataset(self):
 
-    def create_dataset(self, task_dict=None):
+        mixture_path =  os.path.join(
+            self.save_to_disk,
+            self.mixture_name
+        )
 
-        if task_dict is None:
+        try:
+            multitask_dataset = load_from_disk(mixture_path)
+            return multitask_dataset
+        except:
             task_dict = self.task_dict
 
-        task_list = [task_dict[key]['datasets'] for key in task_dict]
-        task_size = [task_dict[key]['probabilities'] for key in task_dict]
-        task_sampling_rate = np.array(task_size)**self.temperature
-        probabilities = task_sampling_rate/sum(task_sampling_rate)
+            mixture = [task_dict[key]['datasets'] for key in task_dict]
+            task_size = [task_dict[key]['probabilities'] for key in task_dict]
+            task_sampling_rate = np.array(task_size)**self.temperature
+            probabilities = task_sampling_rate/sum(task_sampling_rate)
 
-        # multitask_dataset = interleave_datasets(
-        multitask_dataset = concatenate_datasets(
-            task_list,
-            # probabilities=probabilities,
-            # seed=42
-            )
+            multitask_dataset = concatenate_datasets(
+                mixture,
+                )
 
-        if self.save_to_disk != None:
-            multitask_dataset.save_to_disk(self.save_to_disk)
+            if self.save_to_disk != None:
+                multitask_dataset.save_to_disk(
+                    mixture_path
+                    )
 
-        return multitask_dataset
+            return multitask_dataset
 
 
     def _apply_template(self, dataset, template, map_fn=None):
@@ -143,48 +159,21 @@ class MixtureRegistry:
         def filter_fn(ex):
             return len(ex["inputs"]) > 0 and len(ex["labels"]) > 0
 
-        if self.save_to_disk is not None:
-            try:
-                dataset = load_from_disk(self.save_to_disk)
-                print("Dataset+prompt already cached, loading from disk")
-                return dataset
-            except:
-                print("Dataset+prompt not yet cached")
-
         if map_fn == None:
             map_fn = _map_fn
 
         original_columns = dataset.column_names
         dataset = dataset.map(
             map_fn,
-            # num_proc=_num_proc,
+            num_proc=_num_proc,
         ).filter(filter_fn)
         
         # map keeps original columns, remove them
         dataset = dataset.remove_columns(set(original_columns) - {"inputs", "labels", "answer_choices"})
 
-        if self.save_to_disk is not None:
-            dataset.save_to_disk(self.save_to_disk)
-
         return dataset
 
-
-class CustomTemplate(object):
-    """docstring for CustomTemplate"""
-    def __init__(self, inputs_fn, targets_fn):
-        super(CustomTemplate, self).__init__()
-        self.inputs_fn = inputs_fn
-        self.targets_fn = targets_fn
-
-    def get_answer_choices_list(self, example):
-        return None
-
-    def apply(self, example, truncate=True, highlight_variables=False):
-        inputs = self.inputs_fn(example)
-        targets = self.targets_fn(example)
-        return inputs, targets
-
-t0_task_list = [
+t0_mixture = [
     ["glue", "mrpc"], #Paraphrase Identification
     ["glue", "qqp"],
     ["paws", "labeled_final"],
@@ -195,7 +184,7 @@ t0_task_list = [
     ["adversarial_qa", "droberta"],
     ["duorc", "SelfRC"],
     ["duorc", "ParaphraseRC"],
-    ["ropes", None],
+    # ["ropes", None],
     ["quoref", None],
     ["cos_e", "v1.11"], # Multiple-Choice QA
     ["cosmos_qa", None],
@@ -206,7 +195,7 @@ t0_task_list = [
     ["quartz", None],
     ["sciq", None],
     ["social_i_qa", None],
-    ["wiki_hop", "original"],
+    # ["wiki_hop", "original"],
     ["wiqa", None],
     ["amazon_polarity", None], # Sentiment
     ["app_reviews", None],
@@ -225,7 +214,7 @@ t0_task_list = [
     ["trec", None], 
 ]
 
-gpt_task_list = [
+gpt_mixture = [
     ["ai2_arc", "ARC-Challenge"], #Closed-Book QA
     ["ai2_arc", "ARC-Easy"],
     ["trivia_qa", "unfiltered"],
@@ -237,7 +226,7 @@ gpt_task_list = [
     ["hellaswag", None], # Sentence Completion
 ]
 
-sglue_task_list = [
+sglue_mixture = [
     ["super_glue", "wsc.fixed"], # Coreference Resolution
     ["super_glue", "record"], # Extractive QA
     ["super_glue", "boolq"], # Multiple-Choice QA
@@ -246,68 +235,32 @@ sglue_task_list = [
     ["super_glue", "wic"], # Word Sense Disambiguation
 ]
 
-# 3 stages of training/ablation: D4 -> GPT -> SuperGLUE
-t0_train_mixture = MixtureRegistry()
-for task in t0_task_list:
-    t0_train_mixture.add_task(*task)
-
-gpt_train_mixture = MixtureRegistry()
-for task in gpt_task_list:
-    gpt_train_mixture.add_task(*task)
-
-sglue_train_mixture = MixtureRegistry()
-for task in sglue_task_list:
-    sglue_train_mixture.add_task(*task)
-
-translated_t0_train_mixture = MixtureRegistry(include_translated=True)
-for task in t0_task_list:
-    translated_t0_train_mixture.add_task(*task)
-
-translated_gpt_train_mixture = MixtureRegistry(include_translated=True)
-for task in gpt_task_list:
-    translated_gpt_train_mixture.add_task(*task)
-
-translated_sglue_train_mixture = MixtureRegistry(include_translated=True)
-for task in sglue_task_list:
-    translated_sglue_train_mixture.add_task(*task)
-
 training_mixtures = {
     "t0_train": MixtureRegistry(
-        mixture=[
-            t0_train_mixture
-            ]
-        ),
+        mixture_name="t0_train",
+        mixture=t0_mixture
+        ).create_dataset(),
     "t0_plus_train": MixtureRegistry(
-        mixture=[
-            t0_train_mixture,
-            gpt_train_mixture
-            ]
-        ),
+        mixture_name="t0_plus_train",
+        mixture=t0_mixture+gpt_mixture
+        ).create_dataset(),
     "t0_plus_plus_train": MixtureRegistry(
-        mixture=[
-            t0_train_mixture,
-            gpt_train_mixture,
-            sglue_train_mixture
-            ]
-        ),
+        mixture_name="t0_plus_plus_train",
+        mixture=t0_mixture+gpt_mixture+sglue_mixture
+        ).create_dataset(),
     "translated_t0_train": MixtureRegistry(
-        mixture=[
-            translated_t0_train_mixture
-            ]
-        ),
+        mixture_name="translated_t0_train",
+        mixture=t0_mixture,
+        include_translated=True
+        ).create_dataset(),
     "translated_t0_plus_train": MixtureRegistry(
-        mixture=[
-            translated_t0_train_mixture,
-            translated_gpt_train_mixture
-            ]
-        ),
+        mixture_name="translated_t0_plus_train",
+        mixture=t0_mixture+gpt_mixture,
+        include_translated=True
+        ).create_dataset(),
     "translated_t0_plus_plus_train": MixtureRegistry(
-        mixture=[
-            translated_t0_train_mixture,
-            translated_gpt_train_mixture,
-            translated_sglue_train_mixture
-            ]
-        ),
+        mixture_name="translated_t0_plus_plus_train",
+        mixture=t0_mixture+gpt_mixture+sglue_mixture,
+        include_translated=True
+        ).create_dataset(),
 }
-
-
