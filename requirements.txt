@@ -1,2 +1,3 @@
-datasets>=1.7.0
+transformers==4.18.0
+datasets==2.1.0
 promptsource
