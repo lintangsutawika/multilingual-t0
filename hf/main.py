@@ -366,7 +366,7 @@ def main():
         #     raise ValueError("--do_train requires a train dataset")
         # train_dataset = raw_datasets["train"]
         
-        train_dataset = training_mixtures[data_args.dataset_name].create_dataset()
+        train_dataset = training_mixtures[data_args.dataset_name]
         # print(list(islice(train_dataset, 1))) # [{'text': ..., 'timestamp': ..., 'url': ...}]
         if data_args.max_train_samples is not None:
             train_dataset = train_dataset.select(range(data_args.max_train_samples))
