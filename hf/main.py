@@ -24,6 +24,8 @@ import sys
 from dataclasses import dataclass, field
 from typing import Optional
 
+os.environ["WANDB_DISABLED"] = "true"
+
 import datasets
 import numpy as np
 from datasets import load_dataset, load_metric, interleave_datasets
