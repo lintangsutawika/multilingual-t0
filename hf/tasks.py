@@ -17,6 +17,11 @@ MAX_EXAMPLES_PER_TASK = 500_000
 DEFAULT_TEMPERATURE = 1.0 / 0.3
 _num_proc = multiprocessing.cpu_count()
 
+try:
+    cache_path = os.environ["HF_DATASETS_CACHE"]
+except:
+    cache_path = "~/.cache/mt0_tasks/"
+
 # add_translated_prompt_templates()
 
 class MixtureRegistry:
@@ -27,7 +32,7 @@ class MixtureRegistry:
         temperature=DEFAULT_TEMPERATURE,
         max_examples=MAX_EXAMPLES_PER_TASK,
         include_translated=False,
-        save_to_disk="~/.cache/mt0_tasks/",
+        save_to_disk=cache_path,
         ):
         super(MixtureRegistry, self).__init__()
 
@@ -176,42 +181,42 @@ class MixtureRegistry:
 t0_mixture = [
     ["glue", "mrpc"], #Paraphrase Identification
     ["glue", "qqp"],
-    ["paws", "labeled_final"],
-    ["kilt_tasks", "hotpotqa"], # Closed-Book QA
-    ["wiki_qa", None],
-    ["adversarial_qa", "dbidaf"], # Extractive QA
-    ["adversarial_qa", "dbert"],
-    ["adversarial_qa", "droberta"],
-    ["duorc", "SelfRC"],
-    ["duorc", "ParaphraseRC"],
-    # ["ropes", None],
-    ["quoref", None],
-    ["cos_e", "v1.11"], # Multiple-Choice QA
-    ["cosmos_qa", None],
-    ["dream", None],
-    ["qasc", None],
-    ["quail", None],
-    ["quarel", None],
-    ["quartz", None],
-    ["sciq", None],
-    ["social_i_qa", None],
-    # ["wiki_hop", "original"],
-    ["wiqa", None],
-    ["amazon_polarity", None], # Sentiment
-    ["app_reviews", None],
-    ["imdb", None],
-    ["rotten_tomatoes", None],
-    ["yelp_review_full", None],
-    ["common_gen", None], # Structure-to-Text
-    ["wiki_bio", None],
-    ["cnn_dailymail", "3.0.0"], # Summarization
-    ["gigaword", None],
-    ["multi_news", None],
-    ["samsum", None],
-    ["xsum", None],
-    ["ag_news", None], # Topic Classification
-    ["dbpedia_14", None],
-    ["trec", None], 
+    # ["paws", "labeled_final"],
+    # ["kilt_tasks", "hotpotqa"], # Closed-Book QA
+    # ["wiki_qa", None],
+    # ["adversarial_qa", "dbidaf"], # Extractive QA
+    # ["adversarial_qa", "dbert"],
+    # ["adversarial_qa", "droberta"],
+    # ["duorc", "SelfRC"],
+    # ["duorc", "ParaphraseRC"],
+    # # ["ropes", None],
+    # ["quoref", None],
+    # ["cos_e", "v1.11"], # Multiple-Choice QA
+    # ["cosmos_qa", None],
+    # ["dream", None],
+    # ["qasc", None],
+    # ["quail", None],
+    # ["quarel", None],
+    # ["quartz", None],
+    # ["sciq", None],
+    # ["social_i_qa", None],
+    # # ["wiki_hop", "original"],
+    # ["wiqa", None],
+    # ["amazon_polarity", None], # Sentiment
+    # ["app_reviews", None],
+    # ["imdb", None],
+    # ["rotten_tomatoes", None],
+    # ["yelp_review_full", None],
+    # ["common_gen", None], # Structure-to-Text
+    # ["wiki_bio", None],
+    # ["cnn_dailymail", "3.0.0"], # Summarization
+    # ["gigaword", None],
+    # ["multi_news", None],
+    # ["samsum", None],
+    # ["xsum", None],
+    # ["ag_news", None], # Topic Classification
+    # ["dbpedia_14", None],
+    # ["trec", None], 
 ]
 
 gpt_mixture = [
@@ -240,27 +245,27 @@ training_mixtures = {
         mixture_name="t0_train",
         mixture=t0_mixture
         ).create_dataset(),
-    "t0_plus_train": MixtureRegistry(
-        mixture_name="t0_plus_train",
-        mixture=t0_mixture+gpt_mixture
-        ).create_dataset(),
-    "t0_plus_plus_train": MixtureRegistry(
-        mixture_name="t0_plus_plus_train",
-        mixture=t0_mixture+gpt_mixture+sglue_mixture
-        ).create_dataset(),
-    "translated_t0_train": MixtureRegistry(
-        mixture_name="translated_t0_train",
-        mixture=t0_mixture,
-        include_translated=True
-        ).create_dataset(),
-    "translated_t0_plus_train": MixtureRegistry(
-        mixture_name="translated_t0_plus_train",
-        mixture=t0_mixture+gpt_mixture,
-        include_translated=True
-        ).create_dataset(),
-    "translated_t0_plus_plus_train": MixtureRegistry(
-        mixture_name="translated_t0_plus_plus_train",
-        mixture=t0_mixture+gpt_mixture+sglue_mixture,
-        include_translated=True
-        ).create_dataset(),
+    # "t0_plus_train": MixtureRegistry(
+    #     mixture_name="t0_plus_train",
+    #     mixture=t0_mixture+gpt_mixture
+    #     ).create_dataset(),
+    # "t0_plus_plus_train": MixtureRegistry(
+    #     mixture_name="t0_plus_plus_train",
+    #     mixture=t0_mixture+gpt_mixture+sglue_mixture
+    #     ).create_dataset(),
+    # "translated_t0_train": MixtureRegistry(
+    #     mixture_name="translated_t0_train",
+    #     mixture=t0_mixture,
+    #     include_translated=True
+    #     ).create_dataset(),
+    # "translated_t0_plus_train": MixtureRegistry(
+    #     mixture_name="translated_t0_plus_train",
+    #     mixture=t0_mixture+gpt_mixture,
+    #     include_translated=True
+    #     ).create_dataset(),
+    # "translated_t0_plus_plus_train": MixtureRegistry(
+    #     mixture_name="translated_t0_plus_plus_train",
+    #     mixture=t0_mixture+gpt_mixture+sglue_mixture,
+    #     include_translated=True
+    #     ).create_dataset(),
 }

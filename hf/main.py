@@ -48,7 +48,7 @@ from transformers.utils.versions import require_version
 import math
 import random
 
-# import tasks
+from tasks import training_mixtures
 # from p3 import p3
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -57,116 +57,6 @@ import random
 # require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/translation/requirements.txt")
 
 logger = logging.getLogger(__name__)
-
-MT0_LANG_TO_PROBS = {
-    'en': 5.67,
-    'ru': 3.71,
-    'es': 3.09,
-    'de': 3.05,
-    'fr': 2.89,
-    'it': 2.43,
-    'pt': 2.36,
-    'pl': 2.15,
-    'nl': 1.98,
-    'tr': 1.93,
-    'ja': 1.92,
-    'vi': 1.87,
-    'id': 1.80,
-    'cs': 1.72,
-    'zh': 1.67,
-    'fa': 1.67,
-    'ar': 1.66,
-    'sv': 1.61,
-    'ro': 1.58,
-    'el': 1.54,
-    'uk': 1.51,
-    'hu': 1.48,
-    'da': 1.38,
-    'fi': 1.35,
-    'no': 1.33,
-    'bg': 1.29,
-    'hi': 1.21,
-    'sk': 1.19,
-    'ko': 1.14,
-    'th': 1.14,
-    'ca': 1.12,
-    'ms': 1.09,
-    'iw': 1.06,
-    'lt': 1.04,
-    'sl': 0.95,
-    'mr': 0.93,
-    'bn': 0.91,
-    'et': 0.89,
-    'lv': 0.87,
-    'az': 0.82,
-    'gl': 0.79,
-    'cy': 0.76,
-    'sq': 0.76,
-    'ta': 0.73,
-    'sr': 0.72,
-    'ne': 0.69,
-    'lb': 0.68,
-    'hy': 0.65,
-    'kk': 0.65,
-    'ka': 0.64,
-    'mt': 0.64,
-    'af': 0.63,
-    'fil': 0.62,
-    'is': 0.62,
-    'mk':0.62,
-    'ml':0.62,
-    'mn':0.62,
-    'ur':0.61,
-    'be':0.59,
-    'la':0.58,
-    'eu':0.57,
-    'tg':0.54,
-    'te':0.52,
-    'fy':0.51,
-    'kn':0.51,
-    'ky':0.50,
-    'sw':0.50,
-    'so':0.48,
-    'my':0.47,
-    'uz':0.46,
-    'km':0.46,
-    'ru-Latn':0.46,
-    'sd':0.45,
-    'gu':0.43,
-    'hi-Latn':0.43,
-    'jv':0.42,
-    'zu':0.42,
-    'si':0.41,
-    'ja-Latn':0.41,
-    'eo':0.40,
-    'co':0.40,
-    'ga':0.40,
-    'el-Latn':0.39,
-    'zh-Latn':0.37,
-    'pa':0.37,
-    'ceb':0.36,
-    'mg':0.36,
-    'ps':0.36,
-    'sn':0.35,
-    'gd':0.35,
-    'ku':0.34,
-    'hmn':0.34,
-    'su':0.34,
-    'ht':0.33,
-    'ha':0.33,
-    'ny':0.29,
-    'am':0.29,
-    'bg-Latn':0.29,
-    'yi':0.28,
-    'lo':0.28,
-    'mi':0.25,
-    'sm':0.25,
-    'ig':0.24,
-    'haw':0.24,
-    'xh':0.22,
-    'st':0.22,
-    'yo':0.20
-}
 
 @dataclass
 class ModelArguments:
@@ -383,28 +273,6 @@ def main():
     #
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
-    if data_args.dataset_name is not None:
-        # Downloading and loading a dataset from the hub.
-        if data_args.dataset_name == "mc4":
-            dataset_list = list()
-            probs_list = list()
-            for lang, prob in MT0_LANG_TO_PROBS.items():
-                dataset_list.append(load_dataset(data_args.dataset_name, lang, split="train", streaming=True, cache_dir=model_args.cache_dir))
-                probs_list.append(prob / 100)
-                # probs_list.append(0.5)
-            raw_datasets = interleave_datasets(dataset_list, probabilities=probs_list, seed=42)
-
-        # raw_datasets = load_dataset(
-        #     data_args.dataset_name,
-        #     data_args.dataset_config_name,
-        #     cache_dir=model_args.cache_dir
-        # )
-
-    elif data_args.seqio_mixture_name is not None:
-        raw_datasets = load_dataset(
-            p3.__file__,
-            data_args.seqio_mixture_name
-            )
 
     # Load pretrained model and tokenizer
     #
@@ -469,79 +337,27 @@ def main():
             f"`{model.__class__.__name__}`. This will lead to loss being calculated twice and will take up more memory"
         )
 
-    def preprocess_function(examples):
-        text = examples['text']
-        max_input_length_before_eos = data_args.max_input_length - 2
-        tokenized_text = tokenizer.encode_plus(
-            text,
+    def seq2seq_preprocess(examples):
+
+        tokenized_inputs = {}
+        tokenized_inputs = tokenizer(
+                examples['inputs'],
+                add_special_tokens=True,
+                padding='max_length',
+                max_length=data_args.max_input_length,
+                truncation=True
+                )
+
+        tokenized_inputs['label_ids'] = tokenizer(
+            examples['labels'],
             add_special_tokens=False,
-            padding=False,
-        )
-
-        # following select_random_chunk function 
-        # in https://github.com/google-research/text-to-text-transfer-transformer/blob/06a0f54bd02b6222399ccee0107a6f881b030fff/t5/data/preprocessors.py#L2075
-        if len(tokenized_text['input_ids']) > max_input_length_before_eos:
-            num_segments = int(math.ceil(float(len(tokenized_text['input_ids'])) / float(max_input_length_before_eos)))
-            start = max_input_length_before_eos * random.randint(0, num_segments)
-            end = min(start + max_input_length_before_eos, len(tokenized_text['input_ids']))
-            all_input_ids = tokenized_text['input_ids'][start:end]
-        else:
-            all_input_ids = tokenized_text['input_ids']
-        assert len(all_input_ids) <= max_input_length_before_eos
-
-        if len(all_input_ids) >= 2:
-            split_idx = random.randint(1, len(all_input_ids) - 1)
-            split_input_ids = all_input_ids[:min(split_idx, data_args.max_input_length - 1)] 
-            split_input_ids += [tokenizer.eos_token_id]
-
-            split_label_ids = all_input_ids[split_idx:min(len(all_input_ids), split_idx + data_args.max_target_length - 1)] 
-            split_label_ids += [tokenizer.eos_token_id]
-            # print("decode:", tokenizer.decode(tokenized_text['input_ids']))
-            # print("decode input_ids:", tokenizer.decode(input_ids))
-            # print("decode label_ids:", tokenizer.decode(label_ids))
-        else:
-            split_input_ids = all_input_ids + [tokenizer.eos_token_id]
-            split_label_ids = [tokenizer.eos_token_id]
-        
-        # convert back to text 
-        assert len(split_input_ids) <= data_args.max_input_length
-        assert len(split_label_ids) <= data_args.max_target_length
-
-        inputs = tokenizer.decode(split_input_ids) 
-        targets = tokenizer.decode(split_label_ids)
-
-        # print("🔢 len(all_input_ids)", len(all_input_ids))
-        # print("len(split_input_ids)", len(split_input_ids))
-        # print("len(split_label_ids)", len(split_label_ids))
-        # print("split_label_ids", split_label_ids)
-        # print("targets:", targets)
-
-        model_inputs = tokenizer.encode_plus(
-            inputs,
-            add_special_tokens=False,
-            padding=padding,
-            max_length=data_args.max_input_length,
-            truncation=True
-        )
-
-        model_inputs['labels'] = tokenizer.encode(
-            targets,
-            add_special_tokens=False,
-            padding=padding,
+            padding='max_length',
             max_length=data_args.max_target_length,
             truncation=True
-        )
+            )['input_ids']
 
-        # print(tokenizer.decode(model_inputs['input_ids']))
-        # print(tokenizer.decode(model_inputs['labels']))
-        # print(model_inputs['labels'])
-        # print("🐞 model_inputs", len(model_inputs['input_ids']))
-        # print("🐞 model_inputs labels", len(model_inputs['labels']))
-        
-        if padding == "max_length" and data_args.ignore_pad_token_for_loss:
-            model_inputs['labels'][model_inputs['labels'] == tokenizer.pad_token_id] = -100
-        
-        return model_inputs
+        tokenized_inputs["label_ids"] = [-100 if t == tokenizer.pad_token_id else t for t in tokenized_inputs["label_ids"]]
+        return tokenized_inputs
 
     if training_args.do_train:
         # may need https://github.com/huggingface/datasets/issues/2583
@@ -550,8 +366,7 @@ def main():
         #     raise ValueError("--do_train requires a train dataset")
         # train_dataset = raw_datasets["train"]
         
-        raw_datasets = raw_datasets.with_format("torch")
-        train_dataset = raw_datasets
+        train_dataset = training_mixtures[data_args.dataset_name].create_dataset()
         # print(list(islice(train_dataset, 1))) # [{'text': ..., 'timestamp': ..., 'url': ...}]
         if data_args.max_train_samples is not None:
             train_dataset = train_dataset.select(range(data_args.max_train_samples))
@@ -563,7 +378,12 @@ def main():
             #     load_from_cache_file=not data_args.overwrite_cache,
             #     desc="Padding and Tensorize",
             # )
-            train_dataset = train_dataset.map(preprocess_function)
+            pass
+            train_dataset = train_dataset.map(
+               #preprocess_function,
+               seq2seq_preprocess,
+               #num_proc=2, #os.cpu_count()
+            )
 
     if training_args.do_eval:
         # max_target_length = data_args.max_target_length
