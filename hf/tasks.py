@@ -17,10 +17,10 @@ MAX_EXAMPLES_PER_TASK = 500_000
 DEFAULT_TEMPERATURE = 1.0 / 0.3
 _num_proc = multiprocessing.cpu_count()
 
-try:
-    cache_path = os.environ["HF_DATASETS_CACHE"]
-except:
-    cache_path = "~/.cache/mt0_tasks/"
+# try:
+#     cache_path = os.environ["HF_DATASETS_CACHE"]
+# except:
+cache_path = "~/.cache/mt0_tasks/"
 
 # add_translated_prompt_templates()
 
@@ -99,6 +99,7 @@ class MixtureRegistry:
                         dataset_sub_samples = dataset_samples['train'].shuffle(seed=42+idx).select(range(0,cap))
                         dataset = self._apply_template(dataset_sub_samples, dataset_templates[template])
                         dataset.save_to_disk(template_save_path)
+                        print("Cache Sucessful")
 
                     except Exception as e:
                         print(e)
