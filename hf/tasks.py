@@ -20,7 +20,8 @@ _num_proc = multiprocessing.cpu_count()
 try:
     cache_path = os.environ["HF_DATASETS_CACHE"]
 
-except:
+except Exception as e:
+    print(e)
     cache_path = "~/.cache/mt0_tasks/"
     cache_path = os.path.expanduser(cache_path)
 
