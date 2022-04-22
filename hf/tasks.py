@@ -17,10 +17,14 @@ MAX_EXAMPLES_PER_TASK = 500_000
 DEFAULT_TEMPERATURE = 1.0 / 0.3
 _num_proc = multiprocessing.cpu_count()
 
-# try:
-#     cache_path = os.environ["HF_DATASETS_CACHE"]
-# except:
-cache_path = "~/.cache/mt0_tasks/"
+try:
+    cache_path = os.environ["HF_DATASETS_CACHE"]
+
+except:
+    cache_path = "~/.cache/mt0_tasks/"
+    cache_path = os.path.expanduser(cache_path)
+
+print("Using {}".format(cache_path))
 
 # add_translated_prompt_templates()
 
