@@ -18,8 +18,8 @@ DEFAULT_TEMPERATURE = 1.0 / 0.3
 _num_proc = multiprocessing.cpu_count()
 
 try:
-    cache_path = os.environ["HF_DATASETS_CACHE"]
-
+    # cache_path = os.environ["HF_DATASETS_CACHE"]
+    cache_path = "/mnt/ssd-cluster/mt0-data/"
 except Exception as e:
     print(e)
     cache_path = "~/.cache/mt0_tasks/"
