@@ -51,82 +51,86 @@ class MixtureRegistry:
         # Dict to hold all task datasets and sampling probabilities
         self.task_dict = {}
 
-        # def add_task(self, dataset_name=None, subset_name=None, mixture=None):
-        for dataset_name, subset_name in self.mixture:
-
-            if subset_name is not None:
-                task_name = "{}_{}".format(dataset_name, subset_name)
-            else:
-                task_name = dataset_name
-
-            dataset_templates = DatasetTemplates(
-                dataset_name=dataset_name,
-                subset_name=subset_name
-                )
-
-            dataset_samples = load_dataset(
-                dataset_name,
-                subset_name
-            )
-
-            if self.include_translated:
-                template_list = dataset_templates.all_template_names
-            else:
-                #filter translated prompts
-                template_list = [t for t in dataset_templates.all_template_names if "-translate-" not in t]
-
-            num_templates = len(template_list)
-
-            info = get_dataset_infos(dataset_name)
-            subset_info = subset_name or list(info.keys())[0]
-            dataset_splits = info[subset_info].splits
-
-            train_size = dataset_splits['train'].num_examples
-
-            if train_size*num_templates > self.max_examples:
-                cap = self.max_examples // num_templates
-            else:
-                cap = train_size
-
-            for idx, template in enumerate(template_list):
-                template_save_path = os.path.join(
-                    self.save_to_disk,
-                    'tasks/{}/{}'.format(task_name, template)
-                    )
-                try:
-                    dataset = load_from_disk(
-                        template_save_path
-                        )
-                    print("Dataset+prompt already cached, loading from disk")
-                except:
-                    print("Dataset+prompt not yet cached")
-                    try:
-                        dataset_sub_samples = dataset_samples['train'].shuffle(seed=42+idx).select(range(0,cap))
-                        dataset = self._apply_template(dataset_sub_samples, dataset_templates[template])
-                        dataset.save_to_disk(template_save_path)
-                        print("Cache Sucessful")
-
-                    except Exception as e:
-                        print(e)
-                        print("Failed to cached this template")
-                        print(dataset_templates[template].jinja)
-
-                self.task_dict["{}_{}".format(task_name,template)] = {
-                    'datasets': dataset,
-                    'probabilities': cap,
-                }
-
-    def create_dataset(self):
-
-        mixture_path =  os.path.join(
+        self.mixture_path =  os.path.join(
             self.save_to_disk,
             self.mixture_name
         )
 
         try:
-            multitask_dataset = load_from_disk(mixture_path)
-            return multitask_dataset
+            self.multitask_dataset = load_from_disk(self.mixture_path)
+            print("Mixture has been loaded from {}".format(self.mixture_path))
         except:
+            self.multitask_dataset = False
+            print("Building Mixture to {}".format(self.mixture_path))
+
+            # def add_task(self, dataset_name=None, subset_name=None, mixture=None):
+            for dataset_name, subset_name in self.mixture:
+
+                if subset_name is not None:
+                    task_name = "{}_{}".format(dataset_name, subset_name)
+                else:
+                    task_name = dataset_name
+
+                dataset_templates = DatasetTemplates(
+                    dataset_name=dataset_name,
+                    subset_name=subset_name
+                    )
+
+                dataset_samples = load_dataset(
+                    dataset_name,
+                    subset_name
+                )
+
+                if self.include_translated:
+                    template_list = dataset_templates.all_template_names
+                else:
+                    #filter translated prompts
+                    template_list = [t for t in dataset_templates.all_template_names if "-translate-" not in t]
+
+                num_templates = len(template_list)
+
+                info = get_dataset_infos(dataset_name)
+                subset_info = subset_name or list(info.keys())[0]
+                dataset_splits = info[subset_info].splits
+
+                train_size = dataset_splits['train'].num_examples
+
+                if train_size*num_templates > self.max_examples:
+                    cap = self.max_examples // num_templates
+                else:
+                    cap = train_size
+
+                for idx, template in enumerate(template_list):
+                    template_save_path = os.path.join(
+                        self.save_to_disk,
+                        'tasks/{}/{}'.format(task_name, template)
+                        )
+                    try:
+                        dataset = load_from_disk(
+                            template_save_path
+                            )
+                        print("Dataset+prompt already cached, loading from disk")
+                    except:
+                        print("Dataset+prompt not yet cached")
+                        try:
+                            dataset_sub_samples = dataset_samples['train'].shuffle(seed=42+idx).select(range(0,cap))
+                            dataset = self._apply_template(dataset_sub_samples, dataset_templates[template])
+                            dataset.save_to_disk(template_save_path)
+                            print("Cache Sucessful")
+
+                        except Exception as e:
+                            print(e)
+                            print("Failed to cached this template")
+                            print(dataset_templates[template].jinja)
+
+                    self.task_dict["{}_{}".format(task_name,template)] = {
+                        'datasets': dataset,
+                        'probabilities': cap,
+                    }
+
+    def create_dataset(self):
+
+        if self.multitask_dataset is False:
             task_dict = self.task_dict
 
             mixture = [task_dict[key]['datasets'] for key in task_dict]
@@ -140,11 +144,13 @@ class MixtureRegistry:
 
             if self.save_to_disk != None:
                 multitask_dataset.save_to_disk(
-                    mixture_path
+                    self.mixture_path
                     )
 
             return multitask_dataset
 
+        else:
+            return self.multitask_dataset
 
     def _apply_template(self, dataset, template, map_fn=None):
         def _map_fn(ex):
