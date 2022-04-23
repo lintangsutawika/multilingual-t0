@@ -375,20 +375,21 @@ def main():
         # print(list(islice(train_dataset, 1))) # [{'text': ..., 'timestamp': ..., 'url': ...}]
         if data_args.max_train_samples is not None:
             train_dataset = train_dataset.select(range(data_args.max_train_samples))
-        with training_args.main_process_first(desc="train dataset map pre-processing"):
-            # train_dataset = train_dataset.map(
-            #     preprocess_function,
-            #     num_proc=data_args.preprocessing_num_workers,
-            #     remove_columns=column_names,
-            #     load_from_cache_file=not data_args.overwrite_cache,
-            #     desc="Padding and Tensorize",
-            # )
-            pass
-            train_dataset = train_dataset.map(
-               #preprocess_function,
-               seq2seq_preprocess,
-               #num_proc=2, #os.cpu_count()
-            )
+
+        # with training_args.main_process_first(desc="train dataset map pre-processing"):
+        #     # train_dataset = train_dataset.map(
+        #     #     preprocess_function,
+        #     #     num_proc=data_args.preprocessing_num_workers,
+        #     #     remove_columns=column_names,
+        #     #     load_from_cache_file=not data_args.overwrite_cache,
+        #     #     desc="Padding and Tensorize",
+        #     # )
+        #     pass
+        #     train_dataset = train_dataset.map(
+        #        #preprocess_function,
+        #        seq2seq_preprocess,
+        #        num_proc=os.cpu_count(),
+        #     )
 
     if training_args.do_eval:
         # max_target_length = data_args.max_target_length

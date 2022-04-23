@@ -38,6 +38,7 @@ class MixtureRegistry:
         max_examples=MAX_EXAMPLES_PER_TASK,
         include_translated=False,
         save_to_disk=cache_path,
+        pretrained_tokenizer=None,
         ):
         super(MixtureRegistry, self).__init__()
 
@@ -47,6 +48,7 @@ class MixtureRegistry:
         self.max_examples = max_examples
         self.include_translated = include_translated
         self.save_to_disk = save_to_disk
+        self.pretrained_tokenizer = pretrained_tokenizer
 
         # Dict to hold all task datasets and sampling probabilities
         self.task_dict = {}
@@ -140,6 +142,38 @@ class MixtureRegistry:
 
             multitask_dataset = concatenate_datasets(
                 mixture,
+                )
+
+            if self.pretrained_tokenizer is not None:
+
+                from transformers import AutoTokenizer
+                tokenizer = AutoTokenizer.from_pretrained(self.pretrained_tokenizer)
+
+                def _tokenize(examples):
+
+                    tokenized_inputs = {}
+                    tokenized_inputs = tokenizer(
+                            examples['inputs'],
+                            add_special_tokens=True,
+                            padding='max_length',
+                            max_length=1024,
+                            truncation=True
+                            )
+
+                    tokenized_inputs['label_ids'] = tokenizer(
+                        examples['labels'],
+                        add_special_tokens=False,
+                        padding='max_length',
+                        max_length=256,
+                        truncation=True
+                        )['input_ids']
+
+                    tokenized_inputs["label_ids"] = [-100 if t == tokenizer.pad_token_id else t for t in tokenized_inputs["label_ids"]]
+                    return tokenized_inputs
+
+                multitask_dataset = multitask_dataset.map(
+                   _tokenize,
+                   num_proc=_num_proc,
                 )
 
             if self.save_to_disk != None:
