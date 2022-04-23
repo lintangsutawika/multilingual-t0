@@ -12,15 +12,6 @@
         "enabled": "auto"
     },
 
-    // "scheduler": {
-    //     "type": "WarmupLR",
-    //     "params": {
-    //         "warmup_min_lr": "auto",
-    //         "warmup_max_lr": "auto",
-    //         "warmup_num_steps": "auto"
-    //     }
-    // },
-
     "zero_optimization": {
         "stage": 2,
         "offload_optimizer": {
