@@ -252,32 +252,34 @@ sglue_mixture = [
     ["super_glue", "wic"], # Word Sense Disambiguation
 ]
 
-training_mixtures = {
-    "t0_train": MixtureRegistry(
-        mixture_name="t0_train",
-        mixture=t0_mixture
-        ).create_dataset(),
-    "t0_plus_train": MixtureRegistry(
-        mixture_name="t0_plus_train",
-        mixture=t0_mixture+gpt_mixture
-        ).create_dataset(),
-    "t0_plus_plus_train": MixtureRegistry(
-        mixture_name="t0_plus_plus_train",
-        mixture=t0_mixture+gpt_mixture+sglue_mixture
-        ).create_dataset(),
-    "translated_t0_train": MixtureRegistry(
-        mixture_name="translated_t0_train",
-        mixture=t0_mixture,
-        include_translated=True
-        ).create_dataset(),
-    "translated_t0_plus_train": MixtureRegistry(
-        mixture_name="translated_t0_plus_train",
-        mixture=t0_mixture+gpt_mixture,
-        include_translated=True
-        ).create_dataset(),
-    "translated_t0_plus_plus_train": MixtureRegistry(
-        mixture_name="translated_t0_plus_plus_train",
-        mixture=t0_mixture+gpt_mixture+sglue_mixture,
-        include_translated=True
-        ).create_dataset(),
-}
+if __name__ == '__main__':
+
+    training_mixtures = {
+        "t0_train": MixtureRegistry(
+            mixture_name="t0_train",
+            mixture=t0_mixture
+            ).create_dataset(),
+        "t0_plus_train": MixtureRegistry(
+            mixture_name="t0_plus_train",
+            mixture=t0_mixture+gpt_mixture
+            ).create_dataset(),
+        "t0_plus_plus_train": MixtureRegistry(
+            mixture_name="t0_plus_plus_train",
+            mixture=t0_mixture+gpt_mixture+sglue_mixture
+            ).create_dataset(),
+        "translated_t0_train": MixtureRegistry(
+            mixture_name="translated_t0_train",
+            mixture=t0_mixture,
+            include_translated=True
+            ).create_dataset(),
+        "translated_t0_plus_train": MixtureRegistry(
+            mixture_name="translated_t0_plus_train",
+            mixture=t0_mixture+gpt_mixture,
+            include_translated=True
+            ).create_dataset(),
+        "translated_t0_plus_plus_train": MixtureRegistry(
+            mixture_name="translated_t0_plus_plus_train",
+            mixture=t0_mixture+gpt_mixture+sglue_mixture,
+            include_translated=True
+            ).create_dataset(),
+    }
