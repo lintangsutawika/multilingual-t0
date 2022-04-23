@@ -143,6 +143,7 @@ class MixtureRegistry:
                 )
 
             if self.save_to_disk != None:
+                print('saved created dataset')
                 multitask_dataset.save_to_disk(
                     self.mixture_path
                     )
@@ -150,6 +151,7 @@ class MixtureRegistry:
             return multitask_dataset
 
         else:
+            print('Loaded created dataset')
             return self.multitask_dataset
 
     def _apply_template(self, dataset, template, map_fn=None):
