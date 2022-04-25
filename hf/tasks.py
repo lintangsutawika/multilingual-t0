@@ -25,8 +25,8 @@ except Exception as e:
     cache_path = "~/.cache/mt0_tasks/"
     cache_path = os.path.expanduser(cache_path)
 
-tmp_cache_path = "~/.cache/mt0_tasks/"
-tmp_cache_path = os.path.expanduser(cache_path)
+# tmp_cache_path = "~/.cache/mt0_tasks/"
+# tmp_cache_path = os.path.expanduser(cache_path)
 print("Using {}".format(cache_path))
 
 # add_translated_prompt_templates()
@@ -106,7 +106,7 @@ class MixtureRegistry:
 
                 for idx, template in enumerate(template_list):
                     template_save_path = os.path.join(
-                        tmp_cache_path,
+                        self.save_to_disk,
                         'tasks/{}/{}'.format(task_name, template)
                         )
                     try:
