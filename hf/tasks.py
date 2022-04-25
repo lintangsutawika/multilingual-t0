@@ -117,15 +117,20 @@ class MixtureRegistry:
                     except:
                         print("Dataset+prompt not yet cached")
                         try:
-                            dataset_sub_samples = dataset_samples['train'].shuffle(seed=42+idx).select(range(0,cap))
+                            dataset_sub_samples = dataset_samples['train'].shuffle(seed=42+idx, keep_in_memory=True).select(range(0,cap))
                             dataset = self._apply_template(dataset_sub_samples, dataset_templates[template])
                             dataset.save_to_disk(template_save_path)
                             print("Cache Sucessful")
 
                         except Exception as e:
-                            print(e)
                             print("Failed to cached this template")
+                            print("####")
+                            print("ERROR: {}".format(e))
+                            print("####")
+                            print("Jinja Template:")
+                            print("####")
                             print(dataset_templates[template].jinja)
+                            print("####")
 
                     self.task_dict["{}_{}".format(task_name,template)] = {
                         'datasets': dataset,
