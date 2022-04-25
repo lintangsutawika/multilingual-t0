@@ -97,7 +97,7 @@ class MixtureRegistry:
                 subset_info = subset_name or list(info.keys())[0]
                 dataset_splits = info[subset_info].splits
 
-                train_size = datallset_splits['train'].num_examples
+                train_size = dataset_splits['train'].num_examples
 
                 if train_size*num_templates > self.max_examples:
                     cap = self.max_examples // num_templates
