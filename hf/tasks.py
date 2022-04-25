@@ -25,6 +25,8 @@ except Exception as e:
     cache_path = "~/.cache/mt0_tasks/"
     cache_path = os.path.expanduser(cache_path)
 
+tmp_cache_path = "~/.cache/mt0_tasks/"
+tmp_cache_path = os.path.expanduser(cache_path)
 print("Using {}".format(cache_path))
 
 # add_translated_prompt_templates()
@@ -95,7 +97,7 @@ class MixtureRegistry:
                 subset_info = subset_name or list(info.keys())[0]
                 dataset_splits = info[subset_info].splits
 
-                train_size = dataset_splits['train'].num_examples
+                train_size = datallset_splits['train'].num_examples
 
                 if train_size*num_templates > self.max_examples:
                     cap = self.max_examples // num_templates
@@ -104,7 +106,7 @@ class MixtureRegistry:
 
                 for idx, template in enumerate(template_list):
                     template_save_path = os.path.join(
-                        self.save_to_disk,
+                        tmp_cache_path,
                         'tasks/{}/{}'.format(task_name, template)
                         )
                     try:
@@ -293,29 +295,35 @@ if __name__ == '__main__':
     training_mixtures = {
         "t0_train": MixtureRegistry(
             mixture_name="t0_train",
-            mixture=t0_mixture
+            mixture=t0_mixture,
+            pretrained_tokenizer="google/mt5-xl",
             ).create_dataset(),
         "t0_plus_train": MixtureRegistry(
             mixture_name="t0_plus_train",
-            mixture=t0_mixture+gpt_mixture
+            mixture=t0_mixture+gpt_mixture,
+            pretrained_tokenizer="google/mt5-xl",
             ).create_dataset(),
         "t0_plus_plus_train": MixtureRegistry(
             mixture_name="t0_plus_plus_train",
-            mixture=t0_mixture+gpt_mixture+sglue_mixture
+            mixture=t0_mixture+gpt_mixture+sglue_mixture,
+            pretrained_tokenizer="google/mt5-xl",
             ).create_dataset(),
         "translated_t0_train": MixtureRegistry(
             mixture_name="translated_t0_train",
             mixture=t0_mixture,
+            pretrained_tokenizer="google/mt5-xl",
             include_translated=True
             ).create_dataset(),
         "translated_t0_plus_train": MixtureRegistry(
             mixture_name="translated_t0_plus_train",
             mixture=t0_mixture+gpt_mixture,
+            pretrained_tokenizer="google/mt5-xl",
             include_translated=True
             ).create_dataset(),
         "translated_t0_plus_plus_train": MixtureRegistry(
             mixture_name="translated_t0_plus_plus_train",
             mixture=t0_mixture+gpt_mixture+sglue_mixture,
+            pretrained_tokenizer="google/mt5-xl",
             include_translated=True
             ).create_dataset(),
     }
