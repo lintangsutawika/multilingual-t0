@@ -52,6 +52,7 @@ def add_translated_prompt_templates():
         for language_code in language_code_list:
             translated_template_string = row[language_code]
 
+            translated_template_string = re.sub(r'٪', '%', translated_template_string)
             translated_template_string = re.sub(r'(?:\|).*(?:\|)', '|||', translated_template_string)
 
             regex = r"(?:{).*?(?:})"
