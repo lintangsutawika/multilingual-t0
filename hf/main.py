@@ -318,17 +318,6 @@ def main():
     # from parallelformers import parallelize
     # parallelize(model, num_gpus=8, fp16=False, verbose='detail')
     # print("parallelization done!")
-    device_map = {
-    0: [0, 23],
-    1: [1, 2, 3],
-    2: [4, 5, 6],
-    3: [7, 8, 9],
-    4: [10,11,12],
-    5: [13,14,15],
-    6: [16,17,18],
-    7: [19,20,21,22],
-    }
-    model.parallelize(device_map)
 
     prefix = data_args.source_prefix if data_args.source_prefix is not None else ""
 
