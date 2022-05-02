@@ -50,7 +50,6 @@ from transformers.utils.versions import require_version
 import math
 import random
 
-from tasks import MixtureRegistry
 # from p3 import p3
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -372,7 +371,7 @@ def main():
         # if "train" not in raw_datasets:
         #     raise ValueError("--do_train requires a train dataset")
         # train_dataset = raw_datasets["train"]
-        
+        from tasks import MixtureRegistry
         train_dataset = MixtureRegistry(
             mixture_name=data_args.dataset_name,
             ).create_dataset()
