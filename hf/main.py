@@ -316,7 +316,7 @@ def main():
         raise ValueError("Make sure that `config.decoder_start_token_id` is correctly defined")
 
     from parallelformers import parallelize
-    parallelize(model, num_gpus=8, verbose='detail')
+    parallelize(model, fp16=False, num_gpus=8, verbose='detail')
 
     prefix = data_args.source_prefix if data_args.source_prefix is not None else ""
 
