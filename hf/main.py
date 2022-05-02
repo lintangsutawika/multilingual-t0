@@ -318,6 +318,7 @@ def main():
     # from parallelformers import parallelize
     # parallelize(model, num_gpus=8, fp16=False, verbose='detail')
     # print("parallelization done!")
+    model.parallelize()
 
     prefix = data_args.source_prefix if data_args.source_prefix is not None else ""
 
